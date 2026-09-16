@@ -6,7 +6,9 @@ Catch a moving ball to enter Guessing mode. Reveal letters to solve the level's 
 
 ## Project status
 
-Planning stage. No application or executable setup commands exist yet.
+Product baseline v1.0 accepted on 2026-09-16. M0 preparation remains: wireframes, shared agent workflow files, and the M1 implementation brief. No application or executable setup commands exist yet.
+
+Claude handles implementation and tests; Codex handles planning, coordination, verification, and code review.
 
 See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance criteria, tests, and estimates.
 

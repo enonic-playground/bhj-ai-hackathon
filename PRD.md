@@ -1,6 +1,8 @@
 # Hac-Man — Product Requirements Document
 
-Status: proposed implementation baseline. Planning only; game development has not started.
+Status: accepted implementation baseline, version 1.0. Approved by the project owner on 2026-09-16. Game development has not started.
+
+Claude owns implementation and tests; Codex owns planning, coordination, verification, and code review. Future scope changes must be recorded explicitly against this baseline.
 
 ## 1. Concept and intended outcome
 
@@ -96,7 +98,7 @@ State transitions are centralized and processed once. UI input is routed only to
 - Apply app updates at the title screen or after a run, never by forcing reload during play. Validate offline behavior against the production build.
 - No analytics, login, server, or runtime AI service. Static hosting is the intended delivery model; provider selection and public publishing are separate implementation decisions.
 
-## 6. Proposed implementation structure
+## 6. Implementation structure
 
 Use TypeScript, Vite, Canvas 2D for the maze, and HTML/CSS for menus, HUD, and guessing controls. Keep the simulation independent of rendering and browser APIs. Use Vitest for unit/integration checks and Playwright for browser journeys. Pin compatible dependencies when implementation starts.
 
@@ -178,4 +180,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-Next implementation action: M1, after reviewing this proposed scope. This planning task creates the PRD only; the final setup README is a Day 3 deliverable based on verified implementation commands.
+The product baseline is finalized. Before handing M1 to Claude, complete the remaining M0 preparation: wireframe descriptions, shared agent workflow files, and the M1 implementation brief. The final setup README is a Day 3 deliverable based on verified implementation commands.
