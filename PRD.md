@@ -180,4 +180,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-The product baseline is finalized. Before handing M1 to Claude, complete the remaining M0 preparation: wireframe descriptions, shared agent workflow files, and the M1 implementation brief. The final setup README is a Day 3 deliverable based on verified implementation commands.
+The product baseline is finalized and shared agent workflow files are in place. Before handing M1 to Claude, complete the remaining M0 preparation: wireframe descriptions and the M1 implementation brief. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
