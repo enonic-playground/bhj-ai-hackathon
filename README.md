@@ -12,12 +12,16 @@ See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance c
 
 ## Three-day delivery target
 
-| Day | Outcome | Focused time |
+| Day | Outcome | Focused time before contingency |
 | --- | --- | ---: |
-| 1 | Product definition, rules, scope, and milestones | 4–5 hours |
-| 2 | Playable maze, guessing loop, and core arcade mechanics | 8–9 hours |
-| 3 | Mobile/PWA completion, polish, testing, and documentation | 8–10 hours |
+| 1 | Product definition, rules, scope, and milestones | 3–4 hours |
+| 2 | Playable maze, guessing loop, and core arcade mechanics | 6.5–8 hours |
+| 3 | Campaign, mobile/PWA completion, polish, testing, and documentation | 5–6.5 hours |
 
-Estimated total: **20–24 focused hours**, across approximately **10 work sessions**, and **180,000–400,000 cumulative assistant input/output tokens**. These are planning estimates with assumptions detailed in the PRD.
+Base estimate: **16.5–20.5 focused hours**, including **8–11 hours of active Codex sessions**, across **9–10 sessions**, and **1.00–2.45 million cumulative model tokens**.
+
+Budget including contingency: **18.5–24 focused hours**, including **9–13 hours of active Codex sessions**, and **1.2–3.0 million cumulative model tokens**. Allow 1–2 additional repair sessions if needed. Active session time is included in focused work, not added to it.
+
+Tokens include cumulative input and output across model calls, repeated/cached context, and reported reasoning output where available. These are planning allowances, not measured usage or guarantees. [PRD section 9](PRD.md#9-session-and-token-estimates) is the source of truth for estimates and assumptions.
 
 Verified setup, execution, build, test, and installation instructions will be added as the application is implemented and completed by the final milestone.
