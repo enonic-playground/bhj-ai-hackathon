@@ -1,19 +1,19 @@
 # Project status
 
-Updated: 2026-09-17
+Updated: 2026-09-18
 
 ## Current checkpoint
 
 - Product baseline: PRD v1.0 accepted by the project owner.
 - Current milestone: M3 — arcade danger.
-- State: CHANGES_REQUESTED; owner approved the enemy flash and added the M3 ball hue-cycle amendment (D015).
-- Current owner: Claude (M3 ball visibility amendment). Codex has completed the planning update.
+- State: REVIEW; Claude implemented the D015 ball hue cycle on 2026-09-18 at `80039b67eaab7cf1355669f6edc6a075cddfa9ca`.
+- Current owner: Codex (recheck). Claude has released the checkout.
 - Current milestone handoff: `handoffs/M3.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: `0be0b4399100666b7fc52f488b394375d178cdfb` (M2).
-- Acceptance blockers: AC11 ball hue cycle awaits implementation and review. M3-R1 is CLOSED by owner-approved exception (D015); retain the existing enemy flash. Owner-reported user testing supports that effect; broader pacing/device checks remain unverified. M2-R1/R2 and M1 R1/R2/R3 remain closed.
+- Acceptance blockers: AC11 is implemented and awaits Codex's recheck. M3-R1 is CLOSED by owner-approved exception (D015); retain the existing enemy flash. Owner-reported user testing supports that effect; broader pacing/device checks remain unverified. M2-R1/R2 and M1 R1/R2/R3 remain closed.
 - M3 implementation base: `3b5255a11870d29ce5e25cc3141a258e8740ab24` on `main`. The planning the brief expected to find uncommitted (M2 acceptance, M3 brief, coordination updates) was already committed there, so nothing needed a separate checkpoint. The brief's reference HEAD `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` is that commit's parent.
-- Next action: Claude implements the smooth full-hue ball fill cycle (2,000 ms of active maze time), retains the ring and approved enemy flash, verifies AC11, and records a new implementation SHA and evidence in `handoffs/M3.md`. Return to REVIEW with Codex owning the recheck. Preserve the uncommitted review/amendment documents. M4 remains NOT_STARTED.
+- Next action: Codex rechecks `3ff83337..80039b67` against AC11 in `handoffs/M3.md`, runs the checks independently, and records acceptance or further findings. The planning checkpoint `3ff83337` carries the review and amendment documents. M4 remains NOT_STARTED and must not begin before M3 is accepted.
 
 
 ## Milestones
@@ -23,7 +23,7 @@ Updated: 2026-09-17
 | M0: scope and preparation | ACCEPTED | PRD v1.0 accepted; estimates reconciled; shared workflow files, wireframe descriptions/SVGs, and M1 brief complete. Wireframes visually verified by the project owner on 2026-09-17. |
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
-| M3: arcade danger | CHANGES_REQUESTED | `cf8be8ab`: Codex independently passed install/typecheck/build, 198 tests and 56 browser tests (2 skipped). Gameplay/state checks pass; M3-R1 closed by owner approval. D015/AC11 ball hue cycle remains to implement and review. |
+| M3: arcade danger | REVIEW | `80039b67`: the D015 ball hue cycle on top of the reviewed `cf8be8ab`. Codex had independently passed install/typecheck/build, 198 tests and 56 browser tests there; M3-R1 is closed by owner approval. Claude now reports 204 tests and 62 browser runs (2 skipped) on Node 26.7.0; AC11 awaits Codex's recheck. |
 | M4: complete campaign | NOT_STARTED | Depends on accepted M3. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
@@ -33,6 +33,8 @@ Updated: 2026-09-17
 Owner amendment D015: the owner reports user testing found the existing frightened-enemy flash mild and beneficial and explicitly approves it. M3-R1 is closed by that specification exception, superseding its historical removal request below. M3 now includes AC11, a smooth two-second full-hue ball fill cycle using active maze time. No new implementation or verification is claimed by this planning update; the accepted PRD budget is unchanged.
 
 M3 review round 1 (Codex): independently passed `npm ci`, typecheck, 198 unit/integration tests, production build and the dual-build browser suite (56 passed, 2 intentional skips) on Node 26.7.0. Additional return-routing check passed for 470 legal tile/direction combinations. M3-R1 requests removal of synchronized blue/white frightened-enemy flashing, which conflicts with PRD section 5. M3 is not accepted yet. No human playtest or real-device check was performed, and Node 22.12.0 was not rerun. Review time and Codex tokens were not measured.
+
+M3 amendment round (Claude's reported results): the D015 ball hue cycle is implemented at `80039b67` on top of the reviewed `cf8be8ab`; the review and amendment documents were checkpointed first at `3ff83337`. The ball's fill sweeps every hue once per 2,000 ms of active maze time at constant saturation and lightness, keeps its white ring, freezes with the maze and resumes without spending hidden time, and uses one colour per frame for both tunnel copies. No gameplay, state, timing or input code was touched. `npm run typecheck`, `npm test` (204 tests in 16 files), `npm run build`, `npm run build:fixture` and `npm run test:e2e` (62 passed, 2 intentional skips) all passed on Node 26.7.0 (npm 11.19.0), macOS arm64; the browser suite was run three times end to end and the three new journeys six times each. M3-R1 is closed by owner approval, not by a code change, and the enemy flash is retained; the title instruction that called the power pellet flashing now says pulsing, which is what is drawn. Node 22.12.0 was again unavailable, so the advertised minimum is still not re-verified for M3. Reduced-motion support is not implemented for this effect or for any other decorative motion. Claude's additional work was about 1 h; token usage was not measured.
 
 M3 implementation round (Claude's reported results): from a removed `node_modules`, `npm ci`, `npm run typecheck`, `npm test` (198 tests in 15 files, up from 120), `npm run build`, `npm run build:fixture` and `npm run test:e2e` (56 passed, 2 intentional touch-only skips) all passed on Node 26.7.0 (npm 11.19.0), macOS arm64. The browser suite was run four times end to end after the final change, each clean. `npm run dev`, `npm run preview` and `npm run preview:fixture` returned HTTP 200. Verification found and fixed two real UI defects — the mobile guessing panel painted over the pause overlay and swallowed taps meant for Resume, and the four-stat HUD overflowed 360 px — as well as three defects in the new journeys themselves. Node 22.12.0 was **not** available in this session, so the advertised minimum was not re-verified for M3; the engine range and lockfile are unchanged. Mobile evidence is emulation at 360 × 640, the hidden tab is still simulated inside the page, and no human playtest or real-device check is claimed: enemy pacing remains the brief's starting values and is unvalidated. Claude's elapsed work was about 1.5 h against the PRD allocation of 3–3.5 focused hours; token usage was not measured. Screenshots are in `docs/evidence/m3/`; `docs/evidence/m2/` is unchanged.
 
