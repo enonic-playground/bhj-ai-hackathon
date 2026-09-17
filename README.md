@@ -6,7 +6,7 @@ Catch a moving ball to enter Guessing mode. Reveal letters to solve the level's 
 
 ## Project status
 
-Product baseline v1.0 accepted on 2026-09-16. M0 planning is complete. M1 (playable maze) is implemented and awaiting review: the application runs, and the commands below are established and verified. Later milestones add the ball, guessing, enemies, campaign, and PWA behavior.
+Product baseline v1.0 accepted on 2026-09-16. M0 planning is complete. M1 (playable maze) was accepted by Codex on 2026-09-17 after review and independent verification. Later milestones add the ball, guessing, enemies, campaign, and PWA behavior. See [STATUS.md](STATUS.md) for the next action and nonblocking follow-ups.
 
 Claude handles implementation and tests; Codex handles planning, coordination, verification, and code review.
 
