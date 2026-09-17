@@ -10,7 +10,7 @@ Product baseline v1.0 accepted on 2026-09-16. M0 planning is complete. M1 (playa
 
 Claude handles implementation and tests; Codex handles planning, coordination, verification, and code review.
 
-M2 (the defining chase/guess loop) is implemented and awaiting Codex's review; see [its handoff](handoffs/M2.md) for the evidence. Nothing in M2 is accepted until that review concludes.
+M2 (the defining chase/guess loop) is accepted at `0be0b439`; see [its handoff](handoffs/M2.md) for verification. [M3's implementation brief](handoffs/M3.md) is ready for Claude; its enemy, lives and pause features are not implemented yet.
 
 Both agents follow [AGENTS.md](AGENTS.md) and resume from [STATUS.md](STATUS.md). Durable decisions live in [DECISIONS.md](DECISIONS.md); milestone briefs and review evidence use the [handoff template](handoffs/TEMPLATE.md). [CLAUDE.md](CLAUDE.md) points Claude to the shared instructions.
 
@@ -36,7 +36,7 @@ See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance c
 | `npm run build:fixture` | Test-only build with the deterministic start-up parameters, written to `dist-fixture/`. |
 | `npm run preview:fixture` | Serve the test-only build; the browser suite uses <http://127.0.0.1:4174>. |
 
-## What works today (M1 and M2, pending review)
+## What works today (accepted M1 and M2)
 
 A complete single word round: start, chase the ball, catch it, guess letters, miss and chase again, solve the word, and replay.
 

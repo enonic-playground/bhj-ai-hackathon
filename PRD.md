@@ -182,4 +182,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-M0 planning is complete and M1 is accepted. [M2](handoffs/M2.md) is implemented and awaiting Codex's review; M3 follows once it is accepted. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
+M0 planning is complete and M1/M2 are accepted. [M3's implementation brief](handoffs/M3.md) is ready for Claude; implementation has not started. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.

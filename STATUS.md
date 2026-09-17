@@ -5,16 +5,16 @@ Updated: 2026-09-17
 ## Current checkpoint
 
 - Product baseline: PRD v1.0 accepted by the project owner.
-- Current milestone: M2 — defining loop.
-- State: REVIEW; Claude delivered the M2 review round 1 fixes on 2026-09-17.
-- Current owner: Codex (recheck). Claude has released the checkout.
-- Current milestone handoff: `handoffs/M2.md`.
+- Current milestone: M3 — arcade danger.
+- State: READY; implementation brief prepared by Codex on 2026-09-17.
+- Current owner: Claude (implementation). Codex has completed planning and released the checkout.
+- Current milestone handoff: `handoffs/M3.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
-- Last accepted implementation commit: `1a60082863700f816a02a0affe94f805efd570c1`.
-- Acceptance blockers: M2-R1 and M2-R2 are resolved at `0be0b439` and await Codex's recheck; no other blocker is recorded. M1 R1/R2 remain closed and Codex confirmed M1 R3 is resolved.
-- M2 reference base SHA: `1f8fa6032856c5746f0182e8cb8a6701e9feb7d6` on `main`. Actual implementation base: `914bcd12e9ff8062b5c49274c51f8654a66971ac` on `main`, the committed M2 brief; the working tree was clean at that commit.
-- Implementation commit under review: `0be0b4399100666b7fc52f488b394375d178cdfb`, the review round 1 fixes. Review the range `f1e58b35..0be0b439`, or `f6827d10..0be0b439` for the code alone; `f6827d10` is the documentation-only commit that checkpoints Codex's review write-up.
-- Next action: Codex rechecks M2-R1 and M2-R2 and their regressions, reviews the fix diff for regressions elsewhere, and independently reruns `npm ci`, `npm run typecheck`, `npm test`, `npm run build` and `npm run test:e2e`. Do not start M3 yet.
+- Last accepted implementation commit: `0be0b4399100666b7fc52f488b394375d178cdfb` (M2).
+- Acceptance blockers: none to starting M3. M2-R1/R2 and M1 R1/R2/R3 are closed. Real-device and human playtest limitations remain recorded in M2's handoff.
+- M3 reference base HEAD: `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` on `main`. Known uncommitted planning includes the M2 acceptance, M3 brief and coordination updates. Claude must preserve/checkpoint those separately and record the actual implementation base SHA.
+- Next action: Claude reads `handoffs/M3.md`, records its base, marks IMPLEMENTING and delivers enemies, pellets, ordered collisions, lives/death/restart and explicit pause/focus handling with tests. Return a committed implementation SHA and AC evidence in REVIEW. No agent was launched automatically.
+
 
 ## Milestones
 
@@ -22,13 +22,15 @@ Updated: 2026-09-17
 | --- | --- | --- |
 | M0: scope and preparation | ACCEPTED | PRD v1.0 accepted; estimates reconciled; shared workflow files, wireframe descriptions/SVGs, and M1 brief complete. Wireframes visually verified by the project owner on 2026-09-17. |
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
-| M2: defining loop | REVIEW | `0be0b439`: M2-R1 and M2-R2 fixed, with 120 unit/integration tests and 40 browser runs (1 skipped) passing on Node 26.7.0 and 22.12.0. Claude's results; the fix round awaits Codex's independent recheck. |
-| M3: arcade danger | NOT_STARTED | Depends on accepted M2. |
+| M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
+| M3: arcade danger | READY | `handoffs/M3.md`: actionable brief, AC1–AC10, verification and exit demonstration; Claude owns implementation. |
 | M4: complete campaign | NOT_STARTED | Depends on accepted M3. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
 
 ## Verification and budget
+
+M2 review round 2 (Codex): independently passed `npm ci`, typecheck, 120 tests, production build and the dual-build browser suite (39 passed, 1 skipped) on Node 26.7.0. Hidden-time regressions pass and ordinary output contains no fixture controls. M2 is accepted at `0be0b439`. Claude's Node 22.12.0 verification remains reported, not repeated in this round. No real-device or human playtest is claimed. Review time and Codex token usage were not measured. Historical results follow.
 
 M2 fix round 1 (Claude's reported results): frame timing moved into `src/app/frameTiming.ts` so a suspension discards the frame timestamp as well as the loop's buffered time, and the deterministic start-up parameters now exist only in a test-only build (`npm run build:fixture`), with the browser suite serving that build and the ordinary production build separately. From a removed `node_modules`, `npm ci`, `npm run typecheck`, `npm test` (120 tests in 10 files), `npm run build` and `npm run test:e2e` (39 passed, 1 skipped) all passed on Node 26.7.0 (npm 11.19.0) and on the advertised minimum Node 22.12.0 (npm 10.9.0), macOS arm64. `npm run dev`, `npm run preview` and `npm run preview:fixture` returned HTTP 200 on Node 26.7.0. Both new regressions were confirmed failing before the fix. Playwright no longer reuses an already listening preview server, after a stale bundle passed a check the current build failed. Claude's work for this round was about 1.1 h; token usage was not measured. Limitations are unchanged: mobile evidence is emulation, the hidden tab is simulated inside the page because Playwright cannot background a page it drives, and no human playtest or real-device check is claimed.
 

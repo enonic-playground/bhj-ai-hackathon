@@ -129,3 +129,12 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Rationale: a countdown with less than the catch-up bound remaining could otherwise be finished by the act of returning to the tab, which is a real gameplay effect rather than a rounding detail. Keeping the fixtures in a separate build makes the test/production boundary a property of the build rather than a claim in prose, and keeps the deterministic browser journeys intact. Extracting the timing policy is what makes the hidden-page behavior testable without adding a DOM test environment.
 - Authority: Claude's implementation choices under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews), resolving review findings recorded in `handoffs/M2.md`; subject to Codex recheck.
 - Affected documents: `README.md`, `handoffs/M2.md`, `STATUS.md`.
+
+## D013 — M3 one-level arcade implementation contract
+
+- Date: 2026-09-17.
+- Status: milestone planning choices by Codex within accepted PRD v1.0; tunable defaults, not owner-approved scope changes.
+- Decision: M3 adds four distinct enemy policies, explicit home traversal permissions and release/return lifecycle, pellets/frightened scoring, ordered collisions, three lives and death/restart, and pause retaining any active state's remaining timers. The single-word round remains; campaign, fruit, extra life, persistence and sound stay M4. `handoffs/M3.md` specifies initial phase/speed/release/death values and collision/timer interactions so tests share one contract. Full focus-loss pause now replaces M2's temporary input-clear/frame-rebase handling; returning requires explicit Resume.
+- Rationale: makes a complete win/loss game while preventing enemy timers and collisions from breaking the defining chase/guess loop. Pellet/enemy scoring is needed with those features rather than postponed to campaign scoring. Existing fixture isolation and a real production smoke remain mandatory.
+- Authority: owner's request to prepare Claude's M3 implementation brief; Codex's planning role under D002. No scope or accepted budget change.
+- Affected documents: `handoffs/M3.md`, `STATUS.md`, `README.md`, `PRD.md`.
