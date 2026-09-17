@@ -80,3 +80,15 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Rationale: keeps the simulation deterministic and testable without a DOM, prevents invalid level data from reaching players, and satisfies M1's fixed-step and input-cleanup requirements without building M3 systems early.
 - Authority: Claude's implementation choices under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews); subject to Codex review.
 - Affected documents: `README.md`, `handoffs/M1.md`.
+
+## D009 — M1 review round 1 fixes: viewport-owned shell and a narrowed Node range
+
+- Date: 2026-09-17.
+- Status: implementation choices made by Claude to resolve Codex review findings R1 and R2; no PRD, scope, or budget change.
+- Decision:
+  - The application shell occupies exactly the viewport box (`#app { height: 100dvh }`, with a `100vh` fallback) instead of only a minimum height, and the stage may shrink on both axes. The canvas is sized from the stage, so the stage must never be sized by the canvas; a minimum height only let the layout keep the canvas it already had when the window got shorter.
+  - Supported Node versions are declared as the intersection of the pinned toolchain's own ranges, `^22.12.0 || ^24.0.0 || >=26.0.0`, rather than a wider promise the tools cannot keep. Vitest 5 is the narrowest constraint.
+  - `.npmrc` sets `engine-strict=true`, so an unsupported runtime is rejected at `npm ci` with a clear message instead of failing later inside a tool.
+- Rationale: R1 was a layout feedback loop, not a sizing arithmetic error, so the fix belongs in the CSS that bounds the stage rather than in renderer clamping, and it needs no clipping or hidden overflow. R2 was an unkeepable promise; narrowing and enforcing it is honest and fails fast. This refines D008's runtime statement, which recorded only Node 26.7.0.
+- Authority: Claude's implementation fixes under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews); subject to Codex re-review.
+- Affected documents: `README.md`, `package.json`, `.npmrc`, `src/styles.css`, `e2e/layout.spec.ts`, `handoffs/M1.md`.

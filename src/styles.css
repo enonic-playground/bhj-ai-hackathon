@@ -26,11 +26,16 @@ body {
   overflow-x: hidden;
 }
 
+/* The shell owns exactly the viewport box. A fixed height, rather than a
+   minimum, is what lets the maze shrink again after the window gets shorter:
+   with only a minimum, the layout could grow to the canvas it already had, so
+   the stage never reported the smaller height back to the renderer. */
 #app {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--gap);
@@ -99,7 +104,9 @@ body {
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  min-height: 140px;
+  /* Both axes must be free to shrink below the current canvas size. */
+  min-width: 0;
+  min-height: 0;
 }
 
 .stage canvas {
@@ -255,10 +262,6 @@ body {
   .play {
     flex-direction: row;
     align-items: stretch;
-  }
-
-  .stage {
-    min-height: 0;
   }
 
   .panel {

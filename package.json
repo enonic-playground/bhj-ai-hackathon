@@ -6,7 +6,7 @@
   "description": "Maze-chase arcade action combined with letter-by-letter word discovery.",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20.19.0"
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
   },
   "scripts": {
     "dev": "vite",

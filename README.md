@@ -16,7 +16,8 @@ See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance c
 
 ## Requirements
 
-- Node.js 20.19 or newer; developed and verified on Node 26.7.0 with npm 11.19.0.
+- Node.js `^22.12.0 || ^24.0.0 || >=26.0.0`. This is the range all pinned tools support; the narrowest constraint is Vitest 5. Node 20, 21, 23, and 25 are not supported, and `.npmrc` sets `engine-strict=true` so `npm ci` rejects them instead of failing later inside a tool.
+- Verified on Node 22.12.0 (npm 10.9.0), 24.13.0, and 26.7.0 (npm 11.19.0), all on macOS arm64.
 - A Chromium download for the browser tests: `npx playwright install chromium`.
 
 ## Commands
@@ -38,7 +39,7 @@ See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance c
 - Continuous cardinal movement with buffered turns, wall stops, corridor reversal, and side-tunnel wraparound.
 - Dots score 10 points once each; a cleared maze stays playable, since levels end by solving a word from M2 onwards.
 - Arrow keys, WASD, and a visible directional pad, all driving the same movement rules. Handled movement keys suppress page scrolling only while a maze is in play.
-- Responsive shell that keeps the HUD, maze, and pad together at 360 × 640 CSS pixels and uses a side panel on wider viewports, with square tiles at every size.
+- Responsive shell that keeps the HUD, maze, and pad together at 360 × 640 CSS pixels and uses a side panel on wider viewports, with square tiles at every size. The maze refits when the window is resized in either direction, without a reload.
 - A fixed 120 Hz simulation with bounded catch-up, independent of the render cadence; the maze does not advance while the page is hidden.
 
 ## Architecture
