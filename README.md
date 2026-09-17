@@ -30,9 +30,11 @@ See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance c
 | `npm run dev` | Development server on <http://127.0.0.1:5173>. |
 | `npm run typecheck` | TypeScript checking without emitting output. |
 | `npm test` | Unit, simulation, and input tests (Vitest, single run). |
-| `npm run test:e2e` | Playwright browser journeys; builds and previews the app automatically. |
+| `npm run test:e2e` | Playwright browser journeys; builds and previews both builds automatically. |
 | `npm run build` | Type-check the application and write the production build to `dist/`. |
 | `npm run preview` | Serve the production build on <http://127.0.0.1:4173>. |
+| `npm run build:fixture` | Test-only build with the deterministic start-up parameters, written to `dist-fixture/`. |
+| `npm run preview:fixture` | Serve the test-only build; the browser suite uses <http://127.0.0.1:4174>. |
 
 ## What works today (M1 and M2, pending review)
 
@@ -62,11 +64,13 @@ The page exposes a read-only `window.__hacman.getSnapshot()` readout for browser
 
 Randomness, word selection and ball placement are injected, so a test can replay an entire round. The browser tests use three query parameters read once at start-up (`src/app/fixture.ts`): `testSeed=<integer>` seeds the round, `testWord=<index>` pins the word to an entry of the seed list, and `testBall=off` runs the maze with no ball so the movement and layout journeys cannot be interrupted by a legitimate capture. They configure what a round starts with and nothing else: no game state is mutated, no answer is revealed, and the complete-loop journey uses the real spawn rule and the real capture algorithm while chasing the ball with the game's own controls.
 
+Those parameters take effect only in the test-only build. `vite.config.ts` compiles the build-time constant `__TEST_FIXTURES__` to `true` only for `npm run build:fixture`; it is `false` for `npm run dev`, `npm run build` and the Vitest run, which never read the query string. The production build also tree-shakes the dead branch, so an ordinary bundle contains none of the three parameter names, and a visit to `/?testBall=off` plays an ordinary round in the dev server and in production alike. The browser suite therefore serves two builds. The `desktop` and `mobile` projects run against the test-only build on port 4174; the `production` project runs `e2e/production.spec.ts` against the ordinary production build on port 4173, where it plays an unparameterized round and asserts that the parameters neither disable the ball nor pin the word. Frame timing is separated from the DOM in `src/app/frameTiming.ts`, so the hidden-page rules are covered by `tests/frameTiming.test.ts` rather than only by a browser.
+
 ## Known limitations
 
 - Enemies, lives, power pellets, fruit, sound, the five-level campaign, high scores, and PWA install/offline support are not implemented yet; they belong to M3–M5.
 - M2 delivers one round at a time. Play again starts a fresh level one and may pick the same word; campaign progression and the no-repeat 50-word bank are M4.
-- There is no pause interface. Input is dropped and the simulation stops while the page is hidden or unfocused, but the explicit PAUSED state, the pause menu and an explicit resume on return arrive in M3.
+- There is no pause interface. Input is dropped and the simulation stops while the page is hidden or unfocused, and the time spent away is discarded rather than replayed, but the explicit PAUSED state, the pause menu and an explicit resume on return arrive in M3.
 - Mobile behavior is verified with browser emulation at 360 × 640 only. Real-device touch, installation, and offline checks are M5 work.
 - No service worker, manifest, icons, or audio yet.
 

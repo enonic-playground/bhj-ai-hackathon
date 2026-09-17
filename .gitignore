@@ -3,5 +3,6 @@
 # Application build and test output
 node_modules/
 dist/
+dist-fixture/
 test-results/
 playwright-report/

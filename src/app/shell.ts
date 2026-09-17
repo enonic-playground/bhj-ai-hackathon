@@ -6,6 +6,7 @@ import { ALPHABET } from '../game/words.js';
 import { handleGameKey, handleLetterButton, handlePadDirection } from '../input/inputRouter.js';
 import { MazeRenderer } from '../render/renderer.js';
 import { readTestFixture } from './fixture.js';
+import { FrameTiming } from './frameTiming.js';
 
 /** Read-only state readout used by browser tests; it never mutates the game. */
 export interface HacManTestApi {
@@ -73,7 +74,15 @@ export function mountApp(): Game {
   const feedbackOutput = requireElement<HTMLElement>('#word-feedback');
   const missesOutput = requireElement<HTMLElement>('#word-misses');
 
-  const game = new Game(undefined, DEFAULT_CONFIG, readTestFixture(window.location.search));
+  // Fixture parameters take effect only in the test-only build (`npm run
+  // build:fixture`). `__TEST_FIXTURES__` is a build-time constant, so an
+  // ordinary production build drops this branch and the module with it: see
+  // `src/app/fixture.ts`.
+  const game = new Game(
+    undefined,
+    DEFAULT_CONFIG,
+    __TEST_FIXTURES__ ? readTestFixture(window.location.search) : {},
+  );
   const renderer = new MazeRenderer(canvas, game.maze);
   const loop = new FixedStepLoop({
     stepMs: DEFAULT_CONFIG.simulationStepMs,
@@ -308,9 +317,15 @@ export function mountApp(): Game {
     }
   });
 
+  const timing = new FrameTiming({
+    isHidden: () => document.visibilityState === 'hidden',
+    advance: (elapsedMs) => loop.advance(elapsedMs),
+    drop: () => loop.reset(),
+  });
+
   const dropHeldInput = (): void => {
     game.clearInput();
-    loop.reset();
+    timing.suspend();
   };
 
   window.addEventListener('blur', dropHeldInput);
@@ -318,22 +333,14 @@ export function mountApp(): Game {
     if (document.visibilityState === 'hidden') {
       dropHeldInput();
     } else {
-      loop.reset();
+      // Returning rebases the frame clock, so the absence itself is not spent
+      // on the countdown by the first visible frame.
+      timing.suspend();
     }
   });
 
-  let previousTime: number | null = null;
   const frame = (time: number): void => {
-    const delta = previousTime === null ? 0 : time - previousTime;
-    previousTime = time;
-    if (document.visibilityState === 'hidden') {
-      // Nothing advances while the page is hidden, including the resume
-      // countdown. M3 replaces this with the full PAUSED state and an
-      // explicit resume.
-      loop.reset();
-    } else {
-      loop.advance(delta);
-    }
+    timing.frame(time);
     const snapshot = game.snapshot();
     renderer.draw(game);
     applyStatus(snapshot);

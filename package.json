@@ -11,7 +11,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit -p tsconfig.build.json && vite build",
+    "build:fixture": "tsc --noEmit -p tsconfig.build.json && vite build --mode fixture --outDir dist-fixture",
     "preview": "vite preview",
+    "preview:fixture": "vite preview --outDir dist-fixture",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
