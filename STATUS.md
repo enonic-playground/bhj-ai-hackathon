@@ -5,16 +5,16 @@ Updated: 2026-09-17
 ## Current checkpoint
 
 - Product baseline: PRD v1.0 accepted by the project owner.
-- Current milestone: M1 — playable maze.
-- State: ACCEPTED; Codex independently verified the M1 fixes on 2026-09-17.
-- Current owner: Codex (planning the next milestone).
-- Current milestone handoff: `handoffs/M1.md`.
+- Current milestone: M2 — defining loop.
+- State: READY; Claude has not been started by Codex.
+- Current owner: Claude (next to act); Codex planning handoff is complete.
+- Current milestone handoff: `handoffs/M2.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: `1a60082863700f816a02a0affe94f805efd570c1`.
 - Acceptance blockers: none. R1/R2 are closed by Codex. Nonblocking R3: refresh the root lockfile's stale Node engine range in Claude's next checkpoint.
-- Implementation base SHA: `f99531c80f0bf8abf542c95f8b108da157bcab49` (working tree was clean; all planning work was already committed).
-- Implementation commit under review: `1a60082863700f816a02a0affe94f805efd570c1` on `main`. It fixes R1/R2 on top of `86c5f10a91ad0a79e34b5d99ca45c6ac4f010775`, the revision Codex reviewed in round 1; `5a1bfc8` in between is a documentation-only checkpoint of that review write-up.
-- Next action: Codex prepares the M2 implementation brief and includes R3 metadata cleanup. M2 is not READY until its brief exists.
+- M2 reference base SHA: `1f8fa6032856c5746f0182e8cb8a6701e9feb7d6` on `main`; Claude records the actual implementation base after checkpointing this brief if necessary.
+- Implementation commit under review: none; M2 has not started.
+- Next action: Claude reads `handoffs/M2.md`, records the starting checkpoint, implements the ball/guess/single-round loop and R3 cleanup, then returns to Codex with AC1–AC10 evidence.
 
 ## Milestones
 
@@ -22,7 +22,7 @@ Updated: 2026-09-17
 | --- | --- | --- |
 | M0: scope and preparation | ACCEPTED | PRD v1.0 accepted; estimates reconciled; shared workflow files, wireframe descriptions/SVGs, and M1 brief complete. Wireframes visually verified by the project owner on 2026-09-17. |
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
-| M2: defining loop | NOT_STARTED | Depends on accepted M1. |
+| M2: defining loop | READY | `handoffs/M2.md` specifies the single-round loop, AC1–AC10, M1 regressions, and R3 cleanup. |
 | M3: arcade danger | NOT_STARTED | Depends on accepted M2. |
 | M4: complete campaign | NOT_STARTED | Depends on accepted M3. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |

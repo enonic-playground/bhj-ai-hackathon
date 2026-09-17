@@ -92,3 +92,12 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Rationale: R1 was a layout feedback loop, not a sizing arithmetic error, so the fix belongs in the CSS that bounds the stage rather than in renderer clamping, and it needs no clipping or hidden overflow. R2 was an unkeepable promise; narrowing and enforcing it is honest and fails fast. This refines D008's runtime statement, which recorded only Node 26.7.0.
 - Authority: Claude's implementation fixes under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews); subject to Codex re-review.
 - Affected documents: `README.md`, `package.json`, `.npmrc`, `src/styles.css`, `e2e/layout.spec.ts`, `handoffs/M1.md`.
+
+## D010 — M2 single-round implementation boundary
+
+- Date: 2026-09-17.
+- Status: milestone planning choice by Codex within PRD v1.0.
+- Decision: M2 implements a complete single-word round, a small categorized seed list, letter/word scoring, and replay/title actions on completion. Full campaign progression and the 50-word bank remain M4. Start with a configurable two-second wrong-guess countdown. Include M1's nonblocking R3 lockfile metadata cleanup.
+- Rationale: makes the defining chase/guess loop playable and testable without pulling campaign or enemy systems into M2. Correct and wrong guesses, frozen state, input transitions and one-time completion each have explicit acceptance evidence.
+- Authority: owner's request to prepare M2's brief and Codex's agreed planning role; no product scope or budget change.
+- Affected documents: `handoffs/M2.md`, `STATUS.md`, `README.md`, `PRD.md`.

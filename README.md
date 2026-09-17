@@ -10,6 +10,8 @@ Product baseline v1.0 accepted on 2026-09-16. M0 planning is complete. M1 (playa
 
 Claude handles implementation and tests; Codex handles planning, coordination, verification, and code review.
 
+[M2's implementation brief](handoffs/M2.md) is READY for Claude: moving ball, guessing, safe transitions, single-round completion, and M1's remaining lockfile metadata cleanup. M2 implementation has not started.
+
 Both agents follow [AGENTS.md](AGENTS.md) and resume from [STATUS.md](STATUS.md). Durable decisions live in [DECISIONS.md](DECISIONS.md); milestone briefs and review evidence use the [handoff template](handoffs/TEMPLATE.md). [CLAUDE.md](CLAUDE.md) points Claude to the shared instructions.
 
 See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance criteria, tests, and estimates, and [WIREFRAMES.md](WIREFRAMES.md) for the layout references.
