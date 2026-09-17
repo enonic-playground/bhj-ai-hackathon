@@ -1,0 +1,284 @@
+:root {
+  color-scheme: dark;
+  --bg: #05060f;
+  --surface: #101635;
+  --surface-2: #1b2350;
+  --text: #e9ecff;
+  --muted: #a7b0e0;
+  --accent: #ffd23f;
+  --gap: 8px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  overflow-x: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-height: 100dvh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--gap);
+  padding-bottom: calc(var(--gap) + env(safe-area-inset-bottom));
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 6px 10px;
+  background: var(--surface);
+  border-radius: 10px;
+}
+
+.hud__brand {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.hud__stats {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+}
+
+.hud__stat {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.hud__stat dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.hud__stat dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.play {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--gap);
+  min-height: 0;
+}
+
+.stage {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+}
+
+.stage canvas {
+  display: block;
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+/* The play region is focusable for screen readers; show the ring on the maze. */
+.stage:focus-visible {
+  outline: none;
+}
+
+.stage:focus-visible canvas {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.panel {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.panel__hint,
+.panel__note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+  text-align: center;
+}
+
+.panel__note {
+  font-size: 0.7rem;
+}
+
+.pad {
+  display: grid;
+  grid-template-areas:
+    '. up .'
+    'left . right'
+    '. down .';
+  gap: 6px;
+  touch-action: none;
+  user-select: none;
+}
+
+.pad__button {
+  width: 56px;
+  height: 48px;
+  font-size: 1.1rem;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid #3a47a0;
+  border-radius: 10px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.pad__button:active {
+  background: #2c3a86;
+}
+
+.pad__up {
+  grid-area: up;
+}
+.pad__left {
+  grid-area: left;
+}
+.pad__right {
+  grid-area: right;
+}
+.pad__down {
+  grid-area: down;
+}
+
+.button {
+  min-height: 48px;
+  padding: 10px 20px;
+  font: inherit;
+  font-weight: 700;
+  color: #131a3f;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: auto;
+  background: rgba(3, 5, 16, 0.94);
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.overlay__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(420px, 100%);
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid #2b3572;
+  border-radius: 14px;
+}
+
+.overlay__title {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.overlay__lead,
+.overlay__list {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.overlay__subheading {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.overlay__list {
+  padding-left: 18px;
+}
+
+/* Narrow viewports give the maze the space instead: the title screen carries
+   the same milestone note. */
+@media (max-width: 819px) {
+  .panel__note {
+    display: none;
+  }
+}
+
+@media (min-width: 820px) {
+  .play {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .stage {
+    min-height: 0;
+  }
+
+  .panel {
+    flex: 0 0 240px;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: var(--surface);
+    border-radius: 10px;
+  }
+
+  .panel__hint,
+  .panel__note {
+    text-align: left;
+  }
+
+  .pad {
+    justify-content: center;
+    justify-self: center;
+    margin: 0 auto;
+  }
+}

@@ -65,3 +65,18 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Authority: project owner stated, “I have verified the wireframes visually, they are OK.”
 - Scope: approval covers the planning wireframes, not runtime layout, accessibility, or real-device checks on the future application.
 - Affected documents: `WIREFRAMES.md`, `STATUS.md`, `handoffs/M1.md`.
+
+## D008 — M1 implementation choices
+
+- Date: 2026-09-17.
+- Status: implementation choices made by Claude within the accepted M1 scope; no PRD, scope, or budget change.
+- Decision:
+  - Toolchain pinned with exact versions in `package.json` and `package-lock.json`: TypeScript 7.0.2, Vite 8.3.0, Vitest 5.0.1, Playwright 1.63.0, verified on Node 26.7.0.
+  - Maze tiles are authored as a character layout validated at load: structure, spawn, matched tunnel endpoints, walkable borders, and reachability of every corridor and dot from the spawn. An invalid layout throws instead of producing a broken level.
+  - Actor coordinates are continuous tile units with modular horizontal wrapping, so a tunnel crossing costs the same distance as any other tile and positions always stay inside the grid. The renderer draws the player on both sides of the seam.
+  - Movement advances in sub-steps bounded by the next tile centre, so no movement distance, however large, can cross a wall. Simulation runs at a fixed 120 Hz with catch-up bounded to 12 steps per frame.
+  - The page exposes a read-only `window.__hacman.getSnapshot()` readout for browser assertions. It cannot mutate state; browser tests drive gameplay through real controls.
+  - The simulation does not advance while the page is hidden, and queued input is dropped on focus loss. The full PAUSED state and resume countdown remain M3 work.
+- Rationale: keeps the simulation deterministic and testable without a DOM, prevents invalid level data from reaching players, and satisfies M1's fixed-step and input-cleanup requirements without building M3 systems early.
+- Authority: Claude's implementation choices under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews); subject to Codex review.
+- Affected documents: `README.md`, `handoffs/M1.md`.
