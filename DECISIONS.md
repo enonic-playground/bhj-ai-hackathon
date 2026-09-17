@@ -52,6 +52,16 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Date: 2026-09-17.
 - Status: coordination checkpoint recorded by Codex.
 - Decision: close M0's planning deliverables and hand M1 to Claude using `handoffs/M1.md`. M1 covers the playable maze foundation only; later gameplay systems retain their PRD milestones. A visible directional pad is the initial touch input path.
-- Rationale: gives Claude a bounded, testable increment and prevents full-game wireframes from expanding M1. Wireframe descriptions satisfy the planning deliverable; rendered appearance remains unverified and runtime layout inspection is required during implementation.
+- Rationale: gives Claude a bounded, testable increment and prevents full-game wireframes from expanding M1. Wireframe descriptions satisfy the planning deliverable; rendered appearance was unverified at this checkpoint (subsequently verified in D007). Runtime layout inspection is required during implementation.
 - Authority: owner's instruction to move on to Claude's M1 brief; Codex coordinates milestones under the agreed role split. This checkpoint does not claim that Claude has been launched or that implementation is accepted.
 - Affected documents: `handoffs/M1.md`, `STATUS.md`, `PRD.md`, `README.md`.
+
+## D007 — Wireframes visually verified
+
+- Date: 2026-09-17.
+- Status: verified and accepted by the project owner.
+- Decision: wireframe visual review is complete. Use the existing layouts as the implementation reference.
+- Rationale: the project owner inspected the wireframes and confirmed they are OK; the previous inspection caveat is resolved.
+- Authority: project owner stated, “I have verified the wireframes visually, they are OK.”
+- Scope: approval covers the planning wireframes, not runtime layout, accessibility, or real-device checks on the future application.
+- Affected documents: `WIREFRAMES.md`, `STATUS.md`, `handoffs/M1.md`.

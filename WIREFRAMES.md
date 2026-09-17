@@ -68,4 +68,4 @@ Use the same centered panel treatment on both platforms; keep the HUD visible an
 4. M4: result summaries reflect actual score/lives and campaign progression.
 5. M5: verify target sizes, focus, text scaling, landscape, safe areas, and real-device usability. SVG geometry is a design reference, not evidence that these runtime checks pass.
 
-Validation: SVG XML parses successfully and reference geometry has been checked in source. Browser visual inspection was unavailable because the browser security policy blocked local-file navigation; rendered appearance remains to be verified. No application tests exist yet.
+Validation: SVG XML parses successfully and reference geometry has been checked in source. The project owner visually verified the wireframes on 2026-09-17 and confirmed they are OK. Wireframe visual review is complete; implemented UI layout and accessibility still require the milestone checks above. No application tests exist yet.

@@ -11,14 +11,14 @@ Updated: 2026-09-17
 - Current milestone handoff: `handoffs/M1.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: none; application development has not started.
-- Blockers: none identified for starting M1. Wireframe rendered appearance remains unverified; inspect the implemented UI during M1.
+- Blockers: none identified for starting M1. The project owner visually verified the wireframes on 2026-09-17; inspect the implemented UI during M1.
 - Next action: Claude reads shared context and `handoffs/M1.md`, preserves/checkpoints the planning files, records the implementation base SHA, then implements M1 and returns it to Codex for review.
 
 ## Milestones
 
 | Milestone | State | Evidence / remaining work |
 | --- | --- | --- |
-| M0: scope and preparation | ACCEPTED | PRD v1.0 accepted; estimates reconciled; shared workflow files, wireframe descriptions/SVGs, and M1 brief complete. Rendered wireframe inspection remains unverified and is not evidence of runtime layout quality. |
+| M0: scope and preparation | ACCEPTED | PRD v1.0 accepted; estimates reconciled; shared workflow files, wireframe descriptions/SVGs, and M1 brief complete. Wireframes visually verified by the project owner on 2026-09-17. |
 | M1: playable maze | READY | `handoffs/M1.md` defines scope, AC1–AC8, verification, and review handoff. Awaiting Claude implementation. |
 | M2: defining loop | NOT_STARTED | Depends on accepted M1. |
 | M3: arcade danger | NOT_STARTED | Depends on accepted M2. |
