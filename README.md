@@ -6,7 +6,7 @@ Catch a moving ball to enter Guessing mode. Reveal letters to solve the level's 
 
 ## Project status
 
-Product baseline v1.0 accepted on 2026-09-16. Shared agent workflow files are in place. M0 preparation remains: wireframes and the M1 implementation brief. No application or executable setup commands exist yet.
+Product baseline v1.0 accepted on 2026-09-16. M0 planning is complete, including shared agent workflow files, [wireframes](WIREFRAMES.md), and [Claude's M1 implementation brief](handoffs/M1.md). M1 is READY; implementation has not started. No application or executable setup commands exist yet.
 
 Claude handles implementation and tests; Codex handles planning, coordination, verification, and code review.
 

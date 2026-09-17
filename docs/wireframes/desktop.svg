@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1040" viewBox="0 0 1000 1040" role="img" aria-label="Hac-Man desktop Chase and Guessing wireframes"><title>Hac-Man desktop Chase and Guessing wireframes</title><g font-family="Arial, sans-serif">
+<rect x="0" y="0" width="1000" height="1040" rx="0" fill="#f5f6f8" stroke="none"/>
+<text x="20" y="28" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">03 / DESKTOP CHASE · 960 × 460 layout</text>
+<rect x="20" y="42" width="960" height="460" rx="6" fill="white" stroke="#64748b"/>
+<text x="32" y="69" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">HAC-MAN</text>
+<rect x="832" y="46" width="64" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="864.0" y="73" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Mute</text>
+<rect x="904" y="46" width="64" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="936.0" y="73" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Pause</text>
+<text x="32" y="112" font-size="14" font-weight="normal" text-anchor="start" fill="#172033">Score 1,240    Lives 3    Level 2/5</text>
+<text x="32" y="138" font-size="13" font-weight="bold" text-anchor="start" fill="#172033">CHASE · Catch the rolling ball</text>
+<rect x="36" y="152" width="580" height="332" rx="6" fill="#fafafa" stroke="#64748b"/>
+<rect x="82.4" y="191.84" width="145.0" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="285.4" y="191.84" width="104.39999999999999" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="453.59999999999997" y="191.84" width="116.0" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="82.4" y="264.88" width="104.39999999999999" height="76.36" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="256.4" y="271.52" width="139.2" height="66.4" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="476.8" y="264.88" width="92.8" height="76.36" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="82.4" y="404.32" width="145.0" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="285.4" y="404.32" width="104.39999999999999" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="453.59999999999997" y="404.32" width="116.0" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<circle cx="65.0" cy="175.24" r="2" fill="#717b89"/>
+<circle cx="65.0" cy="244.96" r="2" fill="#717b89"/>
+<circle cx="65.0" cy="367.8" r="2" fill="#717b89"/>
+<circle cx="65.0" cy="464.08" r="2" fill="#717b89"/>
+<circle cx="239.0" cy="175.24" r="2" fill="#717b89"/>
+<circle cx="239.0" cy="244.96" r="2" fill="#717b89"/>
+<circle cx="239.0" cy="367.8" r="2" fill="#717b89"/>
+<circle cx="239.0" cy="464.08" r="2" fill="#717b89"/>
+<circle cx="424.6" cy="175.24" r="2" fill="#717b89"/>
+<circle cx="424.6" cy="244.96" r="2" fill="#717b89"/>
+<circle cx="424.6" cy="367.8" r="2" fill="#717b89"/>
+<circle cx="424.6" cy="464.08" r="2" fill="#717b89"/>
+<circle cx="587.0" cy="175.24" r="2" fill="#717b89"/>
+<circle cx="587.0" cy="244.96" r="2" fill="#717b89"/>
+<circle cx="587.0" cy="367.8" r="2" fill="#717b89"/>
+<circle cx="587.0" cy="464.08" r="2" fill="#717b89"/>
+<text x="326.0" y="314.68" font-size="10" font-weight="normal" text-anchor="middle" fill="#172033">HOME</text>
+<text x="105.6" y="384.4" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">P</text>
+<text x="424.6" y="377.76" font-size="22" font-weight="bold" text-anchor="start" fill="#172033">◎</text>
+<text x="268.0" y="244.96" font-size="12" font-weight="bold" text-anchor="start" fill="#172033">1</text>
+<text x="430.40000000000003" y="251.6" font-size="12" font-weight="bold" text-anchor="start" fill="#172033">2</text>
+<text x="233.20000000000002" y="377.76" font-size="12" font-weight="bold" text-anchor="start" fill="#172033">3</text>
+<text x="569.6" y="374.44000000000005" font-size="12" font-weight="bold" text-anchor="start" fill="#172033">4</text>
+<text x="42" y="318.0" font-size="16" font-weight="normal" text-anchor="start" fill="#172033">↔</text>
+<text x="594" y="318.0" font-size="16" font-weight="normal" text-anchor="start" fill="#172033">↔</text>
+<rect x="636" y="152" width="328" height="332" rx="6" fill="white" stroke="#64748b"/>
+<text x="652" y="179" font-size="13" font-weight="bold" text-anchor="start" fill="#172033">FRUIT</text>
+<text x="800" y="213" font-size="24" font-weight="bold" text-anchor="middle" fill="#172033">A _ _ _ E</text>
+<text x="652" y="260" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">Catch ◎ to guess a letter.</text>
+<text x="652" y="290" font-size="14" font-weight="normal" text-anchor="start" fill="#172033">Guessed: A ✓  E ✓</text>
+<text x="652" y="352" font-size="15" font-weight="normal" text-anchor="start" fill="#172033">Move: arrows / WASD</text>
+<text x="652" y="382" font-size="14" font-weight="normal" text-anchor="start" fill="#172033">Dots and fruit add points.</text>
+<text x="652" y="410" font-size="14" font-weight="normal" text-anchor="start" fill="#172033">Solve the word to finish the level.</text>
+<text x="652" y="457" font-size="13" font-weight="normal" text-anchor="start" fill="#172033">P = player · 1–4 = enemies</text>
+<text x="20" y="538" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">04 / DESKTOP GUESS · 960 × 460 layout</text>
+<rect x="20" y="552" width="960" height="460" rx="6" fill="white" stroke="#64748b"/>
+<text x="32" y="579" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">HAC-MAN</text>
+<rect x="832" y="556" width="64" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="864.0" y="583" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Mute</text>
+<rect x="904" y="556" width="64" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="936.0" y="583" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Pause</text>
+<text x="32" y="622" font-size="14" font-weight="normal" text-anchor="start" fill="#172033">Score 1,240    Lives 3    Level 2/5</text>
+<text x="32" y="648" font-size="13" font-weight="bold" text-anchor="start" fill="#172033">GUESS · Maze and timers frozen</text>
+<rect x="36" y="662" width="580" height="332" rx="6" fill="#e8ebef" stroke="#64748b"/>
+<rect x="82.4" y="701.84" width="145.0" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="285.4" y="701.84" width="104.39999999999999" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="453.59999999999997" y="701.84" width="116.0" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="82.4" y="774.88" width="104.39999999999999" height="76.36" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="256.4" y="781.52" width="139.2" height="66.4" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="476.8" y="774.88" width="92.8" height="76.36" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="82.4" y="914.3199999999999" width="145.0" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="285.4" y="914.3199999999999" width="104.39999999999999" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<rect x="453.59999999999997" y="914.3199999999999" width="116.0" height="33.2" rx="2" fill="#cbd1d8" stroke="#8a929e"/>
+<circle cx="65.0" cy="685.24" r="2" fill="#717b89"/>
+<circle cx="65.0" cy="754.96" r="2" fill="#717b89"/>
+<circle cx="65.0" cy="877.8" r="2" fill="#717b89"/>
+<circle cx="65.0" cy="974.0799999999999" r="2" fill="#717b89"/>
+<circle cx="239.0" cy="685.24" r="2" fill="#717b89"/>
+<circle cx="239.0" cy="754.96" r="2" fill="#717b89"/>
+<circle cx="239.0" cy="877.8" r="2" fill="#717b89"/>
+<circle cx="239.0" cy="974.0799999999999" r="2" fill="#717b89"/>
+<circle cx="424.6" cy="685.24" r="2" fill="#717b89"/>
+<circle cx="424.6" cy="754.96" r="2" fill="#717b89"/>
+<circle cx="424.6" cy="877.8" r="2" fill="#717b89"/>
+<circle cx="424.6" cy="974.0799999999999" r="2" fill="#717b89"/>
+<circle cx="587.0" cy="685.24" r="2" fill="#717b89"/>
+<circle cx="587.0" cy="754.96" r="2" fill="#717b89"/>
+<circle cx="587.0" cy="877.8" r="2" fill="#717b89"/>
+<circle cx="587.0" cy="974.0799999999999" r="2" fill="#717b89"/>
+<text x="326.0" y="824.6800000000001" font-size="10" font-weight="normal" text-anchor="middle" fill="#172033">HOME</text>
+<text x="105.6" y="894.4" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">P</text>
+<text x="424.6" y="887.76" font-size="22" font-weight="bold" text-anchor="start" fill="#172033">◎</text>
+<text x="268.0" y="754.96" font-size="12" font-weight="bold" text-anchor="start" fill="#172033">1</text>
+<text x="430.40000000000003" y="761.6" font-size="12" font-weight="bold" text-anchor="start" fill="#172033">2</text>
+<text x="233.20000000000002" y="887.76" font-size="12" font-weight="bold" text-anchor="start" fill="#172033">3</text>
+<text x="569.6" y="884.44" font-size="12" font-weight="bold" text-anchor="start" fill="#172033">4</text>
+<text x="42" y="828.0" font-size="16" font-weight="normal" text-anchor="start" fill="#172033">↔</text>
+<text x="594" y="828.0" font-size="16" font-weight="normal" text-anchor="start" fill="#172033">↔</text>
+<rect x="636" y="662" width="328" height="332" rx="6" fill="white" stroke="#64748b"/>
+<text x="652" y="689" font-size="13" font-weight="bold" text-anchor="start" fill="#172033">FRUIT</text>
+<text x="800" y="723" font-size="24" font-weight="bold" text-anchor="middle" fill="#172033">A _ _ _ E</text>
+<rect x="644" y="735" width="46" height="44" rx="6" fill="#d1d7df" stroke="#64748b"/>
+<text x="667.0" y="755" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">A</text>
+<text x="667.0" y="770" font-size="10" font-weight="normal" text-anchor="middle" fill="#172033">hit</text>
+<rect x="696" y="735" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="719.0" y="755" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">B</text>
+<rect x="748" y="735" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="771.0" y="755" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">C</text>
+<rect x="800" y="735" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="823.0" y="755" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">D</text>
+<rect x="852" y="735" width="46" height="44" rx="6" fill="#d1d7df" stroke="#64748b"/>
+<text x="875.0" y="755" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">E</text>
+<text x="875.0" y="770" font-size="10" font-weight="normal" text-anchor="middle" fill="#172033">hit</text>
+<rect x="904" y="735" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="927.0" y="755" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">F</text>
+<rect x="644" y="785" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="667.0" y="805" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">G</text>
+<rect x="696" y="785" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="719.0" y="805" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">H</text>
+<rect x="748" y="785" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="771.0" y="805" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">I</text>
+<rect x="800" y="785" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="823.0" y="805" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">J</text>
+<rect x="852" y="785" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="875.0" y="805" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">K</text>
+<rect x="904" y="785" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="927.0" y="805" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">L</text>
+<rect x="644" y="835" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="667.0" y="855" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">M</text>
+<rect x="696" y="835" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="719.0" y="855" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">N</text>
+<rect x="748" y="835" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="771.0" y="855" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">O</text>
+<rect x="800" y="835" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="823.0" y="855" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">P</text>
+<rect x="852" y="835" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="875.0" y="855" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Q</text>
+<rect x="904" y="835" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="927.0" y="855" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">R</text>
+<rect x="644" y="885" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="667.0" y="905" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">S</text>
+<rect x="696" y="885" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="719.0" y="905" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">T</text>
+<rect x="748" y="885" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="771.0" y="905" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">U</text>
+<rect x="800" y="885" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="823.0" y="905" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">V</text>
+<rect x="852" y="885" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="875.0" y="905" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">W</text>
+<rect x="904" y="885" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="927.0" y="905" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">X</text>
+<rect x="644" y="935" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="667.0" y="955" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Y</text>
+<rect x="696" y="935" width="46" height="44" rx="6" fill="white" stroke="#64748b"/>
+<text x="719.0" y="955" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Z</text>
+<text x="652" y="987" font-size="12" font-weight="normal" text-anchor="start" fill="#172033">A ✓ E ✓ · Type or click a letter</text>
+</g></svg>

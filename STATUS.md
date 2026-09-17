@@ -1,25 +1,25 @@
 # Project status
 
-Updated: 2026-09-16
+Updated: 2026-09-17
 
 ## Current checkpoint
 
 - Product baseline: PRD v1.0 accepted by the project owner.
-- Current milestone: M0 — scope and preparation.
-- State: IMPLEMENTING (planning documents only).
-- Current owner: Codex.
-- Current milestone handoff: none yet; `handoffs/TEMPLATE.md` is available.
+- Current milestone: M1 — playable maze.
+- State: READY; Claude has not been started by Codex.
+- Current owner: Claude (next to act); Codex planning handoff is complete.
+- Current milestone handoff: `handoffs/M1.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: none; application development has not started.
-- Blockers: none identified for the remaining planning work.
-- Next action: Codex prepares mobile/desktop wireframe descriptions, then an actionable M1 brief for Claude.
+- Blockers: none identified for starting M1. Wireframe rendered appearance remains unverified; inspect the implemented UI during M1.
+- Next action: Claude reads shared context and `handoffs/M1.md`, preserves/checkpoints the planning files, records the implementation base SHA, then implements M1 and returns it to Codex for review.
 
 ## Milestones
 
 | Milestone | State | Evidence / remaining work |
 | --- | --- | --- |
-| M0: scope and preparation | IMPLEMENTING | PRD v1.0 accepted; estimates reconciled; shared workflow files created. Wireframes and M1 brief remain. |
-| M1: playable maze | NOT_STARTED | Awaiting `handoffs/M1.md`; Claude implements once READY. |
+| M0: scope and preparation | ACCEPTED | PRD v1.0 accepted; estimates reconciled; shared workflow files, wireframe descriptions/SVGs, and M1 brief complete. Rendered wireframe inspection remains unverified and is not evidence of runtime layout quality. |
+| M1: playable maze | READY | `handoffs/M1.md` defines scope, AC1–AC8, verification, and review handoff. Awaiting Claude implementation. |
 | M2: defining loop | NOT_STARTED | Depends on accepted M1. |
 | M3: arcade danger | NOT_STARTED | Depends on accepted M2. |
 | M4: complete campaign | NOT_STARTED | Depends on accepted M3. |

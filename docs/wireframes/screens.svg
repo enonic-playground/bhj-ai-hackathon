@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="776" height="1436" viewBox="0 0 776 1436" role="img" aria-label="Hac-Man title, level complete, game over and campaign complete screens"><title>Hac-Man title, level complete, game over and campaign complete screens</title><g font-family="Arial, sans-serif">
+<rect x="0" y="0" width="776" height="1436" rx="0" fill="#f5f6f8" stroke="none"/>
+<text x="20" y="24" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">05 / START</text>
+<rect x="20" y="42" width="360" height="640" rx="6" fill="white" stroke="#64748b"/>
+<text x="200" y="126" font-size="22" font-weight="bold" text-anchor="middle" fill="#172033">HAC-MAN</text>
+<text x="200" y="187" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Chase. Catch. Guess.</text>
+<text x="200" y="225" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Catch the ball to reveal letters.</text>
+<text x="200" y="263" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Correct? Keep guessing.</text>
+<text x="200" y="301" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Wrong? Back to the maze.</text>
+<text x="200" y="339" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Ghosts cost lives.</text>
+<text x="200" y="377" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Solve words to clear five levels.</text>
+<rect x="52" y="472" width="296" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="200.0" y="499" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Start game</text>
+<rect x="52" y="526" width="144" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="124.0" y="553" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">How to play</text>
+<rect x="204" y="526" width="144" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="276.0" y="553" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Mute</text>
+<text x="200" y="610" font-size="14" font-weight="normal" text-anchor="middle" fill="#172033">Best score 8,400</text>
+<text x="396" y="24" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">06 / LEVEL COMPLETE</text>
+<rect x="396" y="42" width="360" height="640" rx="6" fill="white" stroke="#64748b"/>
+<text x="576" y="126" font-size="22" font-weight="bold" text-anchor="middle" fill="#172033">WORD SOLVED</text>
+<text x="576" y="187" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">APPLE</text>
+<text x="576" y="225" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Level 2 of 5 complete</text>
+<text x="576" y="263" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Word bonus +1,000</text>
+<text x="576" y="301" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Score 2,440 · Lives 3</text>
+<text x="576" y="339" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Next: level 3</text>
+<rect x="428" y="472" width="296" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="576.0" y="499" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Next level</text>
+<rect x="428" y="526" width="296" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="576.0" y="553" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Title screen</text>
+<text x="20" y="728" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">07 / GAME OVER</text>
+<rect x="20" y="746" width="360" height="640" rx="6" fill="white" stroke="#64748b"/>
+<text x="200" y="830" font-size="22" font-weight="bold" text-anchor="middle" fill="#172033">GAME OVER</text>
+<text x="200" y="891" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">No lives remaining</text>
+<text x="200" y="929" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">The word was APPLE</text>
+<text x="200" y="967" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Reached level 2 of 5</text>
+<text x="200" y="1005" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Score 1,240</text>
+<text x="200" y="1043" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">High score 8,400</text>
+<rect x="52" y="1176" width="296" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="200.0" y="1203" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">New run</text>
+<rect x="52" y="1230" width="296" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="200.0" y="1257" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Title screen</text>
+<text x="396" y="728" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">08 / CAMPAIGN COMPLETE</text>
+<rect x="396" y="746" width="360" height="640" rx="6" fill="white" stroke="#64748b"/>
+<text x="576" y="830" font-size="22" font-weight="bold" text-anchor="middle" fill="#172033">ALL FIVE SOLVED</text>
+<text x="576" y="891" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Campaign complete</text>
+<text x="576" y="929" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Final word: ELEPHANT</text>
+<text x="576" y="967" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">Final score 12,600</text>
+<text x="576" y="1005" font-size="15" font-weight="normal" text-anchor="middle" fill="#172033">High score 12,600</text>
+<rect x="428" y="1176" width="296" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="576.0" y="1203" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Play again</text>
+<rect x="428" y="1230" width="296" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
+<text x="576.0" y="1257" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Title screen</text>
+</g></svg>

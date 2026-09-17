@@ -87,6 +87,8 @@ State transitions are centralized and processed once. UI input is routed only to
 
 ## 5. UX, accessibility, and delivery requirements
 
+See [WIREFRAMES.md](WIREFRAMES.md) for mobile/desktop Chase and Guessing layouts, start/result screens, and transition behavior. These are planning references; runtime layout and accessibility checks remain implementation work.
+
 - HUD always shows score, lives, level, current mode, and word progress. Use distinct ball and enemy shapes, with an unmistakable target marker.
 - Keep maze and movement controls visible together on a 360 × 640 CSS-pixel viewport; rearrange for landscape and desktop without horizontal page scrolling.
 - Touch controls and letter buttons target at least 44 × 44 CSS pixels. Prevent page gestures only in the gameplay controls, not throughout the site.
@@ -180,4 +182,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-The product baseline is finalized and shared agent workflow files are in place. Before handing M1 to Claude, complete the remaining M0 preparation: wireframe descriptions and the M1 implementation brief. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
+M0 planning is complete: the product baseline is finalized, and shared agent workflow files, wireframes, and [Claude's M1 implementation brief](handoffs/M1.md) are in place. M1 is ready for implementation. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
