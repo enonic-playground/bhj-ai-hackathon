@@ -9,53 +9,95 @@
   <body>
     <div id="app">
       <header class="hud">
-        <p class="hud__brand">Hac-Man</p>
-        <dl class="hud__stats">
-          <div class="hud__stat">
-            <dt>Score</dt>
-            <dd id="hud-score">0</dd>
-          </div>
-          <div class="hud__stat">
-            <dt>Level</dt>
-            <dd id="hud-level">1</dd>
-          </div>
-          <div class="hud__stat">
-            <dt>Mode</dt>
-            <dd id="hud-mode">Title</dd>
-          </div>
-        </dl>
+        <div class="hud__row">
+          <p class="hud__brand">Hac-Man</p>
+          <dl class="hud__stats">
+            <div class="hud__stat">
+              <dt>Score</dt>
+              <dd id="hud-score">0</dd>
+            </div>
+            <div class="hud__stat">
+              <dt>Level</dt>
+              <dd id="hud-level">1</dd>
+            </div>
+            <div class="hud__stat">
+              <dt>Mode</dt>
+              <dd id="hud-mode">Title</dd>
+            </div>
+          </dl>
+        </div>
+        <!-- Word state stays in the header in every mode, so the guessing
+             panel can cover the play area without hiding it. -->
+        <div class="hud__word">
+          <p class="word__category">Category: <strong id="word-category">—</strong></p>
+          <p class="word__mask" id="word-mask">—</p>
+          <p class="word__misses" id="word-misses">Misses: none</p>
+          <p class="word__feedback" id="word-feedback" role="status" aria-live="polite"></p>
+        </div>
       </header>
 
-      <main class="play">
+      <main class="play" id="play">
         <div class="stage" id="stage" tabindex="-1" aria-label="Maze play area">
-          <canvas id="maze-canvas" role="img" aria-label="Maze with the player and remaining dots"></canvas>
+          <canvas id="maze-canvas" role="img" aria-label="Maze with the player, the ball and remaining dots"></canvas>
         </div>
 
-        <aside class="panel">
-          <p class="panel__hint">Arrows, WASD, or the pad below.</p>
-          <div class="pad" id="pad" role="group" aria-label="Directional pad">
-            <button class="pad__button pad__up" type="button" data-direction="up" aria-label="Move up">▲</button>
-            <button class="pad__button pad__left" type="button" data-direction="left" aria-label="Move left">◀</button>
-            <button class="pad__button pad__right" type="button" data-direction="right" aria-label="Move right">▶</button>
-            <button class="pad__button pad__down" type="button" data-direction="down" aria-label="Move down">▼</button>
+        <aside class="panel" id="panel">
+          <div class="chase-controls" id="chase-controls">
+            <p class="panel__hint">Catch the ball with the arrows, WASD, or the pad.</p>
+            <div class="pad" id="pad" role="group" aria-label="Directional pad">
+              <button class="pad__button pad__up" type="button" data-direction="up" aria-label="Move up">▲</button>
+              <button class="pad__button pad__left" type="button" data-direction="left" aria-label="Move left">◀</button>
+              <button class="pad__button pad__right" type="button" data-direction="right" aria-label="Move right">▶</button>
+              <button class="pad__button pad__down" type="button" data-direction="down" aria-label="Move down">▼</button>
+            </div>
+            <p class="panel__note">M2 preview: maze, ball, guessing and one full round. Enemies, lives and the campaign arrive in later milestones.</p>
           </div>
-          <p class="panel__note">M1 preview: maze, movement and dots. Ball, guessing, enemies and lives arrive in later milestones.</p>
+
+          <div class="guess" id="guess-panel" hidden aria-labelledby="guess-heading">
+            <h2 class="guess__heading" id="guess-heading" tabindex="-1">Caught it — guess a letter</h2>
+            <div class="letters" id="letter-grid" role="group" aria-label="Guess a letter"></div>
+          </div>
         </aside>
+
+        <div class="resume" id="resume-overlay" hidden aria-hidden="true">
+          <p class="resume__message" id="resume-message"></p>
+          <p class="resume__count" id="resume-count"></p>
+        </div>
       </main>
     </div>
 
     <section class="overlay" id="title-screen" aria-labelledby="title-heading">
       <div class="overlay__panel">
         <h1 class="overlay__title" id="title-heading">Hac-Man</h1>
-        <p class="overlay__lead">Chase through the maze and collect dots. Catching a ball to guess letters arrives in the next milestone.</p>
+        <p class="overlay__lead">Chase the ball through the maze. Catch it to guess a letter of the hidden word; a wrong letter sends you back into the maze.</p>
         <button class="button button--primary" id="start-button" type="button">Start game</button>
         <h2 class="overlay__subheading">How to play</h2>
         <ul class="overlay__list">
-          <li>Move with the arrow keys or WASD.</li>
-          <li>On touch, use the on-screen directional pad.</li>
+          <li>Move with the arrow keys or WASD; on touch, use the on-screen pad.</li>
           <li>A turn is queued and taken at the first junction that allows it.</li>
-          <li>Each dot scores 10 points. Use the side tunnel to cross the maze.</li>
+          <li>Catch the ringed ball to freeze the maze and guess a letter.</li>
+          <li>A correct letter reveals every copy and scores 100 a position; a wrong one costs you another chase.</li>
+          <li>Each dot scores 10 points. Solving the word scores 1,000 and ends the round.</li>
         </ul>
+      </div>
+    </section>
+
+    <section class="overlay" id="result-screen" hidden aria-labelledby="result-heading">
+      <div class="overlay__panel">
+        <h2 class="overlay__title" id="result-heading" tabindex="-1">Word solved!</h2>
+        <p class="overlay__lead">The word was <strong id="result-word">—</strong>.</p>
+        <dl class="result__stats">
+          <div class="result__stat">
+            <dt>Word bonus</dt>
+            <dd id="result-bonus">0</dd>
+          </div>
+          <div class="result__stat">
+            <dt>Total score</dt>
+            <dd id="result-score">0</dd>
+          </div>
+        </dl>
+        <button class="button button--primary" id="play-again-button" type="button">Play again</button>
+        <button class="button button--secondary" id="result-title-button" type="button">Title screen</button>
       </div>
     </section>
 

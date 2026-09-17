@@ -10,6 +10,9 @@ const COLORS = {
   door: '#ff9ad5',
   dot: '#f3e3c3',
   player: '#ffd23f',
+  ball: '#3ef0d8',
+  ballRing: '#ffffff',
+  freeze: 'rgba(5, 6, 15, 0.62)',
 };
 
 type SolidGroup = 'wall' | 'home';
@@ -66,19 +69,31 @@ export class MazeRenderer {
     this.#context.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
   }
 
-  draw(game: Game, timeMs: number): void {
+  /**
+   * Draws the current game. Animation is driven by the game's own active time,
+   * so a frozen maze is genuinely still and a slow or delayed frame cannot
+   * advance anything.
+   */
+  draw(game: Game): void {
     const tile = this.#tileSize;
     if (tile <= 0) {
       return;
     }
     const ctx = this.#context;
+    const timeMs = game.activeTimeMs;
     ctx.save();
     ctx.fillStyle = COLORS.background;
     ctx.fillRect(0, 0, this.#maze.width * tile, this.#maze.height * tile);
 
     this.#drawWalls();
     this.#drawDots(game);
+    this.#drawBall(game);
     this.#drawPlayer(game, timeMs);
+    if (game.isFrozen) {
+      // The maze stays readable behind the guessing panel, but visibly paused.
+      ctx.fillStyle = COLORS.freeze;
+      ctx.fillRect(0, 0, this.#maze.width * tile, this.#maze.height * tile);
+    }
     ctx.restore();
   }
 
@@ -154,15 +169,48 @@ export class MazeRenderer {
     }
   }
 
+  /** The target is a ringed disc, unmistakable against the player and dots. */
+  #drawBall(game: Game): void {
+    const ball = game.ball;
+    if (!ball) {
+      return;
+    }
+    this.#atSeam(ball.x, (x) => this.#drawBallAt(x, ball.y));
+  }
+
+  #drawBallAt(x: number, y: number): void {
+    const ctx = this.#context;
+    const tile = this.#tileSize;
+    const centreX = (x + 0.5) * tile;
+    const centreY = (y + 0.5) * tile;
+    const radius = tile * 0.3;
+
+    ctx.fillStyle = COLORS.ball;
+    ctx.beginPath();
+    ctx.arc(centreX, centreY, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = COLORS.ballRing;
+    ctx.lineWidth = Math.max(1, tile * 0.07);
+    ctx.beginPath();
+    ctx.arc(centreX, centreY, radius * 1.45, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  /** Runs `draw` at `x`, and again across the seam when the actor is near it. */
+  #atSeam(x: number, draw: (x: number) => void): void {
+    draw(x);
+    if (x > this.#maze.width - 1) {
+      draw(x - this.#maze.width);
+    } else if (x < 1) {
+      draw(x + this.#maze.width);
+    }
+  }
+
   #drawPlayer(game: Game, timeMs: number): void {
     const { x, y, direction } = game.player;
     // Near the tunnel seam the player is drawn on both sides of the maze.
-    this.#drawPlayerAt(x, y, direction, timeMs);
-    if (x > this.#maze.width - 1) {
-      this.#drawPlayerAt(x - this.#maze.width, y, direction, timeMs);
-    } else if (x < 1) {
-      this.#drawPlayerAt(x + this.#maze.width, y, direction, timeMs);
-    }
+    this.#atSeam(x, (seamX) => this.#drawPlayerAt(seamX, y, direction, timeMs));
   }
 
   #drawPlayerAt(

@@ -101,3 +101,20 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Rationale: makes the defining chase/guess loop playable and testable without pulling campaign or enemy systems into M2. Correct and wrong guesses, frozen state, input transitions and one-time completion each have explicit acceptance evidence.
 - Authority: owner's request to prepare M2's brief and Codex's agreed planning role; no product scope or budget change.
 - Affected documents: `handoffs/M2.md`, `STATUS.md`, `README.md`, `PRD.md`.
+
+## D011 — M2 implementation choices
+
+- Date: 2026-09-17.
+- Status: implementation choices made by Claude within the accepted M2 scope; no PRD, scope, or budget change.
+- Decision:
+  - The ball is an ordinary actor driven by a policy instead of queued input, through one shared movement engine (`advanceActor` with an optional direction chooser). Its policy, applied at every tile centre, is a uniform random choice among the legal exits excluding an immediate reversal, falling back to the reversal only at a dead end. It therefore rolls straight through corridors, may turn at junctions, uses the tunnel, and never stops.
+  - Ball spawns are chosen from a breadth-first distance map over the same traversal rules, so a tunnel crossing costs one tile. The graph anchor is the tile centre the player is nearest to; both endpoints of a partly crossed segment are excluded. Tiles at least six tiles away are chosen uniformly; otherwise the farthest reachable tile is, with ties randomized. A fixture with no eligible tile returns no spawn and leaves the round without a ball rather than looping or overlapping the player.
+  - Capture is a centre-to-centre distance of half a tile, tested after movement substeps bounded to a quarter tile, so an arbitrarily long frame cannot let the actors pass through one another. The seam is measured the short way round only when both actors are on a tunnel row, so opposite ends of an ordinary row are correctly far apart.
+  - States are extended with `guess`, `resuming` and `level-complete`. Every transition runs through one private method guarded by its source state, so repeated clicks, key repeat or repeated update calls cannot open guessing twice, respawn a second ball, or award the word bonus again. The countdown treats a sub-nanosecond rounding residue as elapsed, so a whole number of steps ends it exactly.
+  - Animation is driven by the game's own accumulated active time rather than a wall clock, so a frozen maze is genuinely still even though render frames keep arriving.
+  - Input ownership is decided per state: chase owns movement keys and the pad, guessing owns letter keys and the letter grid. Ownership is resolved before the auto-repeat check, so a held arrow key still suppresses page scrolling while only the first press is applied. Letters are activated on `click` only, so one tap cannot guess twice.
+  - Word state lives in the header in every mode, which lets the mobile guessing panel cover the play area without hiding the category, the mask, the misses, or the live feedback.
+  - Randomness, word selection and ball placement are injected. Browser tests configure a round through three start-up query parameters (`testSeed`, `testWord`, `testBall=off`) that choose only what a round starts with; they mutate no state and reveal no answer, and the complete-loop journey uses the real spawn and capture code while chasing with the game's own controls.
+- Rationale: one movement engine and one transition authority keep the ball honest against the same maze rules as the player and make duplicate events harmless. Bounded substeps and an explicit capture radius make contact independent of frame rate. Injecting the three sources of variation is what makes a whole round reproducible in tests without a production control that could be used to cheat.
+- Authority: Claude's implementation choices under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews); subject to Codex review.
+- Affected documents: `README.md`, `handoffs/M2.md`.

@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../src/game/config.js';
-import { Game } from '../src/game/game.js';
 import { createLevelOneMaze } from '../src/game/mazeData.js';
-import { corridorMaze, runForMs, runSteps } from './fixtures.js';
+import { ballFreeGame, corridorMaze, runForMs, runSteps } from './fixtures.js';
 
 describe('level start', () => {
   it('starts on the title screen and ignores movement there', () => {
-    const game = new Game(createLevelOneMaze());
+    const game = ballFreeGame(createLevelOneMaze());
     expect(game.status).toBe('title');
     expect(game.requestDirection('left')).toBe(false);
     runForMs(game, 1000);
@@ -15,7 +14,7 @@ describe('level start', () => {
   });
 
   it('starts a fresh level one with a full maze and no score', () => {
-    const game = new Game(corridorMaze());
+    const game = ballFreeGame(corridorMaze());
     game.startLevel();
     expect(game.status).toBe('chase');
     expect(game.level).toBe(1);
@@ -27,7 +26,7 @@ describe('level start', () => {
 
 describe('dots and score', () => {
   it('awards 10 points once per dot and never rescores it', () => {
-    const game = new Game(corridorMaze());
+    const game = ballFreeGame(corridorMaze());
     game.startLevel();
     game.requestDirection('right');
     runForMs(game, 1000); // Reaches the wall at column 5, collecting four dots.
@@ -42,7 +41,7 @@ describe('dots and score', () => {
   });
 
   it('keeps gameplay active once the last dot is gone', () => {
-    const game = new Game(corridorMaze());
+    const game = ballFreeGame(corridorMaze());
     game.startLevel();
     game.requestDirection('right');
     runForMs(game, 1000);
@@ -56,7 +55,7 @@ describe('dots and score', () => {
   });
 
   it('collects a dot only when the player reaches its tile centre', () => {
-    const game = new Game(corridorMaze());
+    const game = ballFreeGame(corridorMaze());
     game.startLevel();
     game.requestDirection('right');
     runSteps(game, 1);
@@ -69,14 +68,14 @@ describe('dots and score', () => {
   });
 
   it('places no dot under the spawn tile of the authored map', () => {
-    const game = new Game(createLevelOneMaze());
+    const game = ballFreeGame(createLevelOneMaze());
     expect(game.hasDot(game.maze.spawn)).toBe(false);
   });
 });
 
 describe('input state', () => {
   it('drops a queued direction when input is cleared', () => {
-    const game = new Game(corridorMaze());
+    const game = ballFreeGame(corridorMaze());
     game.startLevel();
     game.requestDirection('up'); // Illegal here, so it stays queued.
     expect(game.player.pendingDirection).toBe('up');
@@ -85,7 +84,7 @@ describe('input state', () => {
   });
 
   it('clears queued input when returning to the title screen', () => {
-    const game = new Game(corridorMaze());
+    const game = ballFreeGame(corridorMaze());
     game.startLevel();
     game.requestDirection('up');
     game.returnToTitle();
@@ -94,7 +93,7 @@ describe('input state', () => {
   });
 
   it('resets the maze and score when a level is restarted', () => {
-    const game = new Game(corridorMaze());
+    const game = ballFreeGame(corridorMaze());
     game.startLevel();
     game.requestDirection('right');
     runForMs(game, 1000);
@@ -109,7 +108,7 @@ describe('input state', () => {
 
 describe('authored map simulation', () => {
   it('lets the player cross the side tunnel without leaving the grid', () => {
-    const game = new Game(createLevelOneMaze());
+    const game = ballFreeGame(createLevelOneMaze());
     game.startLevel();
     const tunnelRow = game.maze.tunnelRows[0] as number;
 

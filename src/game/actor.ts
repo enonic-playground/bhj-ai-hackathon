@@ -60,12 +60,26 @@ function snapToCentre(maze: Maze, actor: Actor): void {
 }
 
 /**
+ * Chooses the direction an autonomous actor takes from the tile centre it has
+ * just reached. Used by the ball; the player steers with `pendingDirection`.
+ */
+export type DirectionChooser = (tile: GridPosition, actor: Actor) => Direction | null;
+
+/**
  * Moves the actor up to `distance` tiles along its current direction, applying
  * buffered turns and stopping at walls. Movement is split at tile centres, so an
  * arbitrarily long distance can never pass through a wall. Returns every tile
  * centre reached, in order, for collectible resolution.
+ *
+ * With a `chooseDirection` policy the actor is steered at each tile centre
+ * instead of from queued input, so player and ball share one movement engine.
  */
-export function advanceActor(maze: Maze, actor: Actor, distance: number): GridPosition[] {
+export function advanceActor(
+  maze: Maze,
+  actor: Actor,
+  distance: number,
+  chooseDirection?: DirectionChooser,
+): GridPosition[] {
   const centresReached: GridPosition[] = [];
   if (!(distance > 0)) {
     return centresReached;
@@ -73,6 +87,7 @@ export function advanceActor(maze: Maze, actor: Actor, distance: number): GridPo
 
   // A reversal is legal anywhere in a corridor, not only at a tile centre.
   if (
+    !chooseDirection &&
     actor.direction &&
     actor.pendingDirection === oppositeDirection(actor.direction) &&
     !isAtTileCentre(actor)
@@ -85,7 +100,9 @@ export function advanceActor(maze: Maze, actor: Actor, distance: number): GridPo
   while (remaining > EPSILON) {
     if (isAtTileCentre(actor)) {
       const tile = actorTile(maze, actor);
-      if (actor.pendingDirection && neighbor(maze, tile, actor.pendingDirection)) {
+      if (chooseDirection) {
+        actor.direction = chooseDirection(tile, actor);
+      } else if (actor.pendingDirection && neighbor(maze, tile, actor.pendingDirection)) {
         actor.direction = actor.pendingDirection;
         actor.pendingDirection = null;
       }

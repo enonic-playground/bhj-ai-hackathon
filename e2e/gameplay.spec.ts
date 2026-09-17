@@ -34,7 +34,10 @@ test.beforeEach(async ({ page }) => {
     if (message.type() === 'error') errors.push(message.text());
   });
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/');
+  // The M1 journeys below are about movement, dots and key handling, so they
+  // run the documented ball-free fixture: a legitimate capture would otherwise
+  // freeze the maze mid-assertion. The M2 journeys use the real ball.
+  await page.goto('/?testBall=off');
   await expect(page.getByRole('button', { name: 'Start game' })).toBeVisible();
 });
 
