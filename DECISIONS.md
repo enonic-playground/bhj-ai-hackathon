@@ -153,3 +153,12 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Rationale: making the graph permission explicit is what keeps the player's maze exactly as M1 and M2 shipped while enemies gain a door to cross. Deciding lethality before scoring, and bounding slices by the fastest actor, are what make the collision contract hold at any frame rate. Retaining the paused state rather than a boolean is what lets a pause in guessing resume into guessing, and separating pause from resume removes a whole class of one-press-does-both bugs.
 - Authority: Claude's implementation choices under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews); subject to Codex review.
 - Affected documents: `README.md`, `handoffs/M3.md`.
+
+## D015 — Owner-approved M3 visual feedback amendment
+
+- Date: 2026-09-17.
+- Status: accepted by project owner; supersedes the removal requested in M3-R1.
+- Decision: retain the current frightened-enemy expiry flash as a specific exception to PRD section 5's no-flashing rule. Close M3-R1 by owner approval, not by claiming a code fix. Add a smooth full-spectrum ball fill hue cycle, one revolution per two seconds, to M3; retain the contrasting ring. Use active maze time so the hue freezes with the maze in guessing, countdown, death, pause and result states, with no background catch-up.
+- Rationale: the owner reports user testing found the enemy effect mild and beneficial, and requests greater ball visibility on a busy screen. This feedback supports the specific effect; it does not establish completion of broader pacing or real-device release checks.
+- Authority: owner's explicit instruction to allow the P2 effect and add the two-second ball hue cycle in M3. Claude still implements; Codex plans and reviews. No revision to the accepted time/token budget was requested.
+- Affected documents: `PRD.md`, `handoffs/M3.md`, `STATUS.md`. Claude updates implementation documentation with the delivered behavior.

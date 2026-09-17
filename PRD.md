@@ -1,6 +1,6 @@
 # Hac-Man — Product Requirements Document
 
-Status: accepted implementation baseline, version 1.0. Approved by the project owner on 2026-09-16. See `STATUS.md` for implementation progress.
+Status: accepted implementation baseline, version 1.0. Approved by the project owner on 2026-09-16, with the M3 visual amendment recorded in D015. See `STATUS.md` for implementation progress.
 
 Claude owns implementation and tests; Codex owns planning, coordination, verification, and code review. Future scope changes must be recorded explicitly against this baseline.
 
@@ -89,11 +89,11 @@ State transitions are centralized and processed once. UI input is routed only to
 
 See [WIREFRAMES.md](WIREFRAMES.md) for mobile/desktop Chase and Guessing layouts, start/result screens, and transition behavior. These are planning references; runtime layout and accessibility checks remain implementation work.
 
-- HUD always shows score, lives, level, current mode, and word progress. Use distinct ball and enemy shapes, with an unmistakable target marker.
+- HUD always shows score, lives, level, current mode, and word progress. Use distinct ball and enemy shapes, with an unmistakable target marker. In M3, the ball fill cycles smoothly through the full hue spectrum once every two seconds of active maze time, retaining its contrasting ring so it is easier to spot on a busy screen.
 - Keep maze and movement controls visible together on a 360 × 640 CSS-pixel viewport; rearrange for landscape and desktop without horizontal page scrolling.
 - Touch controls and letter buttons target at least 44 × 44 CSS pixels. Prevent page gestures only in the gameplay controls, not throughout the site.
 - Support keyboard-only menus and guessing, visible focus, labeled buttons, word updates announced through a live region, and non-color-only feedback. Full nonvisual navigation of the action maze is beyond the initial scope.
-- Start audio only after player interaction. Include mute and reduced-motion support for decorative effects; avoid flashing effects.
+- Start audio only after player interaction. Include mute and reduced-motion support for decorative effects; avoid flashing effects except the existing M3 frightened-enemy expiry warning. The project owner approved that specific mild effect after user testing found it beneficial (D015); this is not a general exemption for other flashing effects.
 - Target smooth 60 fps on a representative recent phone and laptop; verify that slower rendering does not change simulation speed. Record tested devices and observed limitations.
 - PWA includes manifest, app icons, standalone presentation, and cached shell, words, artwork, and audio. After one completed online load, the entire campaign must work offline.
 - Test installation on representative Android and iOS devices and desktop where supported; document the actual browser-specific steps during implementation.
@@ -117,7 +117,7 @@ Complete these sequentially. Each implementation milestone ends with a runnable 
 | Day 1 — M0: scope | Finalize concept, rules, wireframe description, acceptance criteria, estimates, and this PRD. Exit: an implementable specification; no code required today. | 3–4 h |
 | Day 2 — M1: playable maze | Set up build/test scripts and title screen; render maze, player, dots, keyboard and touch movement, walls and tunnels. Exit: run locally and navigate/collect without crossing walls. | 1.5–2 h |
 | Day 2 — M2: defining loop | Add rolling ball, safe spawns, frozen guessing view, word rules, transition handling, and level completion. Exit: catch → correct guess → wrong guess → chase → solve. | 2–2.5 h |
-| Day 2 — M3: arcade danger | Add four enemy strategies, home/release logic, chase/scatter, power pellets, lives, death, pause, restart, and collision priority. Exit: a complete playable one-level game with win and loss paths. | 3–3.5 h |
+| Day 2 — M3: arcade danger | Add four enemy strategies, home/release logic, chase/scatter, power pellets, lives, death, pause, restart, collision priority, and the two-second ball hue cycle. Exit: a complete playable one-level game with win and loss paths. | 3–3.5 h |
 | Day 3 — M4: complete campaign | Add word bank, five levels, fruit, full scoring, extra life, high score, audio, and pacing adjustments. Exit: campaign completion and replay with persistent preferences/high score. | 2–2.5 h |
 | Day 3 — M5: mobile and PWA | Refine layout, input, focus, accessibility, install assets, offline cache, and safe update behavior. Exit: install and play offline after initial load; desktop and phone checks pass. | 1.5–2 h |
 | Day 3 — M6: release quality | Full regression, edge cases, cleanup, README, clean-install rehearsal, and demo rehearsal. Exit: reproducible production build and all release gates satisfied. | 1.5–2 h |
@@ -182,4 +182,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-M0 planning is complete and M1/M2 are accepted. [M3's implementation brief](handoffs/M3.md) is ready for Claude; implementation has not started. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
+M0 planning is complete and M1/M2 are accepted. [M3](handoffs/M3.md) has been reviewed; its owner-approved ball visibility amendment awaits implementation and recheck. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
