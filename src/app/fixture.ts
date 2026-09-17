@@ -1,5 +1,6 @@
 import type { EnemyDefinition } from '../game/config.js';
 import type { BallSpawnSelector, GameOptions } from '../game/game.js';
+import { isPlayerWalkable, tileAt } from '../game/maze.js';
 import { createSeededRandom, type RandomSource } from '../game/random.js';
 import { SEED_WORDS, type WordEntry } from '../game/words.js';
 
@@ -9,7 +10,9 @@ import { SEED_WORDS, type WordEntry } from '../game/words.js';
  * - `testSeed=<integer>` seeds ball spawns and ball decisions;
  * - `testWord=<index>` pins the round's word to that entry of `SEED_WORDS`;
  * - `testBall=off` runs the maze with no ball, so the movement, dot and layout
- *   journeys inherited from M1 cannot be interrupted by a legitimate capture;
+ *   journeys inherited from M1 cannot be interrupted by a legitimate capture,
+ *   and `testBall=<col>,<row>` starts it on one tile instead, which is how the
+ *   ball can be put on the tunnel row for a seam check rather than waited for;
  * - `testEnemies=off` runs the maze with no enemies, for the same reason: the
  *   inherited M1/M2 journeys assert movement and layout, not survival. The M3
  *   journeys and the production smoke keep the real four.
@@ -43,8 +46,18 @@ export function readTestFixture(search: string): GameOptions {
     }
   }
 
-  if (params.get('testBall') === 'off') {
+  const ball = params.get('testBall');
+  if (ball === 'off') {
     options.selectBallSpawn = () => null;
+  } else if (ball !== null) {
+    const tile = /^(\d{1,3}),(\d{1,3})$/.exec(ball);
+    if (tile) {
+      const position = { col: Number(tile[1]), row: Number(tile[2]) };
+      // A tile the ball could not legally occupy is ignored rather than used,
+      // so a mistyped parameter cannot put it inside a wall or the enemy home.
+      options.selectBallSpawn = (maze) =>
+        isPlayerWalkable(tileAt(maze, position.col, position.row)) ? position : null;
+    }
   }
 
   if (params.get('testEnemies') === 'off') {

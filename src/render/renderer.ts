@@ -14,7 +14,6 @@ const COLORS = {
   pellet: '#ffe9a8',
   player: '#ffd23f',
   shield: '#7cf6ff',
-  ball: '#3ef0d8',
   ballRing: '#ffffff',
   frightened: '#3355ff',
   frightenedFlash: '#e8f0ff',
@@ -38,6 +37,33 @@ const ENEMY_STYLES: Record<EnemyKind, { readonly color: string; readonly mark: M
 };
 
 type MarkShape = 'circle' | 'triangle' | 'square' | 'diamond';
+
+/**
+ * The ball's fill runs once through every hue in this much active maze time.
+ * Because the phase comes from the game's own active time, it advances only
+ * while the maze does: guessing, the countdown, a death, a pause and the result
+ * panels all hold the colour still, and returning never jumps ahead.
+ */
+export const BALL_HUE_CYCLE_MS = 2000;
+
+/** The hue the cycle starts from: M2's ball colour, so a fresh run looks familiar. */
+const BALL_START_HUE = 172;
+/** Held constant across the cycle, so every hue is equally bright and saturated. */
+const BALL_SATURATION = 85;
+const BALL_LIGHTNESS = 62;
+
+/**
+ * The ball's fill at a moment of active maze time.
+ *
+ * Hue is a continuous function of time taken modulo 360, so the 360°/0° join is
+ * the same smooth step as any other: the colour sweeps rather than jumping
+ * between discrete values, and it is never blinked on or off.
+ */
+export function ballFillColor(activeTimeMs: number): string {
+  const turns = (BALL_START_HUE + (360 * activeTimeMs) / BALL_HUE_CYCLE_MS) / 360;
+  const hue = (turns - Math.floor(turns)) * 360;
+  return `hsl(${hue.toFixed(3)}, ${BALL_SATURATION}%, ${BALL_LIGHTNESS}%)`;
+}
 
 /** Frightened enemies flash white for the last stretch of the effect. */
 const FRIGHTENED_WARNING_MS = 1800;
@@ -116,7 +142,7 @@ export class MazeRenderer {
     this.#drawWalls();
     this.#drawDots(game);
     this.#drawPowerPellets(game, timeMs);
-    this.#drawBall(game);
+    this.#drawBall(game, timeMs);
     this.#drawEnemies(game, timeMs);
     this.#drawPlayer(game, timeMs);
     if (game.isFrozen) {
@@ -218,23 +244,31 @@ export class MazeRenderer {
     }
   }
 
-  /** The target is a ringed disc, unmistakable against the player and dots. */
-  #drawBall(game: Game): void {
+  /**
+   * The target is a ringed disc whose fill sweeps through the whole hue circle
+   * every two active seconds, so it stays findable on a busy maze. The white
+   * ring is what keeps it unmistakable at the hues closest to the dots, the
+   * player and the enemies.
+   */
+  #drawBall(game: Game, timeMs: number): void {
     const ball = game.ball;
     if (!ball) {
       return;
     }
-    this.#atSeam(ball.x, (x) => this.#drawBallAt(x, ball.y));
+    // One colour for the whole frame, handed to both seam copies, so the two
+    // halves of a ball crossing the tunnel can never be a cycle apart.
+    const fill = ballFillColor(timeMs);
+    this.#atSeam(ball.x, (x) => this.#drawBallAt(x, ball.y, fill));
   }
 
-  #drawBallAt(x: number, y: number): void {
+  #drawBallAt(x: number, y: number, fill: string): void {
     const ctx = this.#context;
     const tile = this.#tileSize;
     const centreX = (x + 0.5) * tile;
     const centreY = (y + 0.5) * tile;
     const radius = tile * 0.3;
 
-    ctx.fillStyle = COLORS.ball;
+    ctx.fillStyle = fill;
     ctx.beginPath();
     ctx.arc(centreX, centreY, radius, 0, Math.PI * 2);
     ctx.fill();

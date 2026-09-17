@@ -148,6 +148,11 @@ export interface GameSnapshot {
   readonly enemiesEaten: number;
   readonly protectionRemainingMs: number;
   readonly dyingRemainingMs: number;
+  /**
+   * Simulated time spent in CHASE. It drives every animation, so it is also
+   * what a check reads to advance by maze time rather than by the wall clock.
+   */
+  readonly activeTimeMs: number;
   readonly word: WordSnapshot;
   readonly lastGuess: { readonly letter: string; readonly correct: boolean } | null;
   readonly resumeRemainingMs: number;
@@ -716,6 +721,7 @@ export class Game {
       enemiesEaten: this.#enemiesEaten,
       protectionRemainingMs: this.#protectionRemainingMs,
       dyingRemainingMs: this.#dyingRemainingMs,
+      activeTimeMs: this.#activeTimeMs,
       word: {
         category: this.#word.category,
         length: this.#word.word.length,
