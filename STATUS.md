@@ -6,14 +6,14 @@ Updated: 2026-09-17
 
 - Product baseline: PRD v1.0 accepted by the project owner.
 - Current milestone: M3 — arcade danger.
-- State: READY; implementation brief prepared by Codex on 2026-09-17.
+- State: IMPLEMENTING; Claude started M3 on 2026-09-17 from base `3b5255a11870d29ce5e25cc3141a258e8740ab24`.
 - Current owner: Claude (implementation). Codex has completed planning and released the checkout.
 - Current milestone handoff: `handoffs/M3.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: `0be0b4399100666b7fc52f488b394375d178cdfb` (M2).
 - Acceptance blockers: none to starting M3. M2-R1/R2 and M1 R1/R2/R3 are closed. Real-device and human playtest limitations remain recorded in M2's handoff.
-- M3 reference base HEAD: `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` on `main`. Known uncommitted planning includes the M2 acceptance, M3 brief and coordination updates. Claude must preserve/checkpoint those separately and record the actual implementation base SHA.
-- Next action: Claude reads `handoffs/M3.md`, records its base, marks IMPLEMENTING and delivers enemies, pellets, ordered collisions, lives/death/restart and explicit pause/focus handling with tests. Return a committed implementation SHA and AC evidence in REVIEW. No agent was launched automatically.
+- M3 implementation base: `3b5255a11870d29ce5e25cc3141a258e8740ab24` on `main`. The planning the brief expected to find uncommitted (M2 acceptance, M3 brief, coordination updates) was already committed there, so nothing needed a separate checkpoint. The brief's reference HEAD `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` is that commit's parent.
+- Next action: Claude delivers enemies, pellets, ordered collisions, lives/death/restart and explicit pause/focus handling with tests, then returns a committed implementation SHA and AC1–AC10 evidence in REVIEW.
 
 
 ## Milestones
@@ -23,7 +23,7 @@ Updated: 2026-09-17
 | M0: scope and preparation | ACCEPTED | PRD v1.0 accepted; estimates reconciled; shared workflow files, wireframe descriptions/SVGs, and M1 brief complete. Wireframes visually verified by the project owner on 2026-09-17. |
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
-| M3: arcade danger | READY | `handoffs/M3.md`: actionable brief, AC1–AC10, verification and exit demonstration; Claude owns implementation. |
+| M3: arcade danger | IMPLEMENTING | `handoffs/M3.md`: actionable brief, AC1–AC10, verification and exit demonstration; Claude owns implementation. |
 | M4: complete campaign | NOT_STARTED | Depends on accepted M3. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |

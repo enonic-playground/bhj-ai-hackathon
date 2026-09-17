@@ -1,5 +1,5 @@
 import { DIRECTION_VECTORS, oppositeDirection, type Direction } from './direction.js';
-import { neighbor, wrapIndex, type GridPosition, type Maze } from './maze.js';
+import { neighbor, wrapIndex, type GridPosition, type Maze, type Traversal } from './maze.js';
 
 /**
  * A moving character. `x`/`y` are continuous tile coordinates: the centre of
@@ -61,9 +61,20 @@ function snapToCentre(maze: Maze, actor: Actor): void {
 
 /**
  * Chooses the direction an autonomous actor takes from the tile centre it has
- * just reached. Used by the ball; the player steers with `pendingDirection`.
+ * just reached. Used by the ball and the enemies; the player steers with
+ * `pendingDirection`.
  */
 export type DirectionChooser = (tile: GridPosition, actor: Actor) => Direction | null;
+
+export interface AdvanceOptions {
+  /** Steering policy for an autonomous actor; omitted, the actor uses queued input. */
+  readonly chooseDirection?: DirectionChooser;
+  /**
+   * Which tiles this actor may enter. Defaults to the player/ball graph, so
+   * only a caller that explicitly asks for `home` can cross the enemy door.
+   */
+  readonly traversal?: Traversal;
+}
 
 /**
  * Moves the actor up to `distance` tiles along its current direction, applying
@@ -72,14 +83,16 @@ export type DirectionChooser = (tile: GridPosition, actor: Actor) => Direction |
  * centre reached, in order, for collectible resolution.
  *
  * With a `chooseDirection` policy the actor is steered at each tile centre
- * instead of from queued input, so player and ball share one movement engine.
+ * instead of from queued input, so player, ball and enemies share one movement
+ * engine and one set of legality checks.
  */
 export function advanceActor(
   maze: Maze,
   actor: Actor,
   distance: number,
-  chooseDirection?: DirectionChooser,
+  options: AdvanceOptions = {},
 ): GridPosition[] {
+  const { chooseDirection, traversal = 'maze' } = options;
   const centresReached: GridPosition[] = [];
   if (!(distance > 0)) {
     return centresReached;
@@ -102,11 +115,11 @@ export function advanceActor(
       const tile = actorTile(maze, actor);
       if (chooseDirection) {
         actor.direction = chooseDirection(tile, actor);
-      } else if (actor.pendingDirection && neighbor(maze, tile, actor.pendingDirection)) {
+      } else if (actor.pendingDirection && neighbor(maze, tile, actor.pendingDirection, traversal)) {
         actor.direction = actor.pendingDirection;
         actor.pendingDirection = null;
       }
-      if (!actor.direction || !neighbor(maze, tile, actor.direction)) {
+      if (!actor.direction || !neighbor(maze, tile, actor.direction, traversal)) {
         break; // Stationary, or stopped by a wall.
       }
     }

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { createLevelOneMaze } from '../src/game/mazeData.js';
-import { FIXTURE, chaseUntilCaught, snapshot } from './support.js';
+import { CALM_FIXTURE, chaseUntilCaught, snapshot } from './support.js';
 
 declare global {
   interface Window {
@@ -21,10 +21,9 @@ declare global {
  * animation frames — while everything under test stays the shipped code: the
  * shell's own `visibilitychange` handler, its frame callback and its loop.
  *
- * The point of the check is that the first frame after an absence advances
- * nothing at all. Because the test decides exactly when that frame arrives,
- * the assertions are exact rather than timing-dependent: before the fix for
- * M2-R1, that single frame replayed the loop's catch-up bound of about 100 ms.
+ * Since M3 a hidden page also pauses the game, and coming back never resumes
+ * it. These checks therefore assert both halves: no time reaches the simulation
+ * while the page is away, and the state stays PAUSED until Resume is used.
  */
 async function installTabControl(page: Page): Promise<void> {
   await page.addInitScript(() => {
@@ -86,34 +85,47 @@ async function returnWithOneFrame(page: Page): Promise<void> {
   await page.evaluate(() => window.__tab?.deliverOneFrame());
 }
 
+/** Clicks Resume and lets frames flow again. */
+async function resumePlay(page: Page): Promise<void> {
+  await page.evaluate(() => window.__tab?.resume());
+  await page.getByRole('button', { name: 'Resume' }).click();
+}
+
 test.beforeEach(async ({ page }) => {
   await installTabControl(page);
 });
 
-test('the first frame back from a hidden tab moves nothing', async ({ page }) => {
-  await page.goto('/?testBall=off');
+test('a hidden page pauses, advances nothing, and waits for Resume', async ({ page }) => {
+  await page.goto('/?testBall=off&testEnemies=off');
   await page.getByRole('button', { name: 'Start game' }).click();
   await page.keyboard.press('ArrowLeft');
   await expect.poll(async () => (await snapshot(page)).score, { timeout: 5_000 }).toBeGreaterThan(0);
 
   await hide(page);
   const parked = await snapshot(page);
+  expect(parked.status).toBe('paused');
+  expect(parked.pausedFrom).toBe('chase');
+  expect(parked.pauseReason).toBe('away');
 
   await page.waitForTimeout(HIDDEN_MS); // No frames arrive at all.
   expect(await snapshot(page)).toEqual(parked);
 
+  // The first frame back advances nothing, and coming back does not resume.
   await returnWithOneFrame(page);
   expect(await snapshot(page)).toEqual(parked);
+  await expect(page.locator('#pause-screen')).toBeVisible();
 
-  // Frames after the return do their ordinary work.
-  await page.evaluate(() => window.__tab?.resume());
+  // Only the deliberate action restores play.
+  await resumePlay(page);
+  await expect(page.locator('#hud-mode')).toHaveText('Chase');
+  await page.keyboard.press('ArrowLeft');
   await expect
     .poll(async () => (await snapshot(page)).player.x, { timeout: 5_000 })
     .toBeLessThan(parked.player.x);
 });
 
-test('the resume countdown spends no hidden time', async ({ page }) => {
-  await page.goto(FIXTURE);
+test('the resume countdown spends no hidden time and stays paused on return', async ({ page }) => {
+  await page.goto(CALM_FIXTURE);
   await page.getByRole('button', { name: 'Start game' }).click();
   await chaseUntilCaught(page, createLevelOneMaze());
   await page.locator('[data-letter="Z"]').click();
@@ -121,19 +133,63 @@ test('the resume countdown spends no hidden time', async ({ page }) => {
 
   await hide(page);
   const parked = await snapshot(page);
-  expect(parked.status).toBe('resuming');
+  expect(parked.status).toBe('paused');
+  expect(parked.pausedFrom).toBe('resuming');
   expect(parked.resumeRemainingMs).toBeGreaterThan(0);
 
   await page.waitForTimeout(HIDDEN_MS); // Longer than the whole countdown.
   await returnWithOneFrame(page);
 
   const back = await snapshot(page);
-  expect(back.status).toBe('resuming');
+  expect(back.status).toBe('paused');
   expect(back.resumeRemainingMs).toBe(parked.resumeRemainingMs);
   expect(back.player).toEqual(parked.player);
   expect(back.ball).toEqual(parked.ball);
 
-  // The countdown then runs out on visible time and the chase resumes.
-  await page.evaluate(() => window.__tab?.resume());
+  // Resume puts the countdown back, with the time it had left, and it then
+  // runs out on visible time alone.
+  await resumePlay(page);
+  await expect(page.locator('#hud-mode')).toHaveText('Resuming');
   await expect.poll(async () => (await snapshot(page)).status, { timeout: 5_000 }).toBe('chase');
+});
+
+test('a visible window that loses focus pauses too', async ({ page }) => {
+  await page.goto('/?testBall=off&testEnemies=off');
+  await page.getByRole('button', { name: 'Start game' }).click();
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(async () => (await snapshot(page)).score, { timeout: 5_000 }).toBeGreaterThan(0);
+
+  // The page stays visible and frames keep arriving: only focus is lost. This
+  // is the case M2 could not handle, and the reason its README claim was wrong.
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  const parked = await snapshot(page);
+  expect(parked.status).toBe('paused');
+  expect(parked.pauseReason).toBe('away');
+  await expect(page.locator('#pause-screen')).toBeVisible();
+
+  await page.waitForTimeout(600); // Frames are still being delivered.
+  expect(await snapshot(page)).toEqual(parked);
+
+  await page.getByRole('button', { name: 'Resume' }).click();
+  await expect(page.locator('#hud-mode')).toHaveText('Chase');
+});
+
+test('repeated focus and visibility events never overwrite the retained state', async ({ page }) => {
+  await page.goto(CALM_FIXTURE);
+  await page.getByRole('button', { name: 'Start game' }).click();
+  await chaseUntilCaught(page, createLevelOneMaze());
+  await expect(page.locator('#guess-panel')).toBeVisible();
+
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await hide(page);
+  await returnWithOneFrame(page);
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+
+  const parked = await snapshot(page);
+  expect(parked.status).toBe('paused');
+  expect(parked.pausedFrom).toBe('guess'); // Not PAUSED, whatever happened.
+
+  await resumePlay(page);
+  await expect(page.locator('#hud-mode')).toHaveText('Guessing');
+  await expect(page.locator('#guess-panel')).toBeVisible();
 });

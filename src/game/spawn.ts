@@ -1,33 +1,9 @@
 import { actorTile, type Actor } from './actor.js';
-import { DIRECTIONS } from './direction.js';
-import { neighbor, positionKey, wrapIndex, type GridPosition, type Maze } from './maze.js';
+import { positionKey, wrapIndex, type GridPosition, type Maze } from './maze.js';
+import { pathDistances } from './paths.js';
 import { pickRandom, type RandomSource } from './random.js';
 
 const EPSILON = 1e-9;
-
-/**
- * Shortest path length, in tiles, from `origin` to every tile reachable with
- * legal moves. Tunnel links are ordinary edges, so crossing the seam costs one
- * tile like any other move.
- */
-export function pathDistances(maze: Maze, origin: GridPosition): Map<string, number> {
-  const distances = new Map<string, number>([[positionKey(origin), 0]]);
-  const queue: GridPosition[] = [origin];
-
-  for (let head = 0; head < queue.length; head += 1) {
-    const current = queue[head] as GridPosition;
-    const distance = distances.get(positionKey(current)) as number;
-    for (const direction of DIRECTIONS) {
-      const next = neighbor(maze, current, direction);
-      if (!next) continue;
-      const key = positionKey(next);
-      if (distances.has(key)) continue;
-      distances.set(key, distance + 1);
-      queue.push(next);
-    }
-  }
-  return distances;
-}
 
 /**
  * The tiles an actor currently covers: one at a tile centre, otherwise the two

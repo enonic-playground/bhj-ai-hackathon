@@ -17,6 +17,10 @@
               <dd id="hud-score">0</dd>
             </div>
             <div class="hud__stat">
+              <dt>Lives</dt>
+              <dd id="hud-lives">3</dd>
+            </div>
+            <div class="hud__stat">
               <dt>Level</dt>
               <dd id="hud-level">1</dd>
             </div>
@@ -25,6 +29,9 @@
               <dd id="hud-mode">Title</dd>
             </div>
           </dl>
+          <!-- Pause lives in the header so it stays reachable in Chase,
+               Guessing, the countdown and the death presentation alike. -->
+          <button class="button button--pause" id="pause-button" type="button" disabled>Pause</button>
         </div>
         <!-- Word state stays in the header in every mode, so the guessing
              panel can cover the play area without hiding it. -->
@@ -32,25 +39,26 @@
           <p class="word__category">Category: <strong id="word-category">—</strong></p>
           <p class="word__mask" id="word-mask">—</p>
           <p class="word__misses" id="word-misses">Misses: none</p>
+          <p class="word__shield" id="hud-shield" hidden></p>
           <p class="word__feedback" id="word-feedback" role="status" aria-live="polite"></p>
         </div>
       </header>
 
       <main class="play" id="play">
         <div class="stage" id="stage" tabindex="-1" aria-label="Maze play area">
-          <canvas id="maze-canvas" role="img" aria-label="Maze with the player, the ball and remaining dots"></canvas>
+          <canvas id="maze-canvas" role="img" aria-label="Maze with the player, the ball, four enemies and remaining dots"></canvas>
         </div>
 
         <aside class="panel" id="panel">
           <div class="chase-controls" id="chase-controls">
-            <p class="panel__hint">Catch the ball with the arrows, WASD, or the pad.</p>
+            <p class="panel__hint">Catch the ball with the arrows, WASD, or the pad. Escape pauses.</p>
             <div class="pad" id="pad" role="group" aria-label="Directional pad">
               <button class="pad__button pad__up" type="button" data-direction="up" aria-label="Move up">▲</button>
               <button class="pad__button pad__left" type="button" data-direction="left" aria-label="Move left">◀</button>
               <button class="pad__button pad__right" type="button" data-direction="right" aria-label="Move right">▶</button>
               <button class="pad__button pad__down" type="button" data-direction="down" aria-label="Move down">▼</button>
             </div>
-            <p class="panel__note">M2 preview: maze, ball, guessing and one full round. Enemies, lives and the campaign arrive in later milestones.</p>
+            <p class="panel__note">M3 preview: enemies, power pellets, lives and pause. The campaign, fruit and sound arrive in later milestones.</p>
           </div>
 
           <div class="guess" id="guess-panel" hidden aria-labelledby="guess-heading">
@@ -63,22 +71,39 @@
           <p class="resume__message" id="resume-message"></p>
           <p class="resume__count" id="resume-count"></p>
         </div>
+
+        <div class="resume resume--dying" id="dying-overlay" hidden aria-hidden="true">
+          <p class="resume__message" id="dying-message"></p>
+        </div>
       </main>
     </div>
 
     <section class="overlay" id="title-screen" aria-labelledby="title-heading">
       <div class="overlay__panel">
         <h1 class="overlay__title" id="title-heading">Hac-Man</h1>
-        <p class="overlay__lead">Chase the ball through the maze. Catch it to guess a letter of the hidden word; a wrong letter sends you back into the maze.</p>
+        <p class="overlay__lead">Chase the ball through the maze while four enemies chase you. Catch it to guess a letter of the hidden word; a wrong letter sends you back into the maze.</p>
         <button class="button button--primary" id="start-button" type="button">Start game</button>
         <h2 class="overlay__subheading">How to play</h2>
         <ul class="overlay__list">
-          <li>Move with the arrow keys or WASD; on touch, use the on-screen pad.</li>
+          <li>Move with the arrow keys or WASD; on touch, use the on-screen pad. Escape or the Pause button pauses.</li>
           <li>A turn is queued and taken at the first junction that allows it.</li>
           <li>Catch the ringed ball to freeze the maze and guess a letter.</li>
           <li>A correct letter reveals every copy and scores 100 a position; a wrong one costs you another chase.</li>
-          <li>Each dot scores 10 points. Solving the word scores 1,000 and ends the round.</li>
+          <li>Touching Chaser, Ambusher, Patroller or Prowler costs one of your three lives.</li>
+          <li>Eat a flashing power pellet to turn them blue for six seconds: 200, 400, 800 then 1,600 points each.</li>
+          <li>Each dot scores 10 points and a pellet 50. Solving the word scores 1,000 and ends the round.</li>
         </ul>
+      </div>
+    </section>
+
+    <section class="overlay" id="pause-screen" hidden aria-labelledby="pause-heading">
+      <div class="overlay__panel">
+        <h2 class="overlay__title" id="pause-heading" tabindex="-1">Paused</h2>
+        <p class="overlay__lead" id="pause-reason">The maze is frozen.</p>
+        <p class="overlay__lead">Word so far: <strong id="pause-word">—</strong></p>
+        <button class="button button--primary" id="resume-button" type="button">Resume</button>
+        <button class="button button--secondary" id="pause-restart-button" type="button">Restart run</button>
+        <button class="button button--secondary" id="pause-title-button" type="button">Title screen</button>
       </div>
     </section>
 
@@ -98,6 +123,21 @@
         </dl>
         <button class="button button--primary" id="play-again-button" type="button">Play again</button>
         <button class="button button--secondary" id="result-title-button" type="button">Title screen</button>
+      </div>
+    </section>
+
+    <section class="overlay" id="game-over-screen" hidden aria-labelledby="game-over-heading">
+      <div class="overlay__panel">
+        <h2 class="overlay__title" id="game-over-heading" tabindex="-1">Game over</h2>
+        <p class="overlay__lead">Out of lives. The word was <strong id="game-over-word">—</strong>.</p>
+        <dl class="result__stats">
+          <div class="result__stat">
+            <dt>Final score</dt>
+            <dd id="game-over-score">0</dd>
+          </div>
+        </dl>
+        <button class="button button--primary" id="game-over-restart-button" type="button">Restart run</button>
+        <button class="button button--secondary" id="game-over-title-button" type="button">Title screen</button>
       </div>
     </section>
 

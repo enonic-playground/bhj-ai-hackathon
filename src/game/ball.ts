@@ -46,9 +46,9 @@ export function advanceBall(
   distance: number,
   random: RandomSource,
 ): void {
-  advanceActor(maze, ball, distance, (tile, actor) =>
-    chooseBallDirection(maze, tile, actor.direction, random),
-  );
+  advanceActor(maze, ball, distance, {
+    chooseDirection: (tile, actor) => chooseBallDirection(maze, tile, actor.direction, random),
+  });
 }
 
 /**

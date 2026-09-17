@@ -1,3 +1,5 @@
+import type { EnemyKind } from '../game/config.js';
+import type { Enemy } from '../game/enemy.js';
 import type { Game } from '../game/game.js';
 import type { Maze, Tile } from '../game/maze.js';
 
@@ -9,11 +11,37 @@ const COLORS = {
   homeStroke: '#6b4fb0',
   door: '#ff9ad5',
   dot: '#f3e3c3',
+  pellet: '#ffe9a8',
   player: '#ffd23f',
+  shield: '#7cf6ff',
   ball: '#3ef0d8',
   ballRing: '#ffffff',
+  frightened: '#3355ff',
+  frightenedFlash: '#e8f0ff',
+  eyes: '#ffffff',
+  pupils: '#101636',
+  mark: '#f4f7ff',
+  markEdge: '#0b0f24',
   freeze: 'rgba(5, 6, 15, 0.62)',
 };
+
+/**
+ * One colour and one shape per enemy. The mark is what makes an enemy
+ * identifiable when every body turns blue during a frightened effect, and it is
+ * a shape rather than only a hue so the four are told apart without colour.
+ */
+const ENEMY_STYLES: Record<EnemyKind, { readonly color: string; readonly mark: MarkShape }> = {
+  chaser: { color: '#ff5c57', mark: 'circle' },
+  ambusher: { color: '#ff8ad8', mark: 'triangle' },
+  patroller: { color: '#57d9ff', mark: 'square' },
+  prowler: { color: '#ffb357', mark: 'diamond' },
+};
+
+type MarkShape = 'circle' | 'triangle' | 'square' | 'diamond';
+
+/** Frightened enemies flash white for the last stretch of the effect. */
+const FRIGHTENED_WARNING_MS = 1800;
+const FRIGHTENED_FLASH_PERIOD_MS = 250;
 
 type SolidGroup = 'wall' | 'home';
 
@@ -30,7 +58,7 @@ function solidGroup(tile: Tile): SolidGroup | null {
   }
 }
 
-/** Draws the maze and player. Owns no game state. */
+/** Draws the maze, the collectibles and every actor. Owns no game state. */
 export class MazeRenderer {
   readonly #canvas: HTMLCanvasElement;
   readonly #context: CanvasRenderingContext2D;
@@ -87,10 +115,12 @@ export class MazeRenderer {
 
     this.#drawWalls();
     this.#drawDots(game);
+    this.#drawPowerPellets(game, timeMs);
     this.#drawBall(game);
+    this.#drawEnemies(game, timeMs);
     this.#drawPlayer(game, timeMs);
     if (game.isFrozen) {
-      // The maze stays readable behind the guessing panel, but visibly paused.
+      // The maze stays readable behind a panel or an overlay, but visibly paused.
       ctx.fillStyle = COLORS.freeze;
       ctx.fillRect(0, 0, this.#maze.width * tile, this.#maze.height * tile);
     }
@@ -169,6 +199,25 @@ export class MazeRenderer {
     }
   }
 
+  /** Pellets pulse, so they read as the powerful pick-up rather than a big dot. */
+  #drawPowerPellets(game: Game, timeMs: number): void {
+    const ctx = this.#context;
+    const tile = this.#tileSize;
+    const pulse = 0.28 + 0.06 * Math.sin(timeMs / 180);
+    ctx.fillStyle = COLORS.pellet;
+    for (const pellet of game.remainingPowerPellets()) {
+      ctx.beginPath();
+      ctx.arc(
+        (pellet.col + 0.5) * tile,
+        (pellet.row + 0.5) * tile,
+        Math.max(2, tile * pulse),
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+    }
+  }
+
   /** The target is a ringed disc, unmistakable against the player and dots. */
   #drawBall(game: Game): void {
     const ball = game.ball;
@@ -207,13 +256,138 @@ export class MazeRenderer {
     }
   }
 
+  #drawEnemies(game: Game, timeMs: number): void {
+    const frightenedMs = game.frightenedRemainingMs;
+    for (const enemy of game.enemies) {
+      this.#atSeam(enemy.actor.x, (x) => this.#drawEnemyAt(enemy, x, frightenedMs, timeMs));
+    }
+  }
+
+  #drawEnemyAt(enemy: Enemy, x: number, frightenedMs: number, timeMs: number): void {
+    const ctx = this.#context;
+    const tile = this.#tileSize;
+    const centreX = (x + 0.5) * tile;
+    const centreY = (enemy.actor.y + 0.5) * tile;
+    const radius = tile * 0.4;
+    const style = ENEMY_STYLES[enemy.definition.kind];
+    const edible = enemy.state === 'roaming' && frightenedMs > 0;
+    // An eaten enemy is a pair of eyes: it is on its way home and harmless.
+    const bodiless = enemy.state === 'returning';
+
+    if (!bodiless) {
+      ctx.fillStyle = edible ? this.#frightenedColor(frightenedMs, timeMs) : style.color;
+      this.#traceBody(centreX, centreY, radius);
+      ctx.fill();
+      this.#drawMark(centreX, centreY, radius, style.mark);
+    }
+    this.#drawEyes(centreX, centreY, radius, enemy.actor.direction, edible);
+  }
+
+  #frightenedColor(frightenedMs: number, timeMs: number): string {
+    if (frightenedMs > FRIGHTENED_WARNING_MS) {
+      return COLORS.frightened;
+    }
+    // Flashing warns that the effect is about to end, without relying on colour
+    // alone: the body also alternates between two clearly different tones.
+    const flashing = Math.floor(timeMs / FRIGHTENED_FLASH_PERIOD_MS) % 2 === 0;
+    return flashing ? COLORS.frightenedFlash : COLORS.frightened;
+  }
+
+  /** Dome on top, three feet along the bottom: the arcade silhouette. */
+  #traceBody(centreX: number, centreY: number, radius: number): void {
+    const ctx = this.#context;
+    const bottom = centreY + radius;
+    ctx.beginPath();
+    ctx.arc(centreX, centreY, radius, Math.PI, 0);
+    ctx.lineTo(centreX + radius, bottom);
+    for (let foot = 0; foot < 3; foot += 1) {
+      const from = centreX + radius - (foot * radius * 2) / 3;
+      const to = from - (radius * 2) / 3;
+      ctx.quadraticCurveTo((from + to) / 2, bottom - radius * 0.35, to, bottom);
+    }
+    ctx.closePath();
+  }
+
+  /** The per-enemy shape, so identity survives the frightened colour change. */
+  #drawMark(centreX: number, centreY: number, radius: number, shape: MarkShape): void {
+    const ctx = this.#context;
+    const size = radius * 0.42;
+    const y = centreY + radius * 0.38;
+    // A pale mark inside a dark outline, so the shape reads on a coloured body,
+    // on the frightened blue, and on the pale flash that warns the effect is
+    // about to end. The shape is the identity; the colour only reinforces it.
+    ctx.fillStyle = COLORS.mark;
+    ctx.strokeStyle = COLORS.markEdge;
+    ctx.lineWidth = Math.max(1, radius * 0.16);
+    ctx.beginPath();
+    switch (shape) {
+      case 'circle':
+        ctx.arc(centreX, y, size, 0, Math.PI * 2);
+        break;
+      case 'triangle':
+        ctx.moveTo(centreX, y - size);
+        ctx.lineTo(centreX + size, y + size);
+        ctx.lineTo(centreX - size, y + size);
+        break;
+      case 'square':
+        ctx.rect(centreX - size, y - size, size * 2, size * 2);
+        break;
+      case 'diamond':
+        ctx.moveTo(centreX, y - size * 1.2);
+        ctx.lineTo(centreX + size, y);
+        ctx.lineTo(centreX, y + size * 1.2);
+        ctx.lineTo(centreX - size, y);
+        break;
+      default:
+        break;
+    }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+  }
+
+  #drawEyes(
+    centreX: number,
+    centreY: number,
+    radius: number,
+    direction: string | null,
+    edible: boolean,
+  ): void {
+    const ctx = this.#context;
+    const offsetX = radius * 0.34;
+    const eyeY = centreY - radius * 0.18;
+    const eyeRadius = radius * 0.28;
+    const look = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] }[direction ?? 'left'] ?? [
+      -1, 0,
+    ];
+
+    for (const side of [-1, 1]) {
+      ctx.fillStyle = COLORS.eyes;
+      ctx.beginPath();
+      ctx.arc(centreX + side * offsetX, eyeY, eyeRadius, 0, Math.PI * 2);
+      ctx.fill();
+      if (edible) continue; // Frightened eyes stay blank, as in the arcade.
+      ctx.fillStyle = COLORS.pupils;
+      ctx.beginPath();
+      ctx.arc(
+        centreX + side * offsetX + (look[0] ?? 0) * eyeRadius * 0.4,
+        eyeY + (look[1] ?? 0) * eyeRadius * 0.4,
+        eyeRadius * 0.5,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+    }
+  }
+
   #drawPlayer(game: Game, timeMs: number): void {
     const { x, y, direction } = game.player;
     // Near the tunnel seam the player is drawn on both sides of the maze.
-    this.#atSeam(x, (seamX) => this.#drawPlayerAt(seamX, y, direction, timeMs));
+    this.#atSeam(x, (seamX) => this.#drawPlayerAt(game, seamX, y, direction, timeMs));
   }
 
   #drawPlayerAt(
+    game: Game,
     x: number,
     y: number,
     direction: string | null,
@@ -230,6 +404,28 @@ export class MazeRenderer {
     ] ?? 0;
     const openness = direction === null ? 0.18 : 0.05 + 0.25 * (1 + Math.sin(timeMs / 60)) * 0.5;
     const mouth = openness * Math.PI;
+
+    if (game.dyingRemainingMs > 0) {
+      // The death presentation: a ring expands away from the player while the
+      // maze is frozen, so the moment reads even without the overlay text.
+      const progress = 1 - game.dyingRemainingMs / game.config.dyingPresentationMs;
+      ctx.strokeStyle = COLORS.player;
+      ctx.globalAlpha = Math.max(0, 1 - progress);
+      ctx.lineWidth = Math.max(1, tile * 0.1);
+      ctx.beginPath();
+      ctx.arc(centreX, centreY, radius * (1 + progress * 1.6), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if (game.protectionRemainingMs > 0) {
+      // Protection: a pulsing ring, drawn whether or not the player is moving.
+      ctx.strokeStyle = COLORS.shield;
+      ctx.lineWidth = Math.max(1, tile * 0.09);
+      ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(timeMs / 140));
+      ctx.beginPath();
+      ctx.arc(centreX, centreY, radius * 1.35, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
 
     ctx.fillStyle = COLORS.player;
     ctx.beginPath();

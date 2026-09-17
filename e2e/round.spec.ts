@@ -1,11 +1,11 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 import { createLevelOneMaze } from '../src/game/mazeData.js';
-import { CATEGORY, FIXTURE, WORD, chaseUntilCaught, snapshot } from './support.js';
+import { CALM_FIXTURE, CATEGORY, WORD, chaseUntilCaught, snapshot } from './support.js';
 
 const consoleErrors = new WeakMap<Page, string[]>();
 
 async function shoot(page: Page, testInfo: TestInfo, name: string): Promise<void> {
-  await page.screenshot({ path: `docs/evidence/m2/${testInfo.project.name}-${name}.png` });
+  await page.screenshot({ path: `docs/evidence/m3/${testInfo.project.name}-${name}.png` });
 }
 
 test.beforeEach(async ({ page }) => {
@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }) => {
     if (message.type() === 'error') errors.push(message.text());
   });
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto(FIXTURE);
+  await page.goto(CALM_FIXTURE);
   await expect(page.getByRole('button', { name: 'Start game' })).toBeVisible();
 });
 

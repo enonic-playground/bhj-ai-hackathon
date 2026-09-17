@@ -3,7 +3,12 @@ import { isDirection } from '../game/direction.js';
 import { Game, type GameSnapshot, type GameStatus, type GuessResult } from '../game/game.js';
 import { FixedStepLoop } from '../game/loop.js';
 import { ALPHABET } from '../game/words.js';
-import { handleGameKey, handleLetterButton, handlePadDirection } from '../input/inputRouter.js';
+import {
+  handleGameKey,
+  handleLetterButton,
+  handlePadDirection,
+  handlePauseKey,
+} from '../input/inputRouter.js';
 import { MazeRenderer } from '../render/renderer.js';
 import { readTestFixture } from './fixture.js';
 import { FrameTiming } from './frameTiming.js';
@@ -24,7 +29,10 @@ const MODE_LABELS: Record<GameStatus, string> = {
   chase: 'Chase',
   guess: 'Guessing',
   resuming: 'Resuming',
+  paused: 'Paused',
+  dying: 'Caught',
   'level-complete': 'Solved',
+  'game-over': 'Game over',
 };
 
 function requireElement<T extends Element>(selector: string): T {
@@ -46,6 +54,10 @@ function maskText(mask: readonly (string | null)[]): string {
   return mask.map((letter) => letter ?? '_').join(' ');
 }
 
+function livesText(lives: number): string {
+  return `${lives}${lives > 0 ? ` ${'◆'.repeat(lives)}` : ''}`;
+}
+
 export function mountApp(): Game {
   const canvas = requireElement<HTMLCanvasElement>('#maze-canvas');
   const stage = requireElement<HTMLElement>('#stage');
@@ -63,12 +75,30 @@ export function mountApp(): Game {
   const resultScore = requireElement<HTMLElement>('#result-score');
   const playAgainButton = requireElement<HTMLButtonElement>('#play-again-button');
   const resultTitleButton = requireElement<HTMLButtonElement>('#result-title-button');
+  const pauseScreen = requireElement<HTMLElement>('#pause-screen');
+  const pauseHeading = requireElement<HTMLElement>('#pause-heading');
+  const pauseReason = requireElement<HTMLElement>('#pause-reason');
+  const pauseWord = requireElement<HTMLElement>('#pause-word');
+  const pauseButton = requireElement<HTMLButtonElement>('#pause-button');
+  const resumeButton = requireElement<HTMLButtonElement>('#resume-button');
+  const pauseRestartButton = requireElement<HTMLButtonElement>('#pause-restart-button');
+  const pauseTitleButton = requireElement<HTMLButtonElement>('#pause-title-button');
+  const gameOverScreen = requireElement<HTMLElement>('#game-over-screen');
+  const gameOverHeading = requireElement<HTMLElement>('#game-over-heading');
+  const gameOverWord = requireElement<HTMLElement>('#game-over-word');
+  const gameOverScore = requireElement<HTMLElement>('#game-over-score');
+  const gameOverRestartButton = requireElement<HTMLButtonElement>('#game-over-restart-button');
+  const gameOverTitleButton = requireElement<HTMLButtonElement>('#game-over-title-button');
   const resumeOverlay = requireElement<HTMLElement>('#resume-overlay');
   const resumeMessage = requireElement<HTMLElement>('#resume-message');
   const resumeCount = requireElement<HTMLElement>('#resume-count');
+  const dyingOverlay = requireElement<HTMLElement>('#dying-overlay');
+  const dyingMessage = requireElement<HTMLElement>('#dying-message');
   const scoreOutput = requireElement<HTMLElement>('#hud-score');
+  const livesOutput = requireElement<HTMLElement>('#hud-lives');
   const levelOutput = requireElement<HTMLElement>('#hud-level');
   const modeOutput = requireElement<HTMLElement>('#hud-mode');
+  const shieldOutput = requireElement<HTMLElement>('#hud-shield');
   const categoryOutput = requireElement<HTMLElement>('#word-category');
   const maskOutput = requireElement<HTMLElement>('#word-mask');
   const feedbackOutput = requireElement<HTMLElement>('#word-feedback');
@@ -121,6 +151,7 @@ export function mountApp(): Game {
 
   const updateHud = (snapshot: GameSnapshot): void => {
     setText(scoreOutput, String(snapshot.score));
+    setText(livesOutput, livesText(snapshot.lives));
     setText(levelOutput, String(snapshot.level));
     setText(modeOutput, MODE_LABELS[snapshot.status]);
     setText(categoryOutput, snapshot.status === 'title' ? '—' : snapshot.word.category);
@@ -129,13 +160,19 @@ export function mountApp(): Game {
       missesOutput,
       `Misses: ${snapshot.word.wrongLetters.length > 0 ? snapshot.word.wrongLetters.join(' ') : 'none'}`,
     );
+    // Protection is announced in words as well as drawn as a ring on the maze.
+    const shielded = snapshot.protectionRemainingMs > 0;
+    shieldOutput.hidden = !shielded;
+    if (shielded) {
+      setText(shieldOutput, `Shielded for ${Math.ceil(snapshot.protectionRemainingMs / 1000)}s`);
+    }
   };
 
   /**
    * Reflects guessed state on the letter buttons. A guessed letter keeps its
    * place but is disabled and marked with a symbol as well as a colour, and
-   * every letter is disabled outside guessing so a hidden panel holds nothing
-   * focusable.
+   * every letter is disabled outside guessing — including while paused — so a
+   * covered panel holds nothing focusable.
    */
   const updateLetters = (snapshot: GameSnapshot): void => {
     const guessing = snapshot.status === 'guess';
@@ -211,19 +248,34 @@ export function mountApp(): Game {
 
   let shownStatus: GameStatus | null = null;
 
+  const deathMessage = (lives: number): string =>
+    lives > 0
+      ? `Caught! ${lives} ${lives === 1 ? 'life' : 'lives'} remaining.`
+      : 'Caught! No lives remaining.';
+
   /** Applies the one-time UI changes for a state, including where focus goes. */
   const applyStatus = (snapshot: GameSnapshot): void => {
     const status = snapshot.status;
     if (status === shownStatus) {
       return;
     }
+    const previous = shownStatus;
     shownStatus = status;
+
+    // While paused, the panel keeps showing whatever the pause interrupted, so
+    // the frozen game stays legible behind the overlay. Nothing under the
+    // overlay is operable: those controls are disabled by status, not by state.
+    const beneath = status === 'paused' ? (snapshot.pausedFrom ?? 'chase') : status;
 
     titleScreen.hidden = status !== 'title';
     resultScreen.hidden = status !== 'level-complete';
-    guessPanel.hidden = status !== 'guess';
-    chaseControls.hidden = status === 'guess';
+    gameOverScreen.hidden = status !== 'game-over';
+    pauseScreen.hidden = status !== 'paused';
+    guessPanel.hidden = beneath !== 'guess';
+    chaseControls.hidden = beneath === 'guess';
     resumeOverlay.hidden = status !== 'resuming';
+    dyingOverlay.hidden = status !== 'dying';
+    pauseButton.disabled = !['chase', 'guess', 'resuming', 'dying'].includes(status);
     for (const button of padButtons) {
       button.disabled = status !== 'chase';
     }
@@ -231,17 +283,44 @@ export function mountApp(): Game {
 
     switch (status) {
       case 'guess':
-        setText(feedbackOutput, 'Caught the ball. Choose a letter.');
+        // Resuming from a pause keeps the feedback the player was reading.
+        if (previous !== 'paused') {
+          setText(feedbackOutput, 'Caught the ball. Choose a letter.');
+        }
         guessHeading.focus();
+        break;
+      case 'paused':
+        setText(
+          pauseReason,
+          snapshot.pauseReason === 'away'
+            ? 'Paused because the game lost focus. It will not resume by itself.'
+            : 'The maze is frozen. Resume when you are ready.',
+        );
+        setText(pauseWord, maskText(snapshot.word.mask));
+        pauseHeading.focus();
+        break;
+      case 'dying':
+        setText(dyingMessage, deathMessage(snapshot.lives));
+        setText(feedbackOutput, deathMessage(snapshot.lives));
+        stage.focus();
         break;
       case 'resuming':
         stage.focus(); // Focus leaves the panel before it is hidden.
+        break;
+      case 'chase':
+        stage.focus(); // Movement is keyboard-driven, so the play region owns focus.
         break;
       case 'level-complete':
         setText(resultWord, snapshot.word.answer ?? '');
         setText(resultBonus, String(DEFAULT_CONFIG.wordBonusScore));
         setText(resultScore, String(snapshot.score));
         resultHeading.focus();
+        break;
+      case 'game-over':
+        setText(gameOverWord, snapshot.word.answer ?? '');
+        setText(gameOverScore, String(snapshot.score));
+        setText(feedbackOutput, `Game over. The word was ${snapshot.word.answer ?? ''}.`);
+        gameOverHeading.focus();
         break;
       case 'title':
         setText(feedbackOutput, '');
@@ -252,26 +331,61 @@ export function mountApp(): Game {
     }
   };
 
-  const startRound = (): void => {
-    game.startLevel();
-    setText(feedbackOutput, '');
+  const refresh = (): void => {
     const snapshot = game.snapshot();
     applyStatus(snapshot);
     updateHud(snapshot);
+  };
+
+  const startRound = (): void => {
+    game.startLevel();
+    setText(feedbackOutput, '');
+    refresh();
     resize();
     stage.focus();
   };
 
+  const goToTitle = (): void => {
+    game.returnToTitle();
+    refresh();
+  };
+
+  const timing = new FrameTiming({
+    isHidden: () => document.visibilityState === 'hidden',
+    advance: (elapsedMs) => loop.advance(elapsedMs),
+    drop: () => loop.reset(),
+  });
+
   startButton.addEventListener('click', startRound);
   playAgainButton.addEventListener('click', startRound);
-  resultTitleButton.addEventListener('click', () => {
-    game.returnToTitle();
-    applyStatus(game.snapshot());
+  pauseRestartButton.addEventListener('click', startRound);
+  gameOverRestartButton.addEventListener('click', startRound);
+  resultTitleButton.addEventListener('click', goToTitle);
+  pauseTitleButton.addEventListener('click', goToTitle);
+  gameOverTitleButton.addEventListener('click', goToTitle);
+
+  pauseButton.addEventListener('click', () => {
+    if (game.pause('manual')) {
+      refresh();
+    }
+  });
+
+  resumeButton.addEventListener('click', () => {
+    if (game.resume()) {
+      // The frame clock restarts here, so the paused interval is never replayed.
+      timing.suspend();
+      refresh();
+    }
   });
 
   window.addEventListener('keydown', (event) => {
     if (event.metaKey || event.ctrlKey || event.altKey) {
       return; // Browser and platform shortcuts stay with the browser.
+    }
+    if (handlePauseKey(game, event.key, { repeat: event.repeat })) {
+      event.preventDefault();
+      refresh();
+      return;
     }
     const outcome = handleGameKey(game, event.key, { repeat: event.repeat });
     // Movement keys scroll the page, so the game suppresses their default even
@@ -317,24 +431,26 @@ export function mountApp(): Game {
     }
   });
 
-  const timing = new FrameTiming({
-    isHidden: () => document.visibilityState === 'hidden',
-    advance: (elapsedMs) => loop.advance(elapsedMs),
-    drop: () => loop.reset(),
-  });
-
-  const dropHeldInput = (): void => {
+  /**
+   * Losing focus or visibility pauses an active state and never resumes it:
+   * only the Resume control does that. A second event while already paused is
+   * refused by the game, so the retained state survives repeated blur and
+   * visibility changes.
+   */
+  const leaveGame = (): void => {
     game.clearInput();
+    game.pause('away');
     timing.suspend();
+    refresh();
   };
 
-  window.addEventListener('blur', dropHeldInput);
+  window.addEventListener('blur', leaveGame);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
-      dropHeldInput();
+      leaveGame();
     } else {
       // Returning rebases the frame clock, so the absence itself is not spent
-      // on the countdown by the first visible frame.
+      // on any timer by the first visible frame. The game stays paused.
       timing.suspend();
     }
   });
@@ -351,9 +467,7 @@ export function mountApp(): Game {
     window.requestAnimationFrame(frame);
   };
 
-  const initial = game.snapshot();
-  applyStatus(initial);
-  updateHud(initial);
+  refresh();
   startButton.focus();
   window.requestAnimationFrame(frame);
 

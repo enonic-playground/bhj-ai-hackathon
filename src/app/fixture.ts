@@ -1,3 +1,4 @@
+import type { EnemyDefinition } from '../game/config.js';
 import type { BallSpawnSelector, GameOptions } from '../game/game.js';
 import { createSeededRandom, type RandomSource } from '../game/random.js';
 import { SEED_WORDS, type WordEntry } from '../game/words.js';
@@ -8,9 +9,12 @@ import { SEED_WORDS, type WordEntry } from '../game/words.js';
  * - `testSeed=<integer>` seeds ball spawns and ball decisions;
  * - `testWord=<index>` pins the round's word to that entry of `SEED_WORDS`;
  * - `testBall=off` runs the maze with no ball, so the movement, dot and layout
- *   journeys inherited from M1 cannot be interrupted by a legitimate capture.
+ *   journeys inherited from M1 cannot be interrupted by a legitimate capture;
+ * - `testEnemies=off` runs the maze with no enemies, for the same reason: the
+ *   inherited M1/M2 journeys assert movement and layout, not survival. The M3
+ *   journeys and the production smoke keep the real four.
  *
- * All three are ignored unless present and well formed, so an ordinary visit to
+ * All four are ignored unless present and well formed, so an ordinary visit to
  * the app is unaffected. They only choose what a round starts with: nothing
  * mutates a running game, no answer is revealed in the page, and every rule —
  * capture, guessing, scoring and transitions — runs exactly as in ordinary
@@ -23,6 +27,7 @@ export function readTestFixture(search: string): GameOptions {
     random?: RandomSource;
     selectWord?: () => WordEntry;
     selectBallSpawn?: BallSpawnSelector;
+    enemies?: readonly EnemyDefinition[];
   } = {};
 
   const seed = params.get('testSeed');
@@ -40,6 +45,10 @@ export function readTestFixture(search: string): GameOptions {
 
   if (params.get('testBall') === 'off') {
     options.selectBallSpawn = () => null;
+  }
+
+  if (params.get('testEnemies') === 'off') {
+    options.enemies = [];
   }
 
   return options;

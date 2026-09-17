@@ -15,7 +15,7 @@ async function canvasBottom(page: Page): Promise<number> {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/?testBall=off'); // Layout checks, not ball behaviour.
+  await page.goto('/?testBall=off&testEnemies=off'); // Layout, not danger.
   await page.getByRole('button', { name: 'Start game' }).click();
   await expect(page.locator('#hud-mode')).toHaveText('Chase');
 });
@@ -55,17 +55,17 @@ test('layout fits the viewport with square tiles and usable controls', async ({ 
     body: await page.screenshot(),
     contentType: 'image/png',
   });
-  await page.screenshot({ path: `docs/evidence/m2/${testInfo.project.name}-layout-chase.png` });
+  await page.screenshot({ path: `docs/evidence/m3/${testInfo.project.name}-layout-chase.png` });
 });
 
 test('title screen fits the viewport', async ({ page }, testInfo) => {
-  await page.goto('/?testBall=off');
+  await page.goto('/?testBall=off&testEnemies=off');
   const overflow = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     clientWidth: document.documentElement.clientWidth,
   }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
-  await page.screenshot({ path: `docs/evidence/m2/${testInfo.project.name}-layout-title.png` });
+  await page.screenshot({ path: `docs/evidence/m3/${testInfo.project.name}-layout-title.png` });
 });
 
 test('the directional pad drives the same movement as the keyboard', async ({ page }, testInfo) => {
@@ -137,5 +137,5 @@ test('reducing the viewport height refits the maze without a reload', async ({ p
     body: await page.screenshot(),
     contentType: 'image/png',
   });
-  await page.screenshot({ path: `docs/evidence/m2/${testInfo.project.name}-layout-resized.png` });
+  await page.screenshot({ path: `docs/evidence/m3/${testInfo.project.name}-layout-resized.png` });
 });

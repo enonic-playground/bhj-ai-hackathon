@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { ALPHABET } from '../src/game/words.js';
 import { createLevelOneMaze } from '../src/game/mazeData.js';
-import { FIXTURE, chaseUntilCaught, snapshot } from './support.js';
+import { CALM_FIXTURE, chaseUntilCaught, snapshot } from './support.js';
 
 const MAZE_COLUMNS = 21;
 const MAZE_ROWS = 23;
@@ -14,7 +14,7 @@ async function box(page: Page, selector: string) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(FIXTURE);
+  await page.goto(CALM_FIXTURE);
   await page.getByRole('button', { name: 'Start game' }).click();
   await expect(page.locator('#hud-mode')).toHaveText('Chase');
 });
@@ -126,7 +126,7 @@ test('a short viewport still fits the maze, the pad and the letters', async ({ p
     expect(key.height).toBeGreaterThanOrEqual(MIN_TARGET);
     expect(key.y + key.height).toBeLessThanOrEqual(viewport.height + 1);
   }
-  await page.screenshot({ path: `docs/evidence/m2/${testInfo.project.name}-guess-short.png` });
+  await page.screenshot({ path: `docs/evidence/m3/${testInfo.project.name}-guess-short.png` });
 
   // Back to the chase, the maze and pad still share the shorter viewport.
   await page.locator('[data-letter="Z"]').click();

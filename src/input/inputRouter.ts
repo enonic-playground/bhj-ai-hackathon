@@ -16,9 +16,10 @@ const KEY_DIRECTIONS: Readonly<Record<string, Direction>> = {
 
 /**
  * Which kind of key the current state owns. Chase owns movement; guessing owns
- * letters, so W/A/S/D spell guesses there instead of moving the player. The
- * title screen, the resume countdown and the result panel own neither, so held
- * or repeated input cannot leak across a transition.
+ * letters, so W/A/S/D spell guesses there instead of moving the player. Every
+ * other state — the title screen, the resume countdown, a pause, the death
+ * presentation and both end panels — owns neither, so held or repeated input
+ * cannot leak across a transition.
  */
 export type InputMode = 'movement' | 'letters' | 'none';
 
@@ -89,6 +90,25 @@ export function handleGameKey(game: Game, key: string, options: KeyOptions = {})
   }
 
   return UNOWNED;
+}
+
+/** The key that opens the pause overlay. It never closes it: see `handlePauseKey`. */
+export const PAUSE_KEY = 'Escape';
+
+/**
+ * Opens the pause overlay from an active state. Returns true when the game
+ * actually paused, which is the adapter's signal to stop handling the event.
+ *
+ * Escape only ever pauses. Making it a toggle would let the single press that
+ * opened the overlay reach the Resume control that the overlay moves focus to,
+ * so resuming is deliberately a separate action on a real button. Auto-repeat
+ * from a held key is ignored for the same reason.
+ */
+export function handlePauseKey(game: Game, key: string, options: KeyOptions = {}): boolean {
+  if (key !== PAUSE_KEY || options.repeat === true) {
+    return false;
+  }
+  return game.pause('manual');
 }
 
 /**

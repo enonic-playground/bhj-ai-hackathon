@@ -24,6 +24,12 @@ const PRODUCTION_SPEC = /production\.spec\.ts/;
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
+  // A journey now plays a real round against four enemies, dodging them with
+  // the game's own controls and waiting out any death it runs into, so a test
+  // needs more than Playwright's 30-second default. It has to stay above the
+  // budget `drive` gives itself in `e2e/support.ts`, or a slow chase fails the
+  // test before the helper can report what it was waiting for.
+  timeout: 90_000,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: [['list']],

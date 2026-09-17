@@ -4,7 +4,8 @@ import { DEFAULT_CONFIG } from '../src/game/config.js';
 import { createMaze, isPlayerWalkable, positionKey, tileAt } from '../src/game/maze.js';
 import { createLevelOneMaze } from '../src/game/mazeData.js';
 import { createSeededRandom } from '../src/game/random.js';
-import { chooseBallSpawn, occupiedTiles, pathDistances } from '../src/game/spawn.js';
+import { pathDistances } from '../src/game/paths.js';
+import { chooseBallSpawn, occupiedTiles } from '../src/game/spawn.js';
 import { corridorMaze, ringMaze } from './fixtures.js';
 
 /** Row with tunnel endpoints, where the seam is the short way round. */

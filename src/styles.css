@@ -90,7 +90,8 @@ body {
 
 .hud__stats {
   display: flex;
-  gap: 14px;
+  flex-wrap: wrap;
+  gap: 4px 14px;
   margin: 0;
 }
 
@@ -111,6 +112,39 @@ body {
   margin: 0;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
+}
+
+/* Lives read as a number and as markers, so the count never relies on shape
+   alone or on counting icons. */
+#hud-lives {
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+/* Protection is a HUD line as well as a ring on the maze. */
+.word__shield {
+  font-weight: 700;
+  color: #7cf6ff;
+}
+
+.word__shield[hidden] {
+  display: none;
+}
+
+/* The pause control is a full-size target and stays in the header in every
+   mode, so it is never swapped away with the panel beneath it. */
+.button--pause {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 16px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid #3a47a0;
+}
+
+.button--pause:disabled {
+  cursor: default;
+  opacity: 0.45;
 }
 
 .play {
@@ -285,6 +319,11 @@ body {
   border-radius: 10px;
 }
 
+.resume--dying .resume__message {
+  color: #ffd23f;
+  border-color: #8a6b1f;
+}
+
 .resume__count {
   margin: 0;
   font-size: 2.4rem;
@@ -387,6 +426,10 @@ body {
 .overlay {
   position: fixed;
   inset: 0;
+  /* Above the in-play overlays, including the mobile guessing panel, which is
+     positioned over the play area and would otherwise swallow taps meant for
+     Resume. */
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -397,6 +440,13 @@ body {
 
 .overlay[hidden] {
   display: none;
+}
+
+/* Every overlay button is a full-width target on a narrow screen, so Resume,
+   Restart run and Title screen never crowd each other. */
+.overlay .button {
+  width: 100%;
+  max-width: 320px;
 }
 
 .overlay__panel {
