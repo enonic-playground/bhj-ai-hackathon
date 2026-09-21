@@ -65,6 +65,24 @@ describe('BestScoreStore', () => {
     expect(JSON.parse(storage.getItem(KEY) as string).score).toBe(300);
   });
 
+  it('a stale tab, opened before either has scored, cannot overwrite a higher best saved meanwhile', () => {
+    const storage = memoryStorage();
+    const tabA = new BestScoreStore(storage);
+    const tabB = new BestScoreStore(storage); // Both open against one empty backend.
+
+    tabA.record(10_000);
+    expect(JSON.parse(storage.getItem(KEY) as string)).toEqual({ version: 1, score: 10_000 });
+
+    // Tab B still thinks the best is 0: its own smaller run score must not win.
+    tabB.record(10);
+    expect(JSON.parse(storage.getItem(KEY) as string)).toEqual({ version: 1, score: 10_000 });
+    expect(tabB.best).toBe(10_000); // Reconciled with the stored best, not overwritten by 10.
+
+    // Tab B's own next, genuine improvement still saves normally afterwards.
+    tabB.record(20_000);
+    expect(JSON.parse(storage.getItem(KEY) as string)).toEqual({ version: 1, score: 20_000 });
+  });
+
   for (const [label, raw] of [
     ['absent', null],
     ['malformed JSON', '{not json'],

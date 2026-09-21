@@ -53,8 +53,18 @@ export class BestScoreStore {
     return this.#best;
   }
 
-  /** Records a run's score; persists only when it actually improves the stored best. */
+  /**
+   * Records a run's score; persists only when it actually improves the
+   * stored best. Reconciles with whatever is currently in storage first, so a
+   * stale in-memory best from an earlier tab or read cannot overwrite a
+   * higher best another tab already saved. This reads storage once per score
+   * event, not per frame.
+   */
   record(score: number): void {
+    const stored = this.#readSafely();
+    if (stored > this.#best) {
+      this.#best = stored;
+    }
     if (!isValidScore(score) || score <= this.#best) {
       return;
     }
