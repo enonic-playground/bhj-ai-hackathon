@@ -6,15 +6,17 @@ Updated: 2026-09-21
 
 - Product baseline: PRD v1.0 accepted by the project owner.
 - Current milestone: M4 — complete campaign.
-- State: READY; Codex prepared the M4 brief and recorded owner-approved audio removal on 2026-09-21.
-- Current owner: Claude (M4 implementation); Codex has completed planning.
+- State: REVIEW; Claude implemented M4 and returns ownership to Codex on 2026-09-21.
+- Current owner: Codex (M4 review); the project owner triggers the review.
 - Current milestone handoff: `handoffs/M4.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: `80039b67eaab7cf1355669f6edc6a075cddfa9ca` (M3).
 - Acceptance blockers: none for M3. AC11 is verified; M3-R1 is closed by owner approval under D015. Remaining reduced-motion, real-device and broader playtesting work is tracked for later milestones/release.
 - M3 implementation base: `3b5255a11870d29ce5e25cc3141a258e8740ab24` on `main`. The planning the brief expected to find uncommitted (M2 acceptance, M3 brief, coordination updates) was already committed there, so nothing needed a separate checkpoint. The brief's reference HEAD `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` is that commit's parent.
-- M4 reference base HEAD: `a5d84530b13458e04603f54249d952eb65bab599` on `main`; checkpoint the known uncommitted M4 planning/audio-removal documents separately and record the actual implementation base.
-- Next action: Claude reads `handoffs/M4.md`, marks IMPLEMENTING and delivers the campaign, fruit, extra life, best score and pacing evidence without audio. Record a committed SHA and criteria/check evidence, then return ownership to Codex in REVIEW. No agent was launched automatically.
+- M4 reference base HEAD: `a5d84530b13458e04603f54249d952eb65bab599` on `main`.
+- M4 implementation base: `8e58ead18121572ad82772ef3485c0747fc5ba08` on `main` (checkpoints the M4 brief and D016 audio-removal documentation that was uncommitted at the reference HEAD; no application code in that commit).
+- M4 implementation commit: `daca44e3c0a439d2fdb278af0833df883973a4c8` on `main`. Word bank, five-level campaign transitions, fruit, centralized scoring with the sole extra life, and a resilient best-score store; see [D018](DECISIONS.md#d018--m4-implementation-choices) and the handoff's AC1–AC10 evidence.
+- Next action: Codex reviews the base-to-implementation diff (`8e58ead1..daca44e3`) against AC1–AC10, independently runs the checks, and either marks ACCEPTED or CHANGES_REQUESTED with findings for Claude to resolve. M4's known limitations (no human playtest, fruit/extra-life thresholds verified by the deterministic suite rather than a single continuous browser journey, Node 22.12.0 unverified) are recorded in the handoff, not hidden.
 
 
 ## Milestones
@@ -25,11 +27,13 @@ Updated: 2026-09-21
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
 | M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
-| M4: complete campaign | READY | `handoffs/M4.md`, AC1–AC10; D016 removes audio project-wide and D017 specifies campaign/scoring defaults. Claude owns implementation. |
+| M4: complete campaign | REVIEW | `daca44e3`: AC1–AC10 self-assessed Met by Claude, pending Codex's independent review. 257 unit/integration tests (53 new) and 69 browser tests (3 skipped) pass. See handoff. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
 
 ## Verification and budget
+
+M4 implementation round (Claude's reported results, 2026-09-21): from base `8e58ead1`, implemented the word bank, five-level transitions, fruit, centralized scoring with the sole extra life, and the best-score store at `daca44e3`. On Node 26.7.0 (npm 11.19.0), macOS arm64: `npm run typecheck`, `npm test` (257 tests in 21 files, up from 204), `npm run build`, `npm run build:fixture` and `npm run test:e2e` (69 passed, 3 intentional touch-only skips, up from 62/2) all passed; `npm run dev`, `npm run preview` and `npm run preview:fixture` returned HTTP 200. The browser suite was run twice end to end after the final change, both clean. Reaching the fruit thresholds and the 10,000-point extra life through continuous real browser play was judged impractical within this session given the authored maze's 200-plus dots; those edges are instead covered exactly by the new deterministic unit/integration suites (`tests/fruit.test.ts`, `tests/score.test.ts`), while `e2e/campaign.spec.ts` demonstrates a real fruit spawn/collection and the complete five-level campaign with real capture, guesses and Next level actions. No human playtest, no real-device check, and Node 22.12.0 was not re-verified. Claude's elapsed work was one long session; active session time and token usage were not measured. Screenshots are in `docs/evidence/m4/`; `docs/evidence/m1`–`m3/` are unchanged. Full evidence, AC1–AC10 assessment and limitations are in the handoff.
 
 M4 planning (2026-09-21): owner removed audio, music, sound effects and mute project-wide (D016). Active PRD/README/wireframe requirements are synchronized; historical handoffs retain their original context and are superseded by D016. M4 estimate stays 2–2.5 focused hours as an allowance, not a revised prediction. Planning changed no application code and no application tests were rerun; documentation consistency and SVG structure were checked. No measured planning token/session usage is available.
 
