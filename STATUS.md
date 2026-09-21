@@ -6,18 +6,18 @@ Updated: 2026-09-21
 
 - Product baseline: PRD v1.0 accepted by the project owner.
 - Current milestone: M4 — complete campaign.
-- State: REVIEW; Claude resolved M4-R1/R2 on 2026-09-21 and returns ownership to Codex.
-- Current owner: Codex (M4 recheck); the project owner triggers the review.
+- State: ACCEPTED; Codex independently closed M4-R1/R2 on 2026-09-21.
+- Current owner: Codex (planning the next milestone).
 - Current milestone handoff: `handoffs/M4.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
-- Last accepted implementation commit: `80039b67eaab7cf1355669f6edc6a075cddfa9ca` (M3).
-- Acceptance blockers: M4-R1 and M4-R2 have fix responses pending Codex's independent recheck; see the handoff's fix-response section. M3 remains accepted; M3-R1 stays closed by owner approval under D015.
+- Last accepted implementation commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` (M4).
+- Acceptance blockers: none for M4; M4-R1/R2 closed. Human pacing, real-device/PWA checks and the targeted coverage/layout follow-ups in review round 2 remain later milestone/release work.
 - M3 implementation base: `3b5255a11870d29ce5e25cc3141a258e8740ab24` on `main`. The planning the brief expected to find uncommitted (M2 acceptance, M3 brief, coordination updates) was already committed there, so nothing needed a separate checkpoint. The brief's reference HEAD `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` is that commit's parent.
 - M4 reference base HEAD: `a5d84530b13458e04603f54249d952eb65bab599` on `main`.
 - M4 implementation base: `8e58ead18121572ad82772ef3485c0747fc5ba08` on `main` (checkpoints the M4 brief and D016 audio-removal documentation that was uncommitted at the reference HEAD; no application code in that commit).
 - M4 implementation commit: `daca44e3c0a439d2fdb278af0833df883973a4c8` on `main`. Word bank, five-level campaign transitions, fruit, centralized scoring with the sole extra life, and a resilient best-score store; see [D018](DECISIONS.md#d018--m4-implementation-choices) and the handoff's AC1–AC10 evidence.
 - M4 fix commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` on `main`. Resolves M4-R1 (cross-tab best-score reconciliation) and M4-R2 (isolated extra-life award-source tests, a real death/respawn case and the final-campaign-bonus case); see [D019](DECISIONS.md#d019--m4-fix-round-choices) and the handoff's fix-response section.
-- Next action: Codex independently rechecks M4-R1/R2 against `f4708cb` (base `daca44e3`), reruns the required checks, and marks ACCEPTED or CHANGES_REQUESTED with any further findings. Do not begin M5 yet.
+- Next action: Codex prepares the M5 mobile/PWA implementation brief, carrying forward earned-life HUD/result-panel resize checks, retained denied-storage regression coverage and real-device validation. No M5 implementation has started.
 
 
 ## Milestones
@@ -28,11 +28,13 @@ Updated: 2026-09-21
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
 | M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
-| M4: complete campaign | REVIEW | `f4708cb`: fix response to M4-R1/R2; 263 tests (up from 257) and 69 browser tests (3 skipped) pass. Pending Codex's independent recheck. See handoff fix response. |
+| M4: complete campaign | ACCEPTED | `f4708cb`: Codex closed M4-R1/R2; independently passed 263 tests, both builds, 69 browser tests (3 skips) and two additional production denied-storage probes. See handoff review round 2. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
 
 ## Verification and budget
+
+M4 review round 2 (Codex, 2026-09-21): accepted `f4708cb` after rechecking `daca44e3..f4708cb` at clean HEAD `174d3f0`. Independently passed install, typecheck, 263 tests, both builds and 69 browser tests (3 intentional skips) on Node 26.7.0 / npm 11.19.0. The original stale-tab reproduction passes; scoring tests now exercise their named sources and transitions. Two temporary production browser probes also passed denied getter/quota-exceeded storage, in-memory best, reload and restart. Repository browser tests cover corruption, not denial: the handoff corrects that attribution and carries retained denial regression coverage forward. M4-R1/R2 are closed. No implementation edits, human playtest, real-device check or Node 22.12.0 rerun; targeted fruit-edge and new-panel/earned-life layout coverage remain follow-ups. Review time/tokens not measured; generated screenshots restored.
 
 M4 fix round (Claude's reported results, 2026-09-21): from base `daca44e3`, resolved M4-R1 by having `BestScoreStore.record()` reconcile with the currently stored best before comparing/writing, and resolved M4-R2 by rewriting `tests/score.test.ts`'s extra-life award-source tests so each named source (letter, ordinary word bonus, the final campaign-ending bonus, pellet, eaten enemy, fruit) is isolated and actually crosses the threshold in its own test, adding a real death/respawn case and a production-default check, at `f4708cb`. On Node 26.7.0 (npm 11.19.0), macOS arm64: `npm run typecheck`, `npm test` (263 tests in 21 files, up from 257), `npm run build`, `npm run build:fixture` and `npm run test:e2e` (69 passed, 3 intentional touch-only skips, unchanged) all passed. Reverting only the `bestScore.ts` fix and rerunning its test file reproduced Codex's exact M4-R1 failure, confirming the regression test is not vacuous. No browser spec needed changes, since both findings were reachable through the unit/integration layer. No human playtest, no real-device check, and Node 22.12.0 was not re-verified. Test-generated evidence screenshots were restored to the committed checkpoint after the browser suite ran. Full finding-by-finding resolution is in the handoff's fix-response section.
 
