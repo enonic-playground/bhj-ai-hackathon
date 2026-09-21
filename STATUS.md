@@ -1,19 +1,19 @@
 # Project status
 
-Updated: 2026-09-18
+Updated: 2026-09-21
 
 ## Current checkpoint
 
 - Product baseline: PRD v1.0 accepted by the project owner.
 - Current milestone: M3 — arcade danger.
-- State: REVIEW; Claude implemented the D015 ball hue cycle on 2026-09-18 at `80039b67eaab7cf1355669f6edc6a075cddfa9ca`.
-- Current owner: Codex (recheck). Claude has released the checkout.
+- State: ACCEPTED; Codex verified M3 including D015/AC11 on 2026-09-21.
+- Current owner: Codex (M4 planning).
 - Current milestone handoff: `handoffs/M3.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
-- Last accepted implementation commit: `0be0b4399100666b7fc52f488b394375d178cdfb` (M2).
-- Acceptance blockers: AC11 is implemented and awaits Codex's recheck. M3-R1 is CLOSED by owner-approved exception (D015); retain the existing enemy flash. Owner-reported user testing supports that effect; broader pacing/device checks remain unverified. M2-R1/R2 and M1 R1/R2/R3 remain closed.
+- Last accepted implementation commit: `80039b67eaab7cf1355669f6edc6a075cddfa9ca` (M3).
+- Acceptance blockers: none for M3. AC11 is verified; M3-R1 is closed by owner approval under D015. Remaining reduced-motion, real-device and broader playtesting work is tracked for later milestones/release.
 - M3 implementation base: `3b5255a11870d29ce5e25cc3141a258e8740ab24` on `main`. The planning the brief expected to find uncommitted (M2 acceptance, M3 brief, coordination updates) was already committed there, so nothing needed a separate checkpoint. The brief's reference HEAD `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` is that commit's parent.
-- Next action: Codex rechecks `3ff83337..80039b67` against AC11 in `handoffs/M3.md`, runs the checks independently, and records acceptance or further findings. The planning checkpoint `3ff83337` carries the review and amendment documents. M4 remains NOT_STARTED and must not begin before M3 is accepted.
+- Next action: Codex prepares M4's complete-campaign implementation brief from the accepted M3 baseline. M4 implementation has not started. Carry forward reduced-motion support to M5 and the recorded playtesting/device limitations.
 
 
 ## Milestones
@@ -23,12 +23,14 @@ Updated: 2026-09-18
 | M0: scope and preparation | ACCEPTED | PRD v1.0 accepted; estimates reconciled; shared workflow files, wireframe descriptions/SVGs, and M1 brief complete. Wireframes visually verified by the project owner on 2026-09-17. |
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
-| M3: arcade danger | REVIEW | `80039b67`: the D015 ball hue cycle on top of the reviewed `cf8be8ab`. Codex had independently passed install/typecheck/build, 198 tests and 56 browser tests there; M3-R1 is closed by owner approval. Claude now reports 204 tests and 62 browser runs (2 skipped) on Node 26.7.0; AC11 awaits Codex's recheck. |
+| M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
 | M4: complete campaign | NOT_STARTED | Depends on accepted M3. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
 
 ## Verification and budget
+
+M3 review round 2 (Codex, 2026-09-21): independently passed `npm ci`, typecheck, 204 tests, production build and the dual-build browser suite (62 passed, 2 intentional skips) on Node 26.7.0 at `80039b67`. AC11's cycle, freeze/resume and seam rendering passed; sampled canvas evidence was visually inspected. M3 is accepted, with M3-R1 closed by D015 owner approval. No real-time human playtest or real-device check was performed; reduced-motion remains M5/release work and Node 22.12.0 was not rerun. Review time/tokens were not measured. Earlier entries below retain their historical status.
 
 Owner amendment D015: the owner reports user testing found the existing frightened-enemy flash mild and beneficial and explicitly approves it. M3-R1 is closed by that specification exception, superseding its historical removal request below. M3 now includes AC11, a smooth two-second full-hue ball fill cycle using active maze time. No new implementation or verification is claimed by this planning update; the accepted PRD budget is unchanged.
 

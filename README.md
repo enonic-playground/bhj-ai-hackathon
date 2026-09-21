@@ -6,11 +6,11 @@ Catch a moving ball to enter Guessing mode. Reveal letters to solve the level's 
 
 ## Project status
 
-Product baseline v1.0 accepted on 2026-09-16. M0 planning is complete. M1 (playable maze) was accepted by Codex on 2026-09-17 after review and independent verification. Later milestones add enemies, the campaign, and PWA behavior. See [STATUS.md](STATUS.md) for the next action and nonblocking follow-ups.
+Product baseline v1.0 accepted on 2026-09-16. M0 planning is complete. M1 (playable maze) was accepted by Codex on 2026-09-17 after review and independent verification. Later milestones add the campaign and PWA behavior. See [STATUS.md](STATUS.md) for the next action and nonblocking follow-ups.
 
 Claude handles implementation and tests; Codex handles planning, coordination, verification, and code review.
 
-M2 (the defining chase/guess loop) is accepted at `0be0b439`; see [its handoff](handoffs/M2.md) for verification. M3 (arcade danger: four enemies, power pellets, lives, death, restart, pause, and the owner-approved ball hue cycle) is implemented and awaiting Codex's recheck; see [its handoff](handoffs/M3.md).
+M2 (the defining chase/guess loop) is accepted at `0be0b439`; see [its handoff](handoffs/M2.md) for verification. M3 (arcade danger: four enemies, power pellets, lives, death, restart, pause, and the owner-approved ball hue cycle) is accepted at `80039b67` after Codex's recheck on 2026-09-21; see [its handoff](handoffs/M3.md).
 
 Both agents follow [AGENTS.md](AGENTS.md) and resume from [STATUS.md](STATUS.md). Durable decisions live in [DECISIONS.md](DECISIONS.md); milestone briefs and review evidence use the [handoff template](handoffs/TEMPLATE.md). [CLAUDE.md](CLAUDE.md) points Claude to the shared instructions.
 
@@ -36,7 +36,7 @@ See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance c
 | `npm run build:fixture` | Test-only build with the deterministic start-up parameters, written to `dist-fixture/`. |
 | `npm run preview:fixture` | Serve the test-only build; the browser suite uses <http://127.0.0.1:4174>. |
 
-## What works today (M1 and M2 accepted; M3 in review)
+## What works today (M1–M3 accepted)
 
 A complete one-level game with both a win and a loss path: start with three lives, chase the ball while four enemies chase you, catch it, guess letters, miss and chase again, eat a power pellet and turn the tables, lose lives, and either solve the word or run out of lives and restart.
 

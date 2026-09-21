@@ -182,4 +182,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-M0 planning is complete and M1/M2 are accepted. [M3](handoffs/M3.md) has been reviewed; its owner-approved ball visibility amendment awaits implementation and recheck. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
+M0 planning is complete and M1–M3 are accepted, including [M3’s owner-approved ball visibility amendment](handoffs/M3.md). M4 planning is next. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
