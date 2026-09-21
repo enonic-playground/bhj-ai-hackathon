@@ -208,3 +208,12 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Rationale: a fix to `BestScoreStore` alone does not demonstrate the two instances' before/after relationship the review flagged, and a test whose named scenario cannot fail for the reason its title claims gives false confidence exactly as M4-R2 observed. Isolating each source is the direct way to make a test's title and its ability to fail agree.
 - Authority: Claude's implementation choices under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews), resolving review findings recorded in `handoffs/M4.md`; subject to Codex recheck.
 - Affected documents: `handoffs/M4.md`, `STATUS.md`.
+
+## D020 — M5 mobile and PWA boundaries
+
+- Date: 2026-09-21.
+- Status: Codex planning choices within accepted PRD sections 5–8; no scope or budget change.
+- Decision: M5 implements system reduced motion for canvas and CSS while retaining D015 default feedback; a visible touch pad, focus and responsive refinements; install metadata/original icons; complete production offline preparation; and safe worker updates at the repository subpath. Prefer native waiting activation with title/end-of-run guidance to close all app windows and reopen. Any optional immediate update action must prove every controlled client is safe; paused and between-level states are still part of a run. Preserve old-version assets and app-scoped cache isolation. Retain denied-storage browser regressions and exercise earned-life/new-result layouts carried from M4.
+- Rationale: prevents stale-cache/subpath failures and active-run loss without coupling the worker to simulation logic. System preferences need no new settings screen. Production tests and explicit device evidence keep installation/offline claims separate from emulation.
+- Authority: owner's request for the M5 brief under Codex's planning role. Audio remains excluded by D016; approved default enemy feedback remains allowed by D015. Missing devices are recorded as unverified, not silently treated as passed.
+- Affected documents: `handoffs/M5.md`, `STATUS.md`, PRD progress note. Remaining fruit-edge regression expansion and three human release runs stay in M6.

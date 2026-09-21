@@ -5,10 +5,10 @@ Updated: 2026-09-21
 ## Current checkpoint
 
 - Product baseline: PRD v1.0 accepted by the project owner.
-- Current milestone: M4 — complete campaign.
-- State: ACCEPTED; Codex independently closed M4-R1/R2 on 2026-09-21.
-- Current owner: Codex (planning the next milestone).
-- Current milestone handoff: `handoffs/M4.md`.
+- Current milestone: M5 — mobile usability and PWA.
+- State: READY; M5 brief prepared on 2026-09-21. M4 remains ACCEPTED.
+- Current owner: Claude (M5 implementation); the project owner triggers the session.
+- Current milestone handoff: `handoffs/M5.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` (M4).
 - Acceptance blockers: none for M4; M4-R1/R2 closed. Human pacing, real-device/PWA checks and the targeted coverage/layout follow-ups in review round 2 remain later milestone/release work.
@@ -17,7 +17,8 @@ Updated: 2026-09-21
 - M4 implementation base: `8e58ead18121572ad82772ef3485c0747fc5ba08` on `main` (checkpoints the M4 brief and D016 audio-removal documentation that was uncommitted at the reference HEAD; no application code in that commit).
 - M4 implementation commit: `daca44e3c0a439d2fdb278af0833df883973a4c8` on `main`. Word bank, five-level campaign transitions, fruit, centralized scoring with the sole extra life, and a resilient best-score store; see [D018](DECISIONS.md#d018--m4-implementation-choices) and the handoff's AC1–AC10 evidence.
 - M4 fix commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` on `main`. Resolves M4-R1 (cross-tab best-score reconciliation) and M4-R2 (isolated extra-life award-source tests, a real death/respawn case and the final-campaign-bonus case); see [D019](DECISIONS.md#d019--m4-fix-round-choices) and the handoff's fix-response section.
-- Next action: Codex prepares the M5 mobile/PWA implementation brief, carrying forward earned-life HUD/result-panel resize checks, retained denied-storage regression coverage and real-device validation. No M5 implementation has started.
+- M5 reference base: `0509af884bd895451d248fee1ad6e00a337c5324` on `main`; checkpoint the new planning documents before implementation and record the actual base.
+- Next action: Claude reads `handoffs/M5.md`, checkpoints planning, marks IMPLEMENTING, and delivers mobile/reduced-motion refinements, production install/offline support and safe updates with the specified evidence. Device availability must be recorded; emulation does not satisfy real-device checks.
 
 
 ## Milestones
@@ -29,10 +30,12 @@ Updated: 2026-09-21
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
 | M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
 | M4: complete campaign | ACCEPTED | `f4708cb`: Codex closed M4-R1/R2; independently passed 263 tests, both builds, 69 browser tests (3 skips) and two additional production denied-storage probes. See handoff review round 2. |
-| M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
+| M5: mobile and PWA | READY | Brief in `handoffs/M5.md`; M4 accepted. Claude owns implementation. Production subpath/offline/update checks and explicit device evidence required. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
 
 ## Verification and budget
+
+M5 planning (Codex, 2026-09-21): prepared `handoffs/M5.md` and D020 from clean HEAD `0509af88`. Scope covers mobile/focus/reduced motion, manifest/icons, production offline preparation, safe waiting updates, storage regressions and device documentation. Retains PRD allowance of 1.5–2 focused hours; no new token/session estimate or budget change. No application code changed or application checks rerun in this planning turn. Human pacing and device evidence remain unverified until performed.
 
 M4 review round 2 (Codex, 2026-09-21): accepted `f4708cb` after rechecking `daca44e3..f4708cb` at clean HEAD `174d3f0`. Independently passed install, typecheck, 263 tests, both builds and 69 browser tests (3 intentional skips) on Node 26.7.0 / npm 11.19.0. The original stale-tab reproduction passes; scoring tests now exercise their named sources and transitions. Two temporary production browser probes also passed denied getter/quota-exceeded storage, in-memory best, reload and restart. Repository browser tests cover corruption, not denial: the handoff corrects that attribution and carries retained denial regression coverage forward. M4-R1/R2 are closed. No implementation edits, human playtest, real-device check or Node 22.12.0 rerun; targeted fruit-edge and new-panel/earned-life layout coverage remain follow-ups. Review time/tokens not measured; generated screenshots restored.
 
