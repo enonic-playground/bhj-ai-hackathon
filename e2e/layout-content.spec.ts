@@ -158,3 +158,31 @@ test('a five-digit score and a four-life earned-life badge fit the HUD', async (
   await expect(page.locator('#hud-extra-life')).toBeVisible();
   await page.screenshot({ path: `docs/evidence/m5/${testInfo.project.name}-hud-extremes.png` });
 });
+
+test('expanding install help at a short viewport still leaves the title heading reachable by scrolling', async ({
+  page,
+}, testInfo) => {
+  // M5-R4: the "Install manually" disclosure grows the title overlay taller
+  // than the viewport; plain flexbox centering then clips the panel's top
+  // regardless of scrolling (scrollTop 0 already sits past it), which this
+  // reproduces exactly the way the review round found it — expand, scroll
+  // the overlay to its true top, then check the heading is actually there.
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto('/?testBall=off&testEnemies=off');
+
+  await page.locator('#pwa-install-help summary').click();
+  await expect(page.locator('#pwa-install-help')).toHaveAttribute('open', '');
+
+  await page.evaluate(() => document.querySelector('#title-screen')?.scrollTo(0, 0));
+  const headingBox = await page.locator('#title-heading').boundingBox();
+  expect(headingBox).not.toBeNull();
+  expect(headingBox?.y ?? -1).toBeGreaterThanOrEqual(0);
+  await expect(page.locator('#title-heading')).toBeInViewport();
+
+  // The disclosure itself is a full touch target, not just its text line.
+  const summaryBox = await page.locator('#pwa-install-help summary').boundingBox();
+  expect(summaryBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+
+  expect(await overflowsHorizontally(page)).toBe(false);
+  await page.screenshot({ path: `docs/evidence/m5/${testInfo.project.name}-install-help-expanded.png` });
+});

@@ -54,7 +54,18 @@ self.addEventListener('activate', (event) => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+          .filter((key) => {
+            if (key === CACHE_NAME) return false;
+            // A plain `startsWith(CACHE_PREFIX)` is not enough: the root
+            // scope "/" is itself a *string* prefix of every deeper scope
+            // ("/other-app/", "/game/other/", ...), so it would also match
+            // and delete a sibling or nested app's own valid cache. Parsing
+            // the scope back out and comparing it for exact equality (not
+            // prefix) is what actually confines deletion to this worker's
+            // own scope, however that scope nests relative to another app's.
+            const match = /^hacman-cache:(.*):[^:]+$/.exec(key);
+            return match !== null && match[1] === SCOPE_PATH;
+          })
           .map((key) => caches.delete(key)),
       );
     })(),

@@ -24,13 +24,57 @@ function listFiles(dir: string, base = dir): string[] {
   return files.sort();
 }
 
+export interface ServiceWorkerBuild {
+  readonly version: string;
+  readonly source: string;
+  readonly precacheUrls: readonly string[];
+}
+
+/**
+ * Computes the generated worker's source and version from what a build
+ * actually wrote to `outDir` plus the template's own content. Exported (and
+ * kept pure — no console output, no write) so `tests/serviceWorkerVersion.test.ts`
+ * can exercise the real fingerprinting logic directly against small
+ * controlled directories, instead of only through a full `vite build`.
+ *
+ * The version hashes every precached file's actual *bytes*, not just its
+ * name: a build-hashed JS/CSS chunk's filename already changes on any
+ * content edit, but `index.html`, the manifest and the icons are copied
+ * verbatim with stable names, so a content-only edit to any of them (or to
+ * the worker template itself, which is not part of `outDir` at all) would
+ * otherwise leave the emitted `sw.js` byte-identical and never install for
+ * an existing client (M5-R2).
+ */
+export function computeServiceWorkerSource(outDir: string, templatePath: string): ServiceWorkerBuild | null {
+  if (!existsSync(outDir) || !existsSync(templatePath)) {
+    return null;
+  }
+
+  const precacheUrls = listFiles(outDir);
+  const hash = createHash('sha256');
+  for (const url of precacheUrls) {
+    hash.update(url);
+    hash.update('\0');
+    hash.update(readFileSync(path.join(outDir, url)));
+    hash.update('\0');
+  }
+  const template = readFileSync(templatePath, 'utf8');
+  hash.update(template);
+  const version = hash.digest('hex').slice(0, 16);
+
+  const source = template
+    .replace('__HACMAN_SW_VERSION__', version)
+    .replace('__HACMAN_PRECACHE_URLS__', JSON.stringify(precacheUrls));
+
+  return { version, source, precacheUrls };
+}
+
 /**
  * Emits `dist/sw.js` from `sw/service-worker.template.js`, filling in the
  * real precache list (every file the production build actually wrote,
  * relative filenames only — the worker resolves them against its own scope
  * at runtime, so the same output works at the origin root or a subpath) and
- * a version derived from that list plus `index.html`'s content, since that
- * one precached file's name is never content-hashed by Vite. Applies only to
+ * a content-derived version (`computeServiceWorkerSource`). Applies only to
  * the ordinary production build: `npm run build:fixture` and the dev server
  * must never register this worker (D020).
  */
@@ -48,27 +92,14 @@ function hacmanServiceWorkerPlugin(): Plugin {
     },
     closeBundle() {
       const templatePath = path.resolve(import.meta.dirname, 'sw/service-worker.template.js');
-      if (!existsSync(outDir) || !existsSync(templatePath)) {
+      const result = computeServiceWorkerSource(outDir, templatePath);
+      if (!result) {
         return;
       }
 
-      const precacheUrls = listFiles(outDir);
-      const indexHtmlPath = path.join(outDir, 'index.html');
-      const indexHtmlContent = existsSync(indexHtmlPath) ? readFileSync(indexHtmlPath) : Buffer.alloc(0);
-      const version = createHash('sha256')
-        .update(precacheUrls.join('\n'))
-        .update(indexHtmlContent)
-        .digest('hex')
-        .slice(0, 16);
-
-      const template = readFileSync(templatePath, 'utf8');
-      const source = template
-        .replace('__HACMAN_SW_VERSION__', version)
-        .replace('__HACMAN_PRECACHE_URLS__', JSON.stringify(precacheUrls));
-
-      writeFileSync(path.join(outDir, 'sw.js'), source);
+      writeFileSync(path.join(outDir, 'sw.js'), result.source);
       console.log(
-        `hacman-service-worker: wrote ${path.join(outDir, 'sw.js')}, version ${version}, ${precacheUrls.length} precached files`,
+        `hacman-service-worker: wrote ${path.join(outDir, 'sw.js')}, version ${result.version}, ${result.precacheUrls.length} precached files`,
       );
     },
   };

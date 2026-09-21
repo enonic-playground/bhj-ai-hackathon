@@ -466,8 +466,15 @@ body {
      Resume. */
   z-index: 10;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Plain `center` clips the top of a panel taller than the viewport: the
+     browser centers it symmetrically regardless of overflow, which leaves
+     scrollTop 0 already short of the panel's real top edge and nothing can
+     scroll further up to reach it (M5-R4, reproduced with expanded install
+     help at 360 x 640). `safe center` centers only while everything fits and
+     falls back to aligning from the start — so scrolling from the top always
+     reaches the top of the content — the moment it does not. */
+  align-items: safe center;
+  justify-content: safe center;
   padding: 16px;
   overflow: auto;
   background: rgba(3, 5, 16, 0.94);
@@ -563,7 +570,14 @@ body {
 }
 
 .pwa__help summary {
+  /* `box-sizing: border-box` lets `min-height` include the padding, so the
+     whole clickable summary row — not just its text line, measured at 15px
+     (M5-R4) — meets the 44px touch target the rest of the app uses. */
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 12px 4px;
   font-size: 0.78rem;
+  line-height: 1.4;
   color: var(--text);
   cursor: pointer;
 }
