@@ -14,6 +14,8 @@ import { MazeRenderer } from '../render/renderer.js';
 import { BestScoreStore, resolveLocalStorage } from './bestScore.js';
 import { readTestFixture } from './fixture.js';
 import { FrameTiming } from './frameTiming.js';
+import { initPwa } from './pwa.js';
+import { ReducedMotionWatcher } from './reducedMotion.js';
 
 /** Read-only state readout used by browser tests; it never mutates the game. */
 export interface HacManTestApi {
@@ -118,6 +120,10 @@ export function mountApp(): Game {
   const maskOutput = requireElement<HTMLElement>('#word-mask');
   const feedbackOutput = requireElement<HTMLElement>('#word-feedback');
   const missesOutput = requireElement<HTMLElement>('#word-misses');
+  const pwaOfflineStatus = requireElement<HTMLElement>('#pwa-offline-status');
+  const pwaUpdateStatus = requireElement<HTMLElement>('#pwa-update-status');
+  const pwaInstallButton = requireElement<HTMLButtonElement>('#pwa-install-button');
+  const pwaInstallHelpText = requireElement<HTMLElement>('#pwa-install-help-text');
 
   // Fixture parameters take effect only in the test-only build (`npm run
   // build:fixture`). `__TEST_FIXTURES__` is a build-time constant, so an
@@ -129,6 +135,11 @@ export function mountApp(): Game {
     __TEST_FIXTURES__ ? readTestFixture(window.location.search) : {},
   );
   const renderer = new MazeRenderer(canvas, game.maze);
+  const reducedMotion = new ReducedMotionWatcher(
+    typeof window.matchMedia === 'function' ? window.matchMedia.bind(window) : undefined,
+    (value) => renderer.setReducedMotion(value),
+  );
+  renderer.setReducedMotion(reducedMotion.reducedMotion);
   const bestScore = new BestScoreStore(resolveLocalStorage());
   let lastRecordedScore = -1;
   let extraLifeAnnounced = false;
@@ -532,6 +543,18 @@ export function mountApp(): Game {
   window.requestAnimationFrame(frame);
 
   window.__hacman = { getSnapshot: () => game.snapshot() };
+
+  // The service worker and its offline claims apply to ordinary production
+  // output only: never the dev server, never the fixture build (D020).
+  initPwa(
+    {
+      offlineStatus: pwaOfflineStatus,
+      updateStatus: pwaUpdateStatus,
+      installButton: pwaInstallButton,
+      installHelpText: pwaInstallHelpText,
+    },
+    import.meta.env.PROD && !__TEST_FIXTURES__,
+  );
 
   return game;
 }

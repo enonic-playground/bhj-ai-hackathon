@@ -4,6 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="Hac-Man: maze-chase arcade action combined with word discovery." />
+    <meta name="theme-color" content="#05060f" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png" />
+    <link rel="icon" href="icons/icon-512.png" sizes="512x512" type="image/png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <title>Hac-Man</title>
   </head>
   <body>
@@ -85,6 +90,17 @@
         <p class="overlay__lead">Chase the ball through the maze while four enemies chase you. Catch it to guess a letter of the hidden word; a wrong letter sends you back into the maze.</p>
         <p class="overlay__lead">Best score: <strong id="title-best-score">0</strong></p>
         <button class="button button--primary" id="start-button" type="button">Start game</button>
+
+        <div class="pwa" id="pwa-status">
+          <p class="pwa__line" id="pwa-offline-status" role="status" aria-live="polite">Checking offline readiness…</p>
+          <p class="pwa__line pwa__line--update" id="pwa-update-status" role="status" aria-live="polite" hidden></p>
+          <button class="button button--secondary" id="pwa-install-button" type="button" hidden>Install Hac-Man</button>
+          <details class="pwa__help" id="pwa-install-help">
+            <summary>Install manually</summary>
+            <p id="pwa-install-help-text">Checking this browser's install support…</p>
+          </details>
+        </div>
+
         <h2 class="overlay__subheading">How to play</h2>
         <ul class="overlay__list">
           <li>Move with the arrow keys or WASD; on touch, use the on-screen pad. Escape or the Pause button pauses.</li>

@@ -14,12 +14,14 @@ const FIXTURE_URL = `http://127.0.0.1:${FIXTURE_PORT}`;
  *   round reproducible;
  * - the `production` project serves the ordinary production build (`npm run
  *   build`), plays a round with no parameters at all, and proves that the
- *   fixture parameters have no effect on it.
+ *   fixture parameters have no effect on it. The service worker only exists
+ *   in this build (M5, brief item 7), so PWA/offline/update/storage-failure
+ *   journeys belong here too.
  *
- * `e2e/production.spec.ts` therefore belongs to the production project alone,
- * and every other spec to the fixture projects.
+ * These production-only specs therefore belong to the production project
+ * alone, and every other spec to the fixture projects.
  */
-const PRODUCTION_SPEC = /production\.spec\.ts/;
+const PRODUCTION_SPEC = /(?:^|\/)(production|pwa[-.]?\w*|storage)\.spec\.ts$/;
 
 export default defineConfig({
   testDir: './e2e',

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { BALL_HUE_CYCLE_MS, ballFillColor } from '../src/render/renderer.js';
+import { BALL_HUE_CYCLE_MS, ballFillColor as ballFillColorAt } from '../src/render/motion.js';
+
+/** This file exercises normal motion only; `tests/motion.test.ts` covers reduced motion. */
+function ballFillColor(activeTimeMs: number): string {
+  return ballFillColorAt(activeTimeMs, false);
+}
 
 /**
  * These checks describe what the colour has to do, not how it is produced: the

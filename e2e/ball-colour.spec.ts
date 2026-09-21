@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { createLevelOneMaze } from '../src/game/mazeData.js';
-import { BALL_HUE_CYCLE_MS } from '../src/render/renderer.js';
+import { BALL_HUE_CYCLE_MS } from '../src/render/motion.js';
 import { CALM_FIXTURE, chaseUntilCaught, snapshot } from './support.js';
 
 /**

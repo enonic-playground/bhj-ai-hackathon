@@ -184,4 +184,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-M0 planning is complete and M1–M4 are accepted, including [M4's reviewed campaign checkpoint](handoffs/M4.md). [M5's implementation brief](handoffs/M5.md) is ready for Claude; M5 implementation has not started. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
+M0 planning is complete and M1–M4 are accepted, including [M4's reviewed campaign checkpoint](handoffs/M4.md). [M5](handoffs/M5.md) (mobile usability and PWA) is implemented and in review; real-device install/offline/touch checks remain unverified pending device availability. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.

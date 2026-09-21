@@ -6,8 +6,10 @@ Updated: 2026-09-21
 
 - Product baseline: PRD v1.0 accepted by the project owner.
 - Current milestone: M5 — mobile usability and PWA.
-- State: READY; M5 brief prepared on 2026-09-21. M4 remains ACCEPTED.
-- Current owner: Claude (M5 implementation); the project owner triggers the session.
+- State: REVIEW as of this session. M5 brief prepared on 2026-09-21; M4 remains ACCEPTED.
+- Current owner: Codex (M5 review); the project owner triggers the session.
+- M5 implementation base: clean HEAD `19bb0529bccd0fc7aaf07b7cc4bb6347fda8950a` (the M5 brief commit itself — the checkout was already clean at planning start, so no separate checkpoint commit was needed).
+- M5 implementation commit: `<recorded in the following documentation commit>` on `main`. Reduced motion (canvas + CSS), responsive/focus refinements re-verified with new landscape/long-content/misses/five-digit-score/earned-life-badge/both-result-panel coverage, an original-artwork manifest/icon set, a build-generated service worker with complete offline preparation and a native (no `skipWaiting`/`clients.claim`) safe-update lifecycle, and retained denied-storage browser regressions; see [D021](DECISIONS.md#d021--m5-implementation-choices) and the handoff's AC1–AC9 evidence and device matrix.
 - Current milestone handoff: `handoffs/M5.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` (M4).
@@ -17,8 +19,9 @@ Updated: 2026-09-21
 - M4 implementation base: `8e58ead18121572ad82772ef3485c0747fc5ba08` on `main` (checkpoints the M4 brief and D016 audio-removal documentation that was uncommitted at the reference HEAD; no application code in that commit).
 - M4 implementation commit: `daca44e3c0a439d2fdb278af0833df883973a4c8` on `main`. Word bank, five-level campaign transitions, fruit, centralized scoring with the sole extra life, and a resilient best-score store; see [D018](DECISIONS.md#d018--m4-implementation-choices) and the handoff's AC1–AC10 evidence.
 - M4 fix commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` on `main`. Resolves M4-R1 (cross-tab best-score reconciliation) and M4-R2 (isolated extra-life award-source tests, a real death/respawn case and the final-campaign-bonus case); see [D019](DECISIONS.md#d019--m4-fix-round-choices) and the handoff's fix-response section.
-- M5 reference base: `0509af884bd895451d248fee1ad6e00a337c5324` on `main`; checkpoint the new planning documents before implementation and record the actual base.
-- Next action: Claude reads `handoffs/M5.md`, checkpoints planning, marks IMPLEMENTING, and delivers mobile/reduced-motion refinements, production install/offline support and safe updates with the specified evidence. Device availability must be recorded; emulation does not satisfy real-device checks.
+- M5 reference base: `0509af884bd895451d248fee1ad6e00a337c5324` on `main`.
+- Acceptance blockers for M5: real-device install/offline/touch/orientation checks (AC2/AC4/AC9) are UNVERIFIED — no physical device or HTTPS-hosted deployment was available in this session; see the handoff's device matrix for the exact owner-run resumption steps. All other AC1–AC9 evidence is automated and passing (292 unit tests, both builds, 95 browser tests with the same 3 intentional skips as M4).
+- Next action: Codex reviews the base-to-implementation diff and the handoff's AC1–AC9 evidence, independently runs the checks, and decides ACCEPTED or CHANGES_REQUESTED. If accepted with the device checks still unverified, record that explicitly rather than treating emulation as a substitute, consistent with the brief.
 
 
 ## Milestones
@@ -30,10 +33,12 @@ Updated: 2026-09-21
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
 | M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
 | M4: complete campaign | ACCEPTED | `f4708cb`: Codex closed M4-R1/R2; independently passed 263 tests, both builds, 69 browser tests (3 skips) and two additional production denied-storage probes. See handoff review round 2. |
-| M5: mobile and PWA | READY | Brief in `handoffs/M5.md`; M4 accepted. Claude owns implementation. Production subpath/offline/update checks and explicit device evidence required. |
+| M5: mobile and PWA | REVIEW | Implemented, see `handoffs/M5.md`: 292 unit tests, both builds, 95 browser tests (3 skips), real production service-worker/offline/update-lifecycle journeys. Real-device install/offline/touch checks UNVERIFIED (no device available); Codex review pending. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
 
 ## Verification and budget
+
+M5 implementation round (Claude's reported results, 2026-09-21): from base `19bb0529`, implemented reduced motion (`src/render/motion.ts`, `src/app/reducedMotion.ts`), responsive/focus/safe-area refinements, a generated manifest/icon set (`scripts/generate-icons.mjs`), a build-generated production service worker (`sw/service-worker.template.js`, `vite.config.ts`'s `hacmanServiceWorkerPlugin`) with complete offline preparation and a native-lifecycle safe update path, and retained denied-storage browser regressions; see [D021](DECISIONS.md#d021--m5-implementation-choices) and the handoff's summary/AC evidence. On Node 26.7.0 (npm 11.19.0), macOS arm64: `npm run typecheck`, `npm test` (292 tests in 25 files, up from 263), `npm run build`, `npm run build:fixture` and `npm run test:e2e` (95 passed, 3 intentional touch-only skips, up from 69/3) all passed, run twice end to end after the final change. A real bug — `Vary: Origin`-header cache-matching silently dropping the app's own hashed JS/CSS while offline — was found and fixed during this work; the fix (`{ ignoreVary: true }`) is covered by the retained `e2e/pwa.spec.ts` offline journeys. No human playtest, no real-device install/offline/touch/orientation check, and Node 22.12.0 was not re-verified; the handoff's device matrix names exact owner-run resumption steps. Test-generated evidence screenshots in `docs/evidence/m3/` and `docs/evidence/m4/` were restored to their committed versions after the browser suite ran; new M5 evidence is in `docs/evidence/m5/`. Claude's elapsed work was one long session; active session time and token usage were not measured.
 
 M5 planning (Codex, 2026-09-21): prepared `handoffs/M5.md` and D020 from clean HEAD `0509af88`. Scope covers mobile/focus/reduced motion, manifest/icons, production offline preparation, safe waiting updates, storage regressions and device documentation. Retains PRD allowance of 1.5–2 focused hours; no new token/session estimate or budget change. No application code changed or application checks rerun in this planning turn. Human pacing and device evidence remain unverified until performed.
 

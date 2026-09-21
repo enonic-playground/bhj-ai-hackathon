@@ -2,7 +2,7 @@ import type { EnemyDefinition } from '../game/config.js';
 import type { BallSpawnSelector, GameOptions, WordSelectionContext } from '../game/game.js';
 import { isPlayerWalkable, tileAt } from '../game/maze.js';
 import { createSeededRandom, type RandomSource } from '../game/random.js';
-import { SEED_WORDS, type WordEntry } from '../game/words.js';
+import { SEED_WORDS, WORD_BANK, type WordEntry } from '../game/words.js';
 
 /**
  * Deterministic start-up for browser tests, read from the query string:
@@ -24,6 +24,13 @@ import { SEED_WORDS, type WordEntry } from '../game/words.js';
  * - `testEnemies=off` runs the maze with no enemies, for the same reason: the
  *   inherited M1/M2 journeys assert movement and layout, not survival. The M3
  *   journeys and the production smoke keep the real four.
+ * - `testBankWord=<index>` pins every level's word to `WORD_BANK[index]` (the
+ *   real 50-entry campaign bank, at 4–8 letters) instead of the small 8-entry
+ *   `SEED_WORDS` list `testWord`/`testWords` draw from. It exists solely so an
+ *   M5 layout journey can render a genuine 8-letter word/category — the
+ *   longest and shortest, unlike anything reachable through `SEED_WORDS` —
+ *   without reaching level 5 for real or touching any existing `testWord`/
+ *   `testWords` index, which stay backed by `SEED_WORDS` exactly as before.
  *
  * All are ignored unless present and well formed, so an ordinary visit to the
  * app is unaffected. They only choose what a round or a level starts with:
@@ -48,6 +55,14 @@ export function readTestFixture(search: string): GameOptions {
   const wordIndex = params.get('testWord');
   if (wordIndex !== null && /^\d{1,3}$/.test(wordIndex)) {
     const entry = SEED_WORDS[Number(wordIndex)];
+    if (entry) {
+      options.selectWord = () => entry;
+    }
+  }
+
+  const bankWordIndex = params.get('testBankWord');
+  if (bankWordIndex !== null && /^\d{1,3}$/.test(bankWordIndex)) {
+    const entry = WORD_BANK[Number(bankWordIndex)];
     if (entry) {
       options.selectWord = () => entry;
     }

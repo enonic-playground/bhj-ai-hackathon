@@ -2,6 +2,7 @@ import type { EnemyKind } from '../game/config.js';
 import type { Enemy } from '../game/enemy.js';
 import type { Game } from '../game/game.js';
 import type { Maze, Tile } from '../game/maze.js';
+import { ballFillColor, frightenedTone, pelletRadiusFactor, protectionAlpha } from './motion.js';
 
 const COLORS = {
   background: '#05060f',
@@ -40,37 +41,6 @@ const ENEMY_STYLES: Record<EnemyKind, { readonly color: string; readonly mark: M
 
 type MarkShape = 'circle' | 'triangle' | 'square' | 'diamond';
 
-/**
- * The ball's fill runs once through every hue in this much active maze time.
- * Because the phase comes from the game's own active time, it advances only
- * while the maze does: guessing, the countdown, a death, a pause and the result
- * panels all hold the colour still, and returning never jumps ahead.
- */
-export const BALL_HUE_CYCLE_MS = 2000;
-
-/** The hue the cycle starts from: M2's ball colour, so a fresh run looks familiar. */
-const BALL_START_HUE = 172;
-/** Held constant across the cycle, so every hue is equally bright and saturated. */
-const BALL_SATURATION = 85;
-const BALL_LIGHTNESS = 62;
-
-/**
- * The ball's fill at a moment of active maze time.
- *
- * Hue is a continuous function of time taken modulo 360, so the 360°/0° join is
- * the same smooth step as any other: the colour sweeps rather than jumping
- * between discrete values, and it is never blinked on or off.
- */
-export function ballFillColor(activeTimeMs: number): string {
-  const turns = (BALL_START_HUE + (360 * activeTimeMs) / BALL_HUE_CYCLE_MS) / 360;
-  const hue = (turns - Math.floor(turns)) * 360;
-  return `hsl(${hue.toFixed(3)}, ${BALL_SATURATION}%, ${BALL_LIGHTNESS}%)`;
-}
-
-/** Frightened enemies flash white for the last stretch of the effect. */
-const FRIGHTENED_WARNING_MS = 1800;
-const FRIGHTENED_FLASH_PERIOD_MS = 250;
-
 type SolidGroup = 'wall' | 'home';
 
 /** Solid tiles grouped by appearance; corridors return null. */
@@ -92,6 +62,7 @@ export class MazeRenderer {
   readonly #context: CanvasRenderingContext2D;
   readonly #maze: Maze;
   #tileSize = 0;
+  #reducedMotion = false;
 
   constructor(canvas: HTMLCanvasElement, maze: Maze) {
     const context = canvas.getContext('2d');
@@ -105,6 +76,17 @@ export class MazeRenderer {
 
   get tileSize(): number {
     return this.#tileSize;
+  }
+
+  /**
+   * Applies the system `prefers-reduced-motion` preference to canvas effects
+   * (AC3): the ball fill, pellet pulse, frightened-expiry flash and
+   * protection ring all switch to a stable presentation. Essential actor
+   * movement, chomp animation and one-time transition effects (death,
+   * capture) are unaffected — only continuously looping decoration changes.
+   */
+  setReducedMotion(reducedMotion: boolean): void {
+    this.#reducedMotion = reducedMotion;
   }
 
   /**
@@ -228,11 +210,14 @@ export class MazeRenderer {
     }
   }
 
-  /** Pellets pulse, so they read as the powerful pick-up rather than a big dot. */
+  /**
+   * Pellets pulse, so they read as the powerful pick-up rather than a big
+   * dot; reduced motion holds a steady mid-cycle size instead (AC3).
+   */
   #drawPowerPellets(game: Game, timeMs: number): void {
     const ctx = this.#context;
     const tile = this.#tileSize;
-    const pulse = 0.28 + 0.06 * Math.sin(timeMs / 180);
+    const pulse = pelletRadiusFactor(timeMs, this.#reducedMotion);
     ctx.fillStyle = COLORS.pellet;
     for (const pellet of game.remainingPowerPellets()) {
       ctx.beginPath();
@@ -288,8 +273,9 @@ export class MazeRenderer {
       return;
     }
     // One colour for the whole frame, handed to both seam copies, so the two
-    // halves of a ball crossing the tunnel can never be a cycle apart.
-    const fill = ballFillColor(timeMs);
+    // halves of a ball crossing the tunnel can never be a cycle apart. In
+    // reduced motion this is a stable colour rather than the D015 hue cycle.
+    const fill = ballFillColor(timeMs, this.#reducedMotion);
     this.#atSeam(ball.x, (x) => this.#drawBallAt(x, ball.y, fill));
   }
 
@@ -349,14 +335,15 @@ export class MazeRenderer {
     this.#drawEyes(centreX, centreY, radius, enemy.actor.direction, edible);
   }
 
+  /**
+   * Flashing warns that the effect is about to end, without relying on
+   * colour alone: the body also alternates between two clearly different
+   * tones. Reduced motion holds the warning tone steady instead of blinking
+   * it (AC3), keeping the nonflashing cue that the effect is about to end.
+   */
   #frightenedColor(frightenedMs: number, timeMs: number): string {
-    if (frightenedMs > FRIGHTENED_WARNING_MS) {
-      return COLORS.frightened;
-    }
-    // Flashing warns that the effect is about to end, without relying on colour
-    // alone: the body also alternates between two clearly different tones.
-    const flashing = Math.floor(timeMs / FRIGHTENED_FLASH_PERIOD_MS) % 2 === 0;
-    return flashing ? COLORS.frightenedFlash : COLORS.frightened;
+    const tone = frightenedTone(frightenedMs, timeMs, this.#reducedMotion);
+    return tone === 'flash' ? COLORS.frightenedFlash : COLORS.frightened;
   }
 
   /** Dome on top, three feet along the bottom: the arcade silhouette. */
@@ -483,10 +470,11 @@ export class MazeRenderer {
       ctx.stroke();
       ctx.globalAlpha = 1;
     } else if (game.protectionRemainingMs > 0) {
-      // Protection: a pulsing ring, drawn whether or not the player is moving.
+      // Protection: a pulsing ring, drawn whether or not the player is
+      // moving; reduced motion holds a steady, clearly visible alpha (AC3).
       ctx.strokeStyle = COLORS.shield;
       ctx.lineWidth = Math.max(1, tile * 0.09);
-      ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(timeMs / 140));
+      ctx.globalAlpha = protectionAlpha(timeMs, this.#reducedMotion);
       ctx.beginPath();
       ctx.arc(centreX, centreY, radius * 1.35, 0, Math.PI * 2);
       ctx.stroke();
