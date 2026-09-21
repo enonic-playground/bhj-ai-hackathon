@@ -162,3 +162,21 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Rationale: the owner reports user testing found the enemy effect mild and beneficial, and requests greater ball visibility on a busy screen. This feedback supports the specific effect; it does not establish completion of broader pacing or real-device release checks.
 - Authority: owner's explicit instruction to allow the P2 effect and add the two-second ball hue cycle in M3. Claude still implements; Codex plans and reviews. No revision to the accepted time/token budget was requested.
 - Affected documents: `PRD.md`, `handoffs/M3.md`, `STATUS.md`. Claude updates implementation documentation with the delivered behavior.
+
+## D016 — Audio removed from the project
+
+- Date: 2026-09-21.
+- Status: accepted by project owner; supersedes earlier audio/mute requirements and deferrals in D013, historical handoffs and wireframes.
+- Decision: remove all audio, music, sound effects, mute controls, audio preferences, audio assets and audio-specific offline/tests requirements from the project, including M4. Keep visual feedback and the D015 visual amendment. Preserve historical implementation/review records as history rather than rewriting them.
+- Rationale/authority: owner explicitly stated that audio will not be part of this project and requested an M4 brief on that basis.
+- Budget: retain existing PRD estimates as planning allowances; do not invent a savings figure or silently redistribute scope. Record actual time/usage separately.
+- Affected documents: `PRD.md`, `README.md`, `WIREFRAMES.md`, `docs/wireframes/`, `STATUS.md`, `handoffs/M4.md`.
+
+## D017 — M4 campaign and scoring boundaries
+
+- Date: 2026-09-21.
+- Status: Codex planning choices within the accepted PRD, incorporating D016.
+- Decision: M4 delivers five levels with 4/5/6/7/8-letter categorized words, at least ten curated entries per length; a run-specific used-word set; conservative configured enemy-speed progression; fruit at 30%/70% of original normal dots with one pending spawn if necessary; centralized score awards granting one extra life at 10,000; resilient local high-score storage. Specify death, level and terminal-state reset behavior in the M4 brief. No new preference control is required solely to replace mute; preference persistence is added when a real setting exists.
+- Rationale: makes campaign completion, score edges and cross-level state testable without adding a backend, audio, or unfinished settings. Audio removal does not defer any remaining M4 requirement.
+- Authority: owner's request for M4's implementation brief, under Codex's planning role. Defaults may be tuned with recorded evidence; product scope and accepted budget remain authoritative.
+- Affected documents: `handoffs/M4.md`, `STATUS.md`.

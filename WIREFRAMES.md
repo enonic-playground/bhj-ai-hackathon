@@ -8,7 +8,7 @@ M0 planning reference for Claude. These layouts elaborate PRD v1.0 without chang
 
 Each outlined phone content area is 360 × 640 CSS pixels, excluding browser chrome. Read each frame at its intrinsic size for dimensions; a document viewer may scale the sheet.
 
-**01 — Chase:** persistent header with mute and pause, score/lives/level row, explicit mode label, category and word mask, maze, then a directional pad. The target ball has a ring marker distinct from the numbered enemy placeholders. A visible pad supports play without learning swipe gestures. No letter keyboard is active while chasing.
+**01 — Chase:** persistent header with pause, score/lives/level row, explicit mode label, category and word mask, maze, then a directional pad. The target ball has a ring marker distinct from the numbered enemy placeholders. A visible pad supports play without learning swipe gestures. No letter keyboard is active while chasing.
 
 **02 — Guessing:** keep the HUD visible and freeze/dim the maze. Place an opaque guessing panel over the play area, showing category, word mask, feedback, and A–Z buttons. Hide/disable the movement pad in this mode. The six-column alphabetical grid uses 48 × 44 pixel keys with six-pixel horizontal gaps; all 26 letters fit in five rows without a native keyboard or scrolling at the reference viewport. Used letters remain visible but disabled, with hit/miss text or symbols in addition to color. The complete previous-guess list can wrap within the feedback area; the grid itself always retains every letter's state.
 
@@ -20,7 +20,7 @@ Layout budget for the Chase reference: header/HUD/mode and word region approxima
 
 ![Desktop Chase and Guessing layouts](docs/wireframes/desktop.svg)
 
-**03 — Chase:** a 960 × 460 reference shell places the maze on the left and category, word progress, guessed letters, and keyboard hints on the right. Keep the HUD and pause/mute controls across the top. Extra desktop height may enlarge the maze while preserving its aspect ratio. Keyboard controls are arrows/WASD; touch-capable devices still need a visible directional pad.
+**03 — Chase:** a 960 × 460 reference shell places the maze on the left and category, word progress, guessed letters, and keyboard hints on the right. Keep the HUD and pause control across the top. Extra desktop height may enlarge the maze while preserving its aspect ratio. Keyboard controls are arrows/WASD; touch-capable devices still need a visible directional pad.
 
 **04 — Guessing:** retain the two-column layout and freeze/dim the maze. Replace the right-hand chase instructions with the letter keyboard, keeping category, word progress, and guessed-letter state. The illustrated keys are 46 × 44 px. Capture A–Z for guesses only while this mode is active; WASD must not move the player here. The mobile and desktop views expose the same actions and rules.
 
@@ -32,12 +32,12 @@ The mobile-sized panels also serve as centered panels on desktop, with a dimmed 
 
 | Screen | Content | Primary action | Secondary action |
 | --- | --- | --- | --- |
-| 05 — Start | Game title, short chase/catch/guess explanation, local high score | Start game → level 1 Chase | How to play; mute |
+| 05 — Start | Game title, short chase/catch/guess explanation, local high score | Start game → level 1 Chase | How to play |
 | 06 — Level complete | Solved word, completed level, awarded word bonus, score and lives | Next level → reset level state and begin Chase | Title screen, abandoning the current run |
 | 07 — Game over | Revealed word, zero-lives explanation, reached level, score/high score | New run → fresh level 1 | Title screen |
 | 08 — Campaign complete | Five-level completion, final word and score/high score | Play again → fresh level 1 | Title screen |
 
-How to play expands into a readable panel with the controls and rules from PRD section 3, plus a Back action. A user-triggered Start enables audio if unmuted. Installation instructions and an update-ready notice, when applicable, belong on the title screen; they do not interrupt a run.
+How to play expands into a readable panel with the controls and rules from PRD section 3, plus a Back action. Installation instructions and an update-ready notice, when applicable, belong on the title screen; they do not interrupt a run.
 
 ## Pause and transition overlays
 
@@ -45,7 +45,7 @@ Use the same centered panel treatment on both platforms; keep the HUD visible an
 
 | State | Visible content | Controls / behavior |
 | --- | --- | --- |
-| PAUSED | “Paused”; current word progress; optional “Game paused while away” reason | Resume, Restart run, Mute. Resume restores the prior active mode; it never starts Chase when paused during Guessing. |
+| PAUSED | “Paused”; current word progress; optional “Game paused while away” reason | Resume, Restart run, Title screen. Resume restores the prior active mode; it never starts Chase when paused during Guessing. |
 | RESUMING after wrong guess | “Z is not in the word. Catch the ball again.” followed by a short countdown | No letter or movement actions accepted during countdown. Clear held inputs; then enter Chase with the respawned ball. |
 | DYING | “Caught! 2 lives remaining” | No gameplay input; reset actors according to PRD and return to Chase with two seconds of protection. At zero lives, show Game over. |
 | LEVEL_COMPLETE | The result panel shown above | Explicit Next level prevents accidental advancement and duplicate bonuses. |
@@ -69,3 +69,5 @@ Use the same centered panel treatment on both platforms; keep the HUD visible an
 5. M5: verify target sizes, focus, text scaling, landscape, safe areas, and real-device usability. SVG geometry is a design reference, not evidence that these runtime checks pass.
 
 Validation: SVG XML parses successfully and reference geometry has been checked in source. The project owner visually verified the wireframes on 2026-09-17 and confirmed they are OK. Wireframe visual review is complete; implemented UI layout and accessibility still require the milestone checks above. No application tests exist yet.
+
+Owner amendment D016 (2026-09-21): audio and mute are removed from the project. The SVG references have had their mute buttons removed; retain the remaining accepted layout.

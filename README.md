@@ -12,6 +12,8 @@ Claude handles implementation and tests; Codex handles planning, coordination, v
 
 M2 (the defining chase/guess loop) is accepted at `0be0b439`; see [its handoff](handoffs/M2.md) for verification. M3 (arcade danger: four enemies, power pellets, lives, death, restart, pause, and the owner-approved ball hue cycle) is accepted at `80039b67` after Codex's recheck on 2026-09-21; see [its handoff](handoffs/M3.md).
 
+[M4's implementation brief](handoffs/M4.md) is ready for Claude: five levels, word bank, fruit, extra life, high score and pacing, without audio.
+
 Both agents follow [AGENTS.md](AGENTS.md) and resume from [STATUS.md](STATUS.md). Durable decisions live in [DECISIONS.md](DECISIONS.md); milestone briefs and review evidence use the [handoff template](handoffs/TEMPLATE.md). [CLAUDE.md](CLAUDE.md) points Claude to the shared instructions.
 
 See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance criteria, tests, and estimates, and [WIREFRAMES.md](WIREFRAMES.md) for the layout references.
@@ -81,11 +83,12 @@ Those parameters take effect only in the test-only build. `vite.config.ts` compi
 
 ## Known limitations
 
-- Bonus fruit, the extra life at a score threshold, sound and mute, the five-level campaign, stored high scores and preferences, and PWA install/offline support are not implemented yet; they belong to M4 and M5. The pause menu has no mute control, because there is no audio to mute.
+- Bonus fruit, the extra life at a score threshold, the five-level campaign, stored high scores and preferences, and PWA install/offline support are not implemented yet; they belong to M4 and M5.
 - The game delivers one word at a time. Play again starts a fresh level one and may pick the same word; campaign progression and the no-repeat 50-word bank are M4.
 - Enemy speeds, phase lengths, release offsets and the death and protection durations are the starting values from the M3 brief. They are in `src/game/config.ts` and have not been tuned against a human playtest; pacing work belongs to M4.
 - Mobile behavior is verified with browser emulation at 360 × 640 only. Real-device touch, installation, and offline checks are M5 work.
-- No service worker, manifest, icons, or audio yet.
+- No service worker, manifest or icons yet.
+- Audio, music, sound effects and mute controls are excluded from the project (D016).
 
 ## Three-day delivery target
 

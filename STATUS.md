@@ -5,15 +5,16 @@ Updated: 2026-09-21
 ## Current checkpoint
 
 - Product baseline: PRD v1.0 accepted by the project owner.
-- Current milestone: M3 — arcade danger.
-- State: ACCEPTED; Codex verified M3 including D015/AC11 on 2026-09-21.
-- Current owner: Codex (M4 planning).
-- Current milestone handoff: `handoffs/M3.md`.
+- Current milestone: M4 — complete campaign.
+- State: READY; Codex prepared the M4 brief and recorded owner-approved audio removal on 2026-09-21.
+- Current owner: Claude (M4 implementation); Codex has completed planning.
+- Current milestone handoff: `handoffs/M4.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: `80039b67eaab7cf1355669f6edc6a075cddfa9ca` (M3).
 - Acceptance blockers: none for M3. AC11 is verified; M3-R1 is closed by owner approval under D015. Remaining reduced-motion, real-device and broader playtesting work is tracked for later milestones/release.
 - M3 implementation base: `3b5255a11870d29ce5e25cc3141a258e8740ab24` on `main`. The planning the brief expected to find uncommitted (M2 acceptance, M3 brief, coordination updates) was already committed there, so nothing needed a separate checkpoint. The brief's reference HEAD `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` is that commit's parent.
-- Next action: Codex prepares M4's complete-campaign implementation brief from the accepted M3 baseline. M4 implementation has not started. Carry forward reduced-motion support to M5 and the recorded playtesting/device limitations.
+- M4 reference base HEAD: `a5d84530b13458e04603f54249d952eb65bab599` on `main`; checkpoint the known uncommitted M4 planning/audio-removal documents separately and record the actual implementation base.
+- Next action: Claude reads `handoffs/M4.md`, marks IMPLEMENTING and delivers the campaign, fruit, extra life, best score and pacing evidence without audio. Record a committed SHA and criteria/check evidence, then return ownership to Codex in REVIEW. No agent was launched automatically.
 
 
 ## Milestones
@@ -24,11 +25,13 @@ Updated: 2026-09-21
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
 | M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
-| M4: complete campaign | NOT_STARTED | Depends on accepted M3. |
+| M4: complete campaign | READY | `handoffs/M4.md`, AC1–AC10; D016 removes audio project-wide and D017 specifies campaign/scoring defaults. Claude owns implementation. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
 
 ## Verification and budget
+
+M4 planning (2026-09-21): owner removed audio, music, sound effects and mute project-wide (D016). Active PRD/README/wireframe requirements are synchronized; historical handoffs retain their original context and are superseded by D016. M4 estimate stays 2–2.5 focused hours as an allowance, not a revised prediction. Planning changed no application code and no application tests were rerun; documentation consistency and SVG structure were checked. No measured planning token/session usage is available.
 
 GitHub Pages diagnostic (Codex, 2026-09-21): the live page at `https://enonic-playground.github.io/bhj-ai-hackathon/` serves the source `index.html`, including `src="/src/main.ts"`, rather than the Vite production output. The leading slash explains the reported root-path 404, but rewriting it alone cannot replace the required build step. Local `vite.config.ts` already uses `base: './'`; built HTML references relative `./assets/*.js` and `./assets/*.css`. No other root-absolute runtime asset/API paths were found in the current app. Before hosted testing, Claude should configure Pages to deploy the ordinary `npm run build` output from `dist/` and verify the project-path URL. No deployment setting or implementation file was changed by this diagnostic; M3 remains accepted and Codex retains planning ownership.
 

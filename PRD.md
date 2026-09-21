@@ -1,6 +1,6 @@
 # Hac-Man — Product Requirements Document
 
-Status: accepted implementation baseline, version 1.0. Approved by the project owner on 2026-09-16, with the M3 visual amendment recorded in D015. See `STATUS.md` for implementation progress.
+Status: accepted implementation baseline, version 1.0. Approved by the project owner on 2026-09-16, with the M3 visual amendment (D015) and removal of audio (D016). See `STATUS.md` for implementation progress.
 
 Claude owns implementation and tests; Codex owns planning, coordination, verification, and code review. Future scope changes must be recorded explicitly against this baseline.
 
@@ -10,7 +10,7 @@ Hac-Man is a single-player progressive web app combining maze-chase arcade actio
 
 The three-day outcome is a demo-ready, installable, offline-capable game for mobile and desktop, with automated tests and a complete setup guide. Target play sessions are 5–10 minutes, with approximately 1–3 minutes per level after tuning. These are design targets, not measured results.
 
-Assumptions: one developer working with Codex, one original maze reused across five levels, original simple artwork and sounds, English words, no backend, and access to a phone for testing. Days are relative workdays, not scheduled dates.
+Assumptions: one developer working with Codex, one original maze reused across five levels, original simple artwork, English words, no backend, and access to a phone for testing. Days are relative workdays, not scheduled dates.
 
 ## 2. Scope and arcade fidelity
 
@@ -24,10 +24,12 @@ Assumptions: one developer working with Codex, one original maze reused across f
 | Four enemies | Distinct targeting personalities: direct pursuit, ambush, patrol, and proximity-dependent pursuit. Simplified chase/scatter phases. |
 | Enemy home | Timed releases, return home after being eaten, then rejoin play. |
 | Bonus fruit | Timed collectible, spawned at defined dot thresholds. |
-| Arcade run | Three starting lives, score, local high score, one extra life at a score threshold, death/restart, level transitions, sound and animation. |
+| Arcade run | Three starting lives, score, local high score, one extra life at a score threshold, death/restart, level transitions and animation. |
 | Hac-Man additions | Moving catchable ball, word display, guessing keyboard, persistent guesses, five-level campaign. |
 
-Required supporting features: start/instructions screen, pause/resume, restart, mute, keyboard and touch controls, responsive layout, offline assets, install metadata, automated checks, and final README.
+Required supporting features: start/instructions screen, pause/resume, restart, keyboard and touch controls, responsive layout, offline assets, install metadata, automated checks, and final README.
+
+Audio, music, sound effects and mute controls are excluded from this project by owner decision D016. No audio assets, playback, audio preferences or audio-specific tests/cache requirements are planned.
 
 Deferred: multiplayer, accounts, online leaderboards, generated words, external APIs, daily challenges, multiple languages, custom maze editor, extra maze layouts, endless play, full-word submissions, and a separate Hangman strike limit.
 
@@ -93,9 +95,9 @@ See [WIREFRAMES.md](WIREFRAMES.md) for mobile/desktop Chase and Guessing layouts
 - Keep maze and movement controls visible together on a 360 × 640 CSS-pixel viewport; rearrange for landscape and desktop without horizontal page scrolling.
 - Touch controls and letter buttons target at least 44 × 44 CSS pixels. Prevent page gestures only in the gameplay controls, not throughout the site.
 - Support keyboard-only menus and guessing, visible focus, labeled buttons, word updates announced through a live region, and non-color-only feedback. Full nonvisual navigation of the action maze is beyond the initial scope.
-- Start audio only after player interaction. Include mute and reduced-motion support for decorative effects; avoid flashing effects except the existing M3 frightened-enemy expiry warning. The project owner approved that specific mild effect after user testing found it beneficial (D015); this is not a general exemption for other flashing effects.
+- Include reduced-motion support for decorative effects; avoid flashing effects except the existing M3 frightened-enemy expiry warning. The project owner approved that specific mild effect after user testing found it beneficial (D015); this is not a general exemption for other flashing effects.
 - Target smooth 60 fps on a representative recent phone and laptop; verify that slower rendering does not change simulation speed. Record tested devices and observed limitations.
-- PWA includes manifest, app icons, standalone presentation, and cached shell, words, artwork, and audio. After one completed online load, the entire campaign must work offline.
+- PWA includes manifest, app icons, standalone presentation, and cached shell, words and artwork. After one completed online load, the entire campaign must work offline.
 - Test installation on representative Android and iOS devices and desktop where supported; document the actual browser-specific steps during implementation.
 - Apply app updates at the title screen or after a run, never by forcing reload during play. Validate offline behavior against the production build.
 - No analytics, login, server, or runtime AI service. Static hosting is the intended delivery model; provider selection and public publishing are separate implementation decisions.
@@ -118,7 +120,7 @@ Complete these sequentially. Each implementation milestone ends with a runnable 
 | Day 2 — M1: playable maze | Set up build/test scripts and title screen; render maze, player, dots, keyboard and touch movement, walls and tunnels. Exit: run locally and navigate/collect without crossing walls. | 1.5–2 h |
 | Day 2 — M2: defining loop | Add rolling ball, safe spawns, frozen guessing view, word rules, transition handling, and level completion. Exit: catch → correct guess → wrong guess → chase → solve. | 2–2.5 h |
 | Day 2 — M3: arcade danger | Add four enemy strategies, home/release logic, chase/scatter, power pellets, lives, death, pause, restart, collision priority, and the two-second ball hue cycle. Exit: a complete playable one-level game with win and loss paths. | 3–3.5 h |
-| Day 3 — M4: complete campaign | Add word bank, five levels, fruit, full scoring, extra life, high score, audio, and pacing adjustments. Exit: campaign completion and replay with persistent preferences/high score. | 2–2.5 h |
+| Day 3 — M4: complete campaign | Add word bank, five levels, fruit, full scoring, extra life, high score and pacing adjustments. Exit: campaign completion and replay with a persistent high score. | 2–2.5 h |
 | Day 3 — M5: mobile and PWA | Refine layout, input, focus, accessibility, install assets, offline cache, and safe update behavior. Exit: install and play offline after initial load; desktop and phone checks pass. | 1.5–2 h |
 | Day 3 — M6: release quality | Full regression, edge cases, cleanup, README, clean-install rehearsal, and demo rehearsal. Exit: reproducible production build and all release gates satisfied. | 1.5–2 h |
 
@@ -137,9 +139,9 @@ Tests are introduced with the owning milestone, then extended:
 | Unit | Legal turns/walls/tunnels; maze reachability; ball spawn distance/fallback; enemy decisions and timers; repeated letters; duplicate guesses; score chain; extra life once; word selection without repeats. |
 | Integration | Capture freezes simulation; correct guess stays; wrong guess respawns and resumes; final letter advances once; pellet/contact ordering; ghost death beats ball capture; death preserves word and dots; pause/background freezes timers; game-over/restart resets correctly. |
 | Browser | Desktop and touch input; complete chase/guess journey; lose/restart; five-level completion using deterministic fixtures; responsive layout; high-score persistence; storage failure fallback. |
-| Production/PWA | Cache completes after initial load; reload and play offline; all words/audio/icons available offline; update does not interrupt play; supported install flows checked on real devices. |
+| Production/PWA | Cache completes after initial load; reload and play offline; all words/artwork/icons available offline; update does not interrupt play; supported install flows checked on real devices. |
 
-Use deterministic test fixtures to reach hard-to-trigger states through the game API; retain at least one browser journey using actual player controls. Browser emulation complements real-device touch, audio, and installation checks.
+Use deterministic test fixtures to reach hard-to-trigger states through the game API; retain at least one browser journey using actual player controls. Browser emulation complements real-device touch and installation checks.
 
 Release gates:
 
@@ -182,4 +184,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-M0 planning is complete and M1–M3 are accepted, including [M3’s owner-approved ball visibility amendment](handoffs/M3.md). M4 planning is next. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
+M0 planning is complete and M1–M3 are accepted, including [M3’s owner-approved ball visibility amendment](handoffs/M3.md). [M4's implementation brief](handoffs/M4.md) is ready for Claude; implementation has not started. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.

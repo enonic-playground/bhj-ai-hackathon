@@ -13,8 +13,6 @@
 <text x="200.0" y="499" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Start game</text>
 <rect x="52" y="526" width="144" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
 <text x="124.0" y="553" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">How to play</text>
-<rect x="204" y="526" width="144" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
-<text x="276.0" y="553" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Mute</text>
 <text x="200" y="610" font-size="14" font-weight="normal" text-anchor="middle" fill="#172033">Best score 8,400</text>
 <text x="396" y="24" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">06 / LEVEL COMPLETE</text>
 <rect x="396" y="42" width="360" height="640" rx="6" fill="white" stroke="#64748b"/>

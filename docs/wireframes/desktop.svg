@@ -3,8 +3,6 @@
 <text x="20" y="28" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">03 / DESKTOP CHASE · 960 × 460 layout</text>
 <rect x="20" y="42" width="960" height="460" rx="6" fill="white" stroke="#64748b"/>
 <text x="32" y="69" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">HAC-MAN</text>
-<rect x="832" y="46" width="64" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
-<text x="864.0" y="73" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Mute</text>
 <rect x="904" y="46" width="64" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
 <text x="936.0" y="73" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Pause</text>
 <text x="32" y="112" font-size="14" font-weight="normal" text-anchor="start" fill="#172033">Score 1,240    Lives 3    Level 2/5</text>
@@ -56,8 +54,6 @@
 <text x="20" y="538" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">04 / DESKTOP GUESS · 960 × 460 layout</text>
 <rect x="20" y="552" width="960" height="460" rx="6" fill="white" stroke="#64748b"/>
 <text x="32" y="579" font-size="16" font-weight="bold" text-anchor="start" fill="#172033">HAC-MAN</text>
-<rect x="832" y="556" width="64" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
-<text x="864.0" y="583" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Mute</text>
 <rect x="904" y="556" width="64" height="44" rx="6" fill="#eef1f5" stroke="#64748b"/>
 <text x="936.0" y="583" font-size="14" font-weight="bold" text-anchor="middle" fill="#172033">Pause</text>
 <text x="32" y="622" font-size="14" font-weight="normal" text-anchor="start" fill="#172033">Score 1,240    Lives 3    Level 2/5</text>
