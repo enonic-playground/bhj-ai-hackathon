@@ -6,17 +6,18 @@ Updated: 2026-09-21
 
 - Product baseline: PRD v1.0 accepted by the project owner.
 - Current milestone: M4 — complete campaign.
-- State: REVIEW; Claude implemented M4 and returns ownership to Codex on 2026-09-21.
-- Current owner: Codex (M4 review); the project owner triggers the review.
+- State: REVIEW; Claude resolved M4-R1/R2 on 2026-09-21 and returns ownership to Codex.
+- Current owner: Codex (M4 recheck); the project owner triggers the review.
 - Current milestone handoff: `handoffs/M4.md`.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
 - Last accepted implementation commit: `80039b67eaab7cf1355669f6edc6a075cddfa9ca` (M3).
-- Acceptance blockers: none for M3. AC11 is verified; M3-R1 is closed by owner approval under D015. Remaining reduced-motion, real-device and broader playtesting work is tracked for later milestones/release.
+- Acceptance blockers: M4-R1 and M4-R2 have fix responses pending Codex's independent recheck; see the handoff's fix-response section. M3 remains accepted; M3-R1 stays closed by owner approval under D015.
 - M3 implementation base: `3b5255a11870d29ce5e25cc3141a258e8740ab24` on `main`. The planning the brief expected to find uncommitted (M2 acceptance, M3 brief, coordination updates) was already committed there, so nothing needed a separate checkpoint. The brief's reference HEAD `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` is that commit's parent.
 - M4 reference base HEAD: `a5d84530b13458e04603f54249d952eb65bab599` on `main`.
 - M4 implementation base: `8e58ead18121572ad82772ef3485c0747fc5ba08` on `main` (checkpoints the M4 brief and D016 audio-removal documentation that was uncommitted at the reference HEAD; no application code in that commit).
 - M4 implementation commit: `daca44e3c0a439d2fdb278af0833df883973a4c8` on `main`. Word bank, five-level campaign transitions, fruit, centralized scoring with the sole extra life, and a resilient best-score store; see [D018](DECISIONS.md#d018--m4-implementation-choices) and the handoff's AC1–AC10 evidence.
-- Next action: Codex reviews the base-to-implementation diff (`8e58ead1..daca44e3`) against AC1–AC10, independently runs the checks, and either marks ACCEPTED or CHANGES_REQUESTED with findings for Claude to resolve. M4's known limitations (no human playtest, fruit/extra-life thresholds verified by the deterministic suite rather than a single continuous browser journey, Node 22.12.0 unverified) are recorded in the handoff, not hidden.
+- M4 fix commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` on `main`. Resolves M4-R1 (cross-tab best-score reconciliation) and M4-R2 (isolated extra-life award-source tests, a real death/respawn case and the final-campaign-bonus case); see [D019](DECISIONS.md#d019--m4-fix-round-choices) and the handoff's fix-response section.
+- Next action: Codex independently rechecks M4-R1/R2 against `f4708cb` (base `daca44e3`), reruns the required checks, and marks ACCEPTED or CHANGES_REQUESTED with any further findings. Do not begin M5 yet.
 
 
 ## Milestones
@@ -27,11 +28,15 @@ Updated: 2026-09-21
 | M1: playable maze | ACCEPTED | `1a600828`: Codex verified R1/R2, 46 unit/integration tests, 16 browser runs, and install/typecheck/tests/build on Node 22.12.0. Nonblocking R3 carried forward. |
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
 | M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
-| M4: complete campaign | REVIEW | `daca44e3`: AC1–AC10 self-assessed Met by Claude, pending Codex's independent review. 257 unit/integration tests (53 new) and 69 browser tests (3 skipped) pass. See handoff. |
+| M4: complete campaign | REVIEW | `f4708cb`: fix response to M4-R1/R2; 263 tests (up from 257) and 69 browser tests (3 skipped) pass. Pending Codex's independent recheck. See handoff fix response. |
 | M5: mobile and PWA | NOT_STARTED | Depends on accepted M4. |
 | M6: release quality | NOT_STARTED | Depends on accepted M5. |
 
 ## Verification and budget
+
+M4 fix round (Claude's reported results, 2026-09-21): from base `daca44e3`, resolved M4-R1 by having `BestScoreStore.record()` reconcile with the currently stored best before comparing/writing, and resolved M4-R2 by rewriting `tests/score.test.ts`'s extra-life award-source tests so each named source (letter, ordinary word bonus, the final campaign-ending bonus, pellet, eaten enemy, fruit) is isolated and actually crosses the threshold in its own test, adding a real death/respawn case and a production-default check, at `f4708cb`. On Node 26.7.0 (npm 11.19.0), macOS arm64: `npm run typecheck`, `npm test` (263 tests in 21 files, up from 257), `npm run build`, `npm run build:fixture` and `npm run test:e2e` (69 passed, 3 intentional touch-only skips, unchanged) all passed. Reverting only the `bestScore.ts` fix and rerunning its test file reproduced Codex's exact M4-R1 failure, confirming the regression test is not vacuous. No browser spec needed changes, since both findings were reachable through the unit/integration layer. No human playtest, no real-device check, and Node 22.12.0 was not re-verified. Test-generated evidence screenshots were restored to the committed checkpoint after the browser suite ran. Full finding-by-finding resolution is in the handoff's fix-response section.
+
+M4 review round 1 (Codex, 2026-09-21): reviewed `8e58ead1..daca44e3` at clean HEAD `4ddb1958`. Independently passed install, typecheck, 257 tests, both builds and 69 browser tests (3 intentional skips), on Node 26.7.0 / npm 11.19.0. Reproduced a stale-tab overwrite of best score from 10,000 to 10 (M4-R1); identified claimed extra-life scenarios absent from the tests (M4-R2). M4 is CHANGES_REQUESTED, owner Claude. The handoff distinguishes passing coverage from unverified edges. No implementation edits, human playtest, real-device check or minimum-Node rerun; review time/tokens not measured. Test-generated screenshots were restored to the submitted revision.
 
 M4 implementation round (Claude's reported results, 2026-09-21): from base `8e58ead1`, implemented the word bank, five-level transitions, fruit, centralized scoring with the sole extra life, and the best-score store at `daca44e3`. On Node 26.7.0 (npm 11.19.0), macOS arm64: `npm run typecheck`, `npm test` (257 tests in 21 files, up from 204), `npm run build`, `npm run build:fixture` and `npm run test:e2e` (69 passed, 3 intentional touch-only skips, up from 62/2) all passed; `npm run dev`, `npm run preview` and `npm run preview:fixture` returned HTTP 200. The browser suite was run twice end to end after the final change, both clean. Reaching the fruit thresholds and the 10,000-point extra life through continuous real browser play was judged impractical within this session given the authored maze's 200-plus dots; those edges are instead covered exactly by the new deterministic unit/integration suites (`tests/fruit.test.ts`, `tests/score.test.ts`), while `e2e/campaign.spec.ts` demonstrates a real fruit spawn/collection and the complete five-level campaign with real capture, guesses and Next level actions. No human playtest, no real-device check, and Node 22.12.0 was not re-verified. Claude's elapsed work was one long session; active session time and token usage were not measured. Screenshots are in `docs/evidence/m4/`; `docs/evidence/m1`–`m3/` are unchanged. Full evidence, AC1–AC10 assessment and limitations are in the handoff.
 
