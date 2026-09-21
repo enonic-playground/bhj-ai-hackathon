@@ -1,6 +1,7 @@
 import { DEFAULT_CONFIG } from '../game/config.js';
 import { isDirection } from '../game/direction.js';
 import { Game, type GameSnapshot, type GameStatus, type GuessResult } from '../game/game.js';
+import { CAMPAIGN_LENGTH } from '../game/levels.js';
 import { FixedStepLoop } from '../game/loop.js';
 import { ALPHABET } from '../game/words.js';
 import {
@@ -10,6 +11,7 @@ import {
   handlePauseKey,
 } from '../input/inputRouter.js';
 import { MazeRenderer } from '../render/renderer.js';
+import { BestScoreStore, resolveLocalStorage } from './bestScore.js';
 import { readTestFixture } from './fixture.js';
 import { FrameTiming } from './frameTiming.js';
 
@@ -33,6 +35,7 @@ const MODE_LABELS: Record<GameStatus, string> = {
   dying: 'Caught',
   'level-complete': 'Solved',
   'game-over': 'Game over',
+  'campaign-complete': 'Campaign complete',
 };
 
 function requireElement<T extends Element>(selector: string): T {
@@ -68,13 +71,22 @@ export function mountApp(): Game {
   const letterGrid = requireElement<HTMLElement>('#letter-grid');
   const titleScreen = requireElement<HTMLElement>('#title-screen');
   const startButton = requireElement<HTMLButtonElement>('#start-button');
+  const titleBestScoreOutput = requireElement<HTMLElement>('#title-best-score');
   const resultScreen = requireElement<HTMLElement>('#result-screen');
   const resultHeading = requireElement<HTMLElement>('#result-heading');
   const resultWord = requireElement<HTMLElement>('#result-word');
   const resultBonus = requireElement<HTMLElement>('#result-bonus');
   const resultScore = requireElement<HTMLElement>('#result-score');
-  const playAgainButton = requireElement<HTMLButtonElement>('#play-again-button');
+  const resultLives = requireElement<HTMLElement>('#result-lives');
+  const nextLevelButton = requireElement<HTMLButtonElement>('#next-level-button');
   const resultTitleButton = requireElement<HTMLButtonElement>('#result-title-button');
+  const campaignCompleteScreen = requireElement<HTMLElement>('#campaign-complete-screen');
+  const campaignCompleteHeading = requireElement<HTMLElement>('#campaign-complete-heading');
+  const campaignCompleteWord = requireElement<HTMLElement>('#campaign-complete-word');
+  const campaignCompleteScore = requireElement<HTMLElement>('#campaign-complete-score');
+  const campaignCompleteBest = requireElement<HTMLElement>('#campaign-complete-best');
+  const campaignCompleteReplayButton = requireElement<HTMLButtonElement>('#campaign-complete-replay-button');
+  const campaignCompleteTitleButton = requireElement<HTMLButtonElement>('#campaign-complete-title-button');
   const pauseScreen = requireElement<HTMLElement>('#pause-screen');
   const pauseHeading = requireElement<HTMLElement>('#pause-heading');
   const pauseReason = requireElement<HTMLElement>('#pause-reason');
@@ -85,8 +97,10 @@ export function mountApp(): Game {
   const pauseTitleButton = requireElement<HTMLButtonElement>('#pause-title-button');
   const gameOverScreen = requireElement<HTMLElement>('#game-over-screen');
   const gameOverHeading = requireElement<HTMLElement>('#game-over-heading');
+  const gameOverLevel = requireElement<HTMLElement>('#game-over-level');
   const gameOverWord = requireElement<HTMLElement>('#game-over-word');
   const gameOverScore = requireElement<HTMLElement>('#game-over-score');
+  const gameOverBest = requireElement<HTMLElement>('#game-over-best');
   const gameOverRestartButton = requireElement<HTMLButtonElement>('#game-over-restart-button');
   const gameOverTitleButton = requireElement<HTMLButtonElement>('#game-over-title-button');
   const resumeOverlay = requireElement<HTMLElement>('#resume-overlay');
@@ -99,6 +113,7 @@ export function mountApp(): Game {
   const levelOutput = requireElement<HTMLElement>('#hud-level');
   const modeOutput = requireElement<HTMLElement>('#hud-mode');
   const shieldOutput = requireElement<HTMLElement>('#hud-shield');
+  const extraLifeOutput = requireElement<HTMLElement>('#hud-extra-life');
   const categoryOutput = requireElement<HTMLElement>('#word-category');
   const maskOutput = requireElement<HTMLElement>('#word-mask');
   const feedbackOutput = requireElement<HTMLElement>('#word-feedback');
@@ -114,6 +129,9 @@ export function mountApp(): Game {
     __TEST_FIXTURES__ ? readTestFixture(window.location.search) : {},
   );
   const renderer = new MazeRenderer(canvas, game.maze);
+  const bestScore = new BestScoreStore(resolveLocalStorage());
+  let lastRecordedScore = -1;
+  let extraLifeAnnounced = false;
   const loop = new FixedStepLoop({
     stepMs: DEFAULT_CONFIG.simulationStepMs,
     maxStepsPerFrame: DEFAULT_CONFIG.maxStepsPerFrame,
@@ -152,7 +170,7 @@ export function mountApp(): Game {
   const updateHud = (snapshot: GameSnapshot): void => {
     setText(scoreOutput, String(snapshot.score));
     setText(livesOutput, livesText(snapshot.lives));
-    setText(levelOutput, String(snapshot.level));
+    setText(levelOutput, `${snapshot.level}/${CAMPAIGN_LENGTH}`);
     setText(modeOutput, MODE_LABELS[snapshot.status]);
     setText(categoryOutput, snapshot.status === 'title' ? '—' : snapshot.word.category);
     setText(maskOutput, snapshot.status === 'title' ? '—' : maskText(snapshot.word.mask));
@@ -165,6 +183,17 @@ export function mountApp(): Game {
     shieldOutput.hidden = !shielded;
     if (shielded) {
       setText(shieldOutput, `Shielded for ${Math.ceil(snapshot.protectionRemainingMs / 1000)}s`);
+    }
+    // A static badge, present for the rest of the run once earned: no flash,
+    // and the one-time announcement below carries the non-colour feedback.
+    extraLifeOutput.hidden = !snapshot.extraLifeEarned;
+    if (snapshot.extraLifeEarned && !extraLifeAnnounced) {
+      extraLifeAnnounced = true;
+      setText(feedbackOutput, `Extra life! You now have ${snapshot.lives} lives.`);
+    }
+    if (snapshot.score !== lastRecordedScore) {
+      lastRecordedScore = snapshot.score;
+      bestScore.record(snapshot.score);
     }
   };
 
@@ -269,6 +298,7 @@ export function mountApp(): Game {
 
     titleScreen.hidden = status !== 'title';
     resultScreen.hidden = status !== 'level-complete';
+    campaignCompleteScreen.hidden = status !== 'campaign-complete';
     gameOverScreen.hidden = status !== 'game-over';
     pauseScreen.hidden = status !== 'paused';
     guessPanel.hidden = beneath !== 'guess';
@@ -314,16 +344,32 @@ export function mountApp(): Game {
         setText(resultWord, snapshot.word.answer ?? '');
         setText(resultBonus, String(DEFAULT_CONFIG.wordBonusScore));
         setText(resultScore, String(snapshot.score));
+        setText(resultLives, livesText(snapshot.lives));
         resultHeading.focus();
         break;
+      case 'campaign-complete':
+        // Recorded here, not only in `updateHud`, so this run's final score is
+        // already reflected the moment the panel that announces it appears.
+        bestScore.record(snapshot.score);
+        lastRecordedScore = snapshot.score;
+        setText(campaignCompleteWord, snapshot.word.answer ?? '');
+        setText(campaignCompleteScore, String(snapshot.score));
+        setText(campaignCompleteBest, String(bestScore.best));
+        campaignCompleteHeading.focus();
+        break;
       case 'game-over':
+        bestScore.record(snapshot.score);
+        lastRecordedScore = snapshot.score;
+        setText(gameOverLevel, String(snapshot.level));
         setText(gameOverWord, snapshot.word.answer ?? '');
         setText(gameOverScore, String(snapshot.score));
+        setText(gameOverBest, String(bestScore.best));
         setText(feedbackOutput, `Game over. The word was ${snapshot.word.answer ?? ''}.`);
         gameOverHeading.focus();
         break;
       case 'title':
         setText(feedbackOutput, '');
+        setText(titleBestScoreOutput, String(bestScore.best));
         startButton.focus();
         break;
       default:
@@ -339,10 +385,22 @@ export function mountApp(): Game {
 
   const startRound = (): void => {
     game.startLevel();
+    extraLifeAnnounced = false;
     setText(feedbackOutput, '');
     refresh();
     resize();
     stage.focus();
+  };
+
+  /** Next level: clears stale input and rebases frame timing before play, same as Resume. */
+  const advanceLevel = (): void => {
+    if (game.nextLevel()) {
+      timing.suspend();
+      setText(feedbackOutput, '');
+      refresh();
+      resize();
+      stage.focus();
+    }
   };
 
   const goToTitle = (): void => {
@@ -357,10 +415,12 @@ export function mountApp(): Game {
   });
 
   startButton.addEventListener('click', startRound);
-  playAgainButton.addEventListener('click', startRound);
+  campaignCompleteReplayButton.addEventListener('click', startRound);
   pauseRestartButton.addEventListener('click', startRound);
   gameOverRestartButton.addEventListener('click', startRound);
+  nextLevelButton.addEventListener('click', advanceLevel);
   resultTitleButton.addEventListener('click', goToTitle);
+  campaignCompleteTitleButton.addEventListener('click', goToTitle);
   pauseTitleButton.addEventListener('click', goToTitle);
   gameOverTitleButton.addEventListener('click', goToTitle);
 

@@ -1,5 +1,5 @@
 import type { EnemyDefinition } from '../game/config.js';
-import type { BallSpawnSelector, GameOptions } from '../game/game.js';
+import type { BallSpawnSelector, GameOptions, WordSelectionContext } from '../game/game.js';
 import { isPlayerWalkable, tileAt } from '../game/maze.js';
 import { createSeededRandom, type RandomSource } from '../game/random.js';
 import { SEED_WORDS, type WordEntry } from '../game/words.js';
@@ -8,7 +8,15 @@ import { SEED_WORDS, type WordEntry } from '../game/words.js';
  * Deterministic start-up for browser tests, read from the query string:
  *
  * - `testSeed=<integer>` seeds ball spawns and ball decisions;
- * - `testWord=<index>` pins the round's word to that entry of `SEED_WORDS`;
+ * - `testWord=<index>` pins every level's word to that one entry of
+ *   `SEED_WORDS`, independently of the level's normal campaign length — the
+ *   inherited M2/M3 single-word journeys use this, unchanged since M3;
+ * - `testWords=<i1>,<i2>,...` pins level 1, 2, 3… to those `SEED_WORDS`
+ *   entries in order, reusing the last one for any level beyond the list.
+ *   This is how the M4 five-level journey knows every level's word without
+ *   the runtime snapshot ever revealing an unsolved answer: the test itself
+ *   chose the words through this query string, exactly as a fixture-only
+ *   fixed spawn or seed is known to a test without being leaked by the game;
  * - `testBall=off` runs the maze with no ball, so the movement, dot and layout
  *   journeys inherited from M1 cannot be interrupted by a legitimate capture,
  *   and `testBall=<col>,<row>` starts it on one tile instead, which is how the
@@ -17,18 +25,17 @@ import { SEED_WORDS, type WordEntry } from '../game/words.js';
  *   inherited M1/M2 journeys assert movement and layout, not survival. The M3
  *   journeys and the production smoke keep the real four.
  *
- * All four are ignored unless present and well formed, so an ordinary visit to
- * the app is unaffected. They only choose what a round starts with: nothing
- * mutates a running game, no answer is revealed in the page, and every rule —
- * capture, guessing, scoring and transitions — runs exactly as in ordinary
- * play. The complete-loop journey uses the real spawn rule and the real capture
- * algorithm; only its word and seed are pinned.
+ * All are ignored unless present and well formed, so an ordinary visit to the
+ * app is unaffected. They only choose what a round or a level starts with:
+ * nothing mutates a running game, no answer is revealed in the page, and every
+ * rule — capture, guessing, scoring and transitions — runs exactly as in
+ * ordinary play.
  */
 export function readTestFixture(search: string): GameOptions {
   const params = new URLSearchParams(search);
   const options: {
     random?: RandomSource;
-    selectWord?: () => WordEntry;
+    selectWord?: (context: WordSelectionContext) => WordEntry;
     selectBallSpawn?: BallSpawnSelector;
     enemies?: readonly EnemyDefinition[];
   } = {};
@@ -43,6 +50,16 @@ export function readTestFixture(search: string): GameOptions {
     const entry = SEED_WORDS[Number(wordIndex)];
     if (entry) {
       options.selectWord = () => entry;
+    }
+  }
+
+  const wordList = params.get('testWords');
+  if (wordList !== null) {
+    const entries = wordList
+      .split(',')
+      .map((index) => (/^\d{1,3}$/.test(index) ? SEED_WORDS[Number(index)] : undefined));
+    if (entries.length > 0 && entries.every((entry): entry is WordEntry => entry !== undefined)) {
+      options.selectWord = ({ level }) => entries[Math.min(level - 1, entries.length - 1)] as WordEntry;
     }
   }
 

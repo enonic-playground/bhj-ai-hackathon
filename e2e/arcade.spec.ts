@@ -387,13 +387,17 @@ test('the complete round with enemies active: catch, solve and replay', async ({
   await page.waitForTimeout(200);
   expect((await snapshot(page)).score).toBe(solved.score);
 
-  await page.getByRole('button', { name: 'Play again' }).click();
+  // Level one of five: Next level advances the campaign, keeping score and
+  // lives, rather than restarting the run.
+  await page.getByRole('button', { name: 'Next level' }).click();
   await expect(page.locator('#hud-mode')).toHaveText('Chase');
-  const replay = await snapshot(page);
-  expect(replay.lives).toBe(3);
-  expect(replay.score).toBe(0);
-  expect(replay.pelletsRemaining).toBe(MAZE.powerPelletTiles.length);
-  expect(stillHome(replay)).toBeGreaterThanOrEqual(3);
+  await expect(page.locator('#hud-level')).toHaveText('2/5');
+  const nextLevel = await snapshot(page);
+  expect(nextLevel.level).toBe(2);
+  expect(nextLevel.lives).toBe(3);
+  expect(nextLevel.score).toBe(solved.score);
+  expect(nextLevel.pelletsRemaining).toBe(MAZE.powerPelletTiles.length);
+  expect(stillHome(nextLevel)).toBeGreaterThanOrEqual(3);
 });
 
 test('lives, pause and protection stay usable on a touch screen', async ({ page }, testInfo) => {

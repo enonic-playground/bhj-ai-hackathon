@@ -34,9 +34,12 @@ describe('dots and score', () => {
     expect(game.score).toBe(4 * DEFAULT_CONFIG.dotScore);
     expect(game.dotsRemaining).toBe(0);
 
+    // The four-dot corridor crosses both fruit thresholds on the way right, so
+    // a fruit is already waiting on the spawn tile for the walk back: one dot
+    // sweep's worth of points, exactly once, plus that one fruit.
     game.requestDirection('left');
     runForMs(game, 1000);
-    expect(game.score).toBe(4 * DEFAULT_CONFIG.dotScore); // Cleared corridor, no new points.
+    expect(game.score).toBe(4 * DEFAULT_CONFIG.dotScore + DEFAULT_CONFIG.fruitScorePerLevel);
     expect(game.player.x).toBeCloseTo(1, 9);
   });
 

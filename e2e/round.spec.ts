@@ -119,10 +119,14 @@ test('the complete round: catch, guess, miss, catch again, solve and replay', as
   await page.waitForTimeout(200);
   expect((await snapshot(page)).score).toBe(solved.score);
 
-  // ---- Play again --------------------------------------------------------
-  await page.getByRole('button', { name: 'Play again' }).click();
+  // ---- Next level ----------------------------------------------------------
+  // Level one of five: the deliberate Next level action advances the campaign
+  // rather than restarting the run, so score and lives carry over.
+  await expect(page.locator('#hud-level')).toHaveText('1/5');
+  await page.getByRole('button', { name: 'Next level' }).click();
   await expect(page.locator('#result-screen')).toBeHidden();
   await expect(page.locator('#hud-mode')).toHaveText('Chase');
+  await expect(page.locator('#hud-level')).toHaveText('2/5');
   await expect(page.locator('#word-mask')).toHaveText('_ _ _ _ _');
   await expect(page.locator('#word-misses')).toHaveText('Misses: none');
   // The guessed state is cleared; letters stay disabled until the next catch.
@@ -130,11 +134,13 @@ test('the complete round: catch, guess, miss, catch again, solve and replay', as
   await expect(letter('P')).toHaveAttribute('aria-label', 'P');
   await expect(letter('P')).toBeDisabled();
 
-  const replay = await snapshot(page);
-  expect(replay.score).toBe(0);
-  expect(replay.dotsRemaining).toBe(maze.dotTiles.length);
-  expect(replay.ball).not.toBeNull();
-  expect(replay.word.revealedLetters).toEqual([]);
+  const nextLevel = await snapshot(page);
+  expect(nextLevel.level).toBe(2);
+  expect(nextLevel.score).toBe(solved.score); // Preserved across the transition.
+  expect(nextLevel.lives).toBe(solved.lives);
+  expect(nextLevel.dotsRemaining).toBe(maze.dotTiles.length);
+  expect(nextLevel.ball).not.toBeNull();
+  expect(nextLevel.word.revealedLetters).toEqual([]);
 });
 
 test('the title screen action abandons a solved round', async ({ page }) => {

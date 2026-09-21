@@ -12,6 +12,8 @@ const COLORS = {
   door: '#ff9ad5',
   dot: '#f3e3c3',
   pellet: '#ffe9a8',
+  fruit: '#ff6b4a',
+  fruitStem: '#7be07a',
   player: '#ffd23f',
   shield: '#7cf6ff',
   ballRing: '#ffffff',
@@ -142,6 +144,7 @@ export class MazeRenderer {
     this.#drawWalls();
     this.#drawDots(game);
     this.#drawPowerPellets(game, timeMs);
+    this.#drawFruit(game);
     this.#drawBall(game, timeMs);
     this.#drawEnemies(game, timeMs);
     this.#drawPlayer(game, timeMs);
@@ -242,6 +245,35 @@ export class MazeRenderer {
       );
       ctx.fill();
     }
+  }
+
+  /**
+   * The fruit is a distinct rounded shape with a small stem, so it reads as a
+   * different kind of pick-up from the round dots and pulsing pellets rather
+   * than only by colour.
+   */
+  #drawFruit(game: Game): void {
+    const fruit = game.fruit;
+    if (!fruit) {
+      return;
+    }
+    const ctx = this.#context;
+    const tile = this.#tileSize;
+    const centreX = (fruit.position.col + 0.5) * tile;
+    const centreY = (fruit.position.row + 0.5) * tile;
+    const radius = tile * 0.32;
+
+    ctx.fillStyle = COLORS.fruit;
+    ctx.beginPath();
+    ctx.arc(centreX, centreY + radius * 0.12, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = COLORS.fruitStem;
+    ctx.lineWidth = Math.max(1, tile * 0.08);
+    ctx.beginPath();
+    ctx.moveTo(centreX, centreY - radius * 0.7);
+    ctx.lineTo(centreX + radius * 0.35, centreY - radius * 1.35);
+    ctx.stroke();
   }
 
   /**

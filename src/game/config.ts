@@ -85,6 +85,14 @@ export interface GameConfig {
   readonly protectionMs: number;
   /** The enemies to place, in maze start-slot order. */
   readonly enemies: readonly EnemyDefinition[];
+  /** How long a spawned fruit stays collectible, in active CHASE milliseconds. */
+  readonly fruitLifetimeMs: number;
+  /** Fraction of the level's original normal dots consumed at which each fruit threshold fires. */
+  readonly fruitThresholdRatios: readonly [number, number];
+  /** Fruit points per collection, multiplied by the current level number. */
+  readonly fruitScorePerLevel: number;
+  /** Score at which the run's one extra life is granted. */
+  readonly extraLifeScoreThreshold: number;
 }
 
 /**
@@ -161,6 +169,10 @@ export const DEFAULT_CONFIG: GameConfig = {
   dyingPresentationMs: 750,
   protectionMs: 2000,
   enemies: DEFAULT_ENEMIES,
+  fruitLifetimeMs: 10_000,
+  fruitThresholdRatios: [0.3, 0.7],
+  fruitScorePerLevel: 100,
+  extraLifeScoreThreshold: 10_000,
 };
 
 /** The fastest any actor moves, as a fraction of player speed. */

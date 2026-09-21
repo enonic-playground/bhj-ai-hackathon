@@ -131,6 +131,20 @@ body {
   display: none;
 }
 
+/* A static badge, not a flash: it appears once an extra life is earned and
+   stays for the rest of the run, so the feedback never relies on colour or a
+   momentary announcement alone. */
+.hud__extra-life {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--hit);
+}
+
+.hud__extra-life[hidden] {
+  display: none;
+}
+
 /* The pause control is a full-size target and stays in the header in every
    mode, so it is never swapped away with the panel beneath it. */
 .button--pause {

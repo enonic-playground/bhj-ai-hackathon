@@ -28,7 +28,7 @@ test('the guessing panel fits the viewport with usable letter targets', async ({
 
   // Score, mode, level, category and word progress all stay readable.
   await expect(page.locator('#hud-score')).toHaveText(/\d+/);
-  await expect(page.locator('#hud-level')).toHaveText('1');
+  await expect(page.locator('#hud-level')).toHaveText('1/5');
   await expect(page.locator('#hud-mode')).toHaveText('Guessing');
   await expect(page.locator('#word-category')).toHaveText('Fruit');
   await expect(page.locator('#word-mask')).toHaveText('_ _ _ _ _');

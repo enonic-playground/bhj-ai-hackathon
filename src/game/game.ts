@@ -21,6 +21,8 @@ import {
   type EnemyPhase,
   type EnemyState,
 } from './enemy.js';
+import { fruitThresholds, type FruitInstance } from './fruit.js';
+import { CAMPAIGN_LENGTH, levelDefinition } from './levels.js';
 import { createLevelOneMaze } from './mazeData.js';
 import {
   neighbor,
@@ -33,20 +35,23 @@ import { DistanceCache } from './paths.js';
 import { createSystemRandom, type RandomSource } from './random.js';
 import { chooseBallSpawn } from './spawn.js';
 import {
+  WORD_BANK,
   countOccurrences,
   isWordSolved,
   maskWord,
   normalizeLetter,
-  selectSeedWord,
+  normalizeWordKey,
+  selectWordForLevel,
   validateWordEntry,
   type WordEntry,
 } from './words.js';
 
 /**
- * Every application state the one-level game uses. `resuming` is the countdown
- * after a wrong letter, `dying` the death presentation, and `paused` retains
- * whichever of the active states it interrupted. CAMPAIGN_COMPLETE arrives with
- * the campaign in M4.
+ * Every application state the campaign uses. `resuming` is the countdown after
+ * a wrong letter, `dying` the death presentation, and `paused` retains
+ * whichever of the active states it interrupted. `level-complete` follows
+ * solving levels one through four; solving level five goes straight to
+ * `campaign-complete` instead, and there is no level six.
  */
 export type GameStatus =
   | 'title'
@@ -56,7 +61,8 @@ export type GameStatus =
   | 'paused'
   | 'dying'
   | 'level-complete'
-  | 'game-over';
+  | 'game-over'
+  | 'campaign-complete';
 
 /** States that a pause may interrupt, and that an explicit resume restores. */
 const PAUSABLE_STATUSES: readonly GameStatus[] = ['chase', 'guess', 'resuming', 'dying'];
@@ -127,6 +133,11 @@ export interface WordSnapshot {
   readonly answer: string | null;
 }
 
+export interface FruitSnapshot {
+  readonly position: GridPosition;
+  readonly remainingMs: number;
+}
+
 export interface GameSnapshot {
   readonly status: GameStatus;
   /** The state a pause interrupted, or null when the game is not paused. */
@@ -135,11 +146,15 @@ export interface GameSnapshot {
   readonly level: number;
   readonly score: number;
   readonly lives: number;
+  /** True once this run has crossed the score threshold and taken its one extra life. */
+  readonly extraLifeEarned: boolean;
   readonly dotsRemaining: number;
   readonly pelletsRemaining: number;
   readonly player: ActorSnapshot;
   /** Absent while the player is guessing or the round is over. */
   readonly ball: ActorSnapshot | null;
+  /** Absent unless a fruit is currently on the board. */
+  readonly fruit: FruitSnapshot | null;
   readonly enemies: readonly EnemySnapshot[];
   readonly enemyPhase: EnemyPhase;
   readonly phaseRemainingMs: number;
@@ -170,15 +185,29 @@ export type BallSpawnSelector = (
   random: RandomSource,
 ) => GridPosition | null;
 
+export interface WordSelectionContext {
+  readonly level: number;
+  /** The campaign length for this level, from `LEVELS`. */
+  readonly wordLength: number;
+  /** Normalized words already used this run; a fresh run starts this empty. */
+  readonly excluded: ReadonlySet<string>;
+  readonly random: RandomSource;
+}
+
 export interface GameOptions {
   /** Injected for reproducible spawns, ball decisions and frightened movement. */
   readonly random?: RandomSource;
-  /** Injected word selection; tests and fixtures pin a known word. */
-  readonly selectWord?: (random: RandomSource) => WordEntry;
+  /** Injected word selection; tests and fixtures pin a known word or sequence. */
+  readonly selectWord?: (context: WordSelectionContext) => WordEntry;
   /** Injected ball placement; defaults to the PRD's distance rule. */
   readonly selectBallSpawn?: BallSpawnSelector;
   /** Replaces the configured enemy set; an empty list runs the maze with none. */
   readonly enemies?: readonly EnemyDefinition[];
+}
+
+/** Default word selection: an unused word of the level's length from the campaign bank. */
+function defaultSelectWord(context: WordSelectionContext): WordEntry {
+  return selectWordForLevel(WORD_BANK, context.wordLength, context.excluded, context.random);
 }
 
 /**
@@ -193,10 +222,12 @@ export class Game {
   readonly config: GameConfig;
 
   readonly #random: RandomSource;
-  readonly #selectWord: (random: RandomSource) => WordEntry;
+  readonly #selectWord: (context: WordSelectionContext) => WordEntry;
   readonly #selectBallSpawn: BallSpawnSelector;
   readonly #enemyDefinitions: readonly EnemyDefinition[];
   readonly #distances: DistanceCache;
+  /** Dots-consumed thresholds at which the two fruits fire; fixed for the maze's lifetime. */
+  readonly #fruitThresholds: readonly [number, number];
 
   #status: GameStatus = 'title';
   #pausedFrom: GameStatus | null = null;
@@ -204,10 +235,22 @@ export class Game {
   #level = 1;
   #score = 0;
   #lives: number;
+  /** True once this run has taken its one extra life; cleared only by `startLevel`. */
+  #extraLifeEarned = false;
+  /** Normalized words already selected this run, so no level repeats one. */
+  #usedWords = new Set<string>();
+  /** Effective config for the current level: `config` with `enemySpeedFactor` overridden. */
+  #effectiveConfig: GameConfig;
   #dots = new Set<string>();
   #pellets = new Set<string>();
   #player: Actor;
   #ball: Actor | null = null;
+  #fruit: FruitInstance | null = null;
+  /** True once a fruit is queued behind one already on the board. */
+  #pendingFruitSpawn = false;
+  /** Normal dots consumed this level, for the fruit thresholds. */
+  #dotsConsumed = 0;
+  #fruitFired: [boolean, boolean] = [false, false];
   #enemies: Enemy[] = [];
   #phase: EnemyPhase = 'scatter';
   #phaseRemainingMs = 0;
@@ -215,7 +258,8 @@ export class Game {
   #enemiesEaten = 0;
   #protectionRemainingMs = 0;
   #dyingRemainingMs = 0;
-  #word: WordEntry;
+  /** Assigned by `#selectRoundWord`, always called before the constructor returns. */
+  #word!: WordEntry;
   #revealedLetters: string[] = [];
   #wrongLetters: string[] = [];
   #lastGuess: { letter: string; correct: boolean } | null = null;
@@ -231,7 +275,7 @@ export class Game {
     this.maze = maze;
     this.config = config;
     this.#random = options.random ?? createSystemRandom();
-    this.#selectWord = options.selectWord ?? selectSeedWord;
+    this.#selectWord = options.selectWord ?? defaultSelectWord;
     this.#selectBallSpawn =
       options.selectBallSpawn ??
       ((currentMaze, player, random) =>
@@ -241,10 +285,12 @@ export class Game {
         }));
     this.#enemyDefinitions = validateEnemyDefinitions(maze, options.enemies ?? config.enemies);
     this.#distances = new DistanceCache(maze);
+    this.#fruitThresholds = fruitThresholds(maze.dotTiles.length, config.fruitThresholdRatios);
+    this.#effectiveConfig = config;
     this.#lives = config.startingLives;
     this.#player = createActor(maze.spawn);
-    this.#word = validateWordEntry(this.#selectWord(this.#random));
-    this.#resetRoundState();
+    this.#selectRoundWord();
+    this.#resetLevelState();
   }
 
   get status(): GameStatus {
@@ -317,6 +363,16 @@ export class Game {
     return this.#resumeRemainingMs;
   }
 
+  /** Roaming enemy speed for the current level, as a fraction of the player's. */
+  get enemySpeedFactor(): number {
+    return this.#effectiveConfig.enemySpeedFactor;
+  }
+
+  /** The fruit currently on the board, or null. */
+  get fruit(): FruitInstance | null {
+    return this.#fruit;
+  }
+
   /** True while the maze simulation is not advancing under the player's control. */
   get isFrozen(): boolean {
     return this.#status !== 'chase' && this.#status !== 'title';
@@ -344,10 +400,31 @@ export class Game {
   startLevel(): void {
     this.#level = 1;
     this.#score = 0;
-    this.#word = validateWordEntry(this.#selectWord(this.#random));
-    this.#resetRoundState();
+    this.#lives = this.config.startingLives;
+    this.#extraLifeEarned = false;
+    this.#usedWords = new Set();
+    this.#selectRoundWord();
+    this.#resetLevelState();
     this.#status = 'chase';
     this.#spawnBall();
+  }
+
+  /**
+   * Advances from a solved level's result screen to the next level, once.
+   * Score, lives and the earned extra-life flag survive; everything else about
+   * the round is reset. Only reachable for levels one through four: solving
+   * level five goes straight to `campaign-complete` instead.
+   */
+  nextLevel(): boolean {
+    if (this.#status !== 'level-complete') {
+      return false;
+    }
+    this.#level += 1;
+    this.#selectRoundWord();
+    this.#resetLevelState();
+    this.#status = 'chase';
+    this.#spawnBall();
+    return true;
   }
 
   returnToTitle(): void {
@@ -433,7 +510,7 @@ export class Game {
 
     this.#revealedLetters.push(letter);
     const awarded = revealed * this.config.letterScore;
-    this.#score += awarded;
+    this.#awardScore(awarded);
     this.#lastGuess = { letter, correct: true };
 
     if (isWordSolved(this.#word.word, this.#revealedSet())) {
@@ -475,7 +552,8 @@ export class Game {
     // caller's step is, no two actors can swap sides without touching. The
     // bound is taken from the fastest actor in the game, which is an enemy on
     // its way home rather than the player.
-    const reach = this.config.playerSpeedTilesPerSecond * stepSeconds * fastestSpeedFactor(this.config);
+    const reach =
+      this.config.playerSpeedTilesPerSecond * stepSeconds * fastestSpeedFactor(this.#effectiveConfig);
     const substeps = Math.max(1, Math.ceil(reach / this.config.maxSubstepTiles));
 
     for (let index = 0; index < substeps; index += 1) {
@@ -499,6 +577,11 @@ export class Game {
   #substep(stepSeconds: number): void {
     const distance = this.config.playerSpeedTilesPerSecond * stepSeconds;
 
+    // A fruit queued behind one already on the board, or behind one that just
+    // expired, appears at the start of the substep that follows the one that
+    // freed the slot: never the same substep as the collection or expiry that
+    // queued it.
+    this.#maybeSpawnPendingFruit();
     this.#advanceTimers(stepSeconds);
 
     const centresReached = advanceActor(this.maze, this.#player, distance);
@@ -542,6 +625,13 @@ export class Game {
       }
     }
 
+    if (this.#fruit) {
+      this.#fruit.remainingMs -= elapsedMs;
+      if (this.#fruit.remainingMs <= TIMER_EPSILON_MS) {
+        this.#fruit = null; // Expired uncollected; a queued fruit waits for the next substep.
+      }
+    }
+
     for (const enemy of this.#enemies) {
       if (enemy.state !== 'home' && enemy.state !== 'resting') continue;
       enemy.waitRemainingMs -= elapsedMs;
@@ -578,7 +668,7 @@ export class Game {
       if (enemy.state === 'home' || enemy.state === 'resting') {
         continue; // Waiting enemies hold their slot; only their timer moves.
       }
-      const factor = speedFactorFor(enemy, this.#frightenedRemainingMs, this.config);
+      const factor = speedFactorFor(enemy, this.#frightenedRemainingMs, this.#effectiveConfig);
       const distance = this.config.playerSpeedTilesPerSecond * stepSeconds * factor;
       advanceActor(this.maze, enemy.actor, distance, {
         // The permission is taken from the state the enemy is in when the move
@@ -684,7 +774,7 @@ export class Game {
   #eatEnemy(enemy: Enemy): void {
     const scores = this.config.enemyEatScores;
     const index = Math.min(this.#enemiesEaten, scores.length - 1);
-    this.#score += scores[index] ?? 0;
+    this.#awardScore(scores[index] ?? 0);
     this.#enemiesEaten += 1;
     enemy.state = 'returning';
     // Turning round is the documented transition that lets it head home at once.
@@ -694,7 +784,10 @@ export class Game {
   snapshot(): GameSnapshot {
     const revealed = this.#revealedSet();
     const solved = isWordSolved(this.#word.word, revealed);
-    const roundOver = this.#status === 'level-complete' || this.#status === 'game-over';
+    const roundOver =
+      this.#status === 'level-complete' ||
+      this.#status === 'game-over' ||
+      this.#status === 'campaign-complete';
     return {
       status: this.#status,
       pausedFrom: this.#pausedFrom,
@@ -702,10 +795,12 @@ export class Game {
       level: this.#level,
       score: this.#score,
       lives: this.#lives,
+      extraLifeEarned: this.#extraLifeEarned,
       dotsRemaining: this.#dots.size,
       pelletsRemaining: this.#pellets.size,
       player: actorSnapshot(this.#player),
       ball: this.#ball ? actorSnapshot(this.#ball) : null,
+      fruit: this.#fruit ? { position: this.#fruit.position, remainingMs: this.#fruit.remainingMs } : null,
       enemies: this.#enemies.map((enemy) => ({
         ...actorSnapshot(enemy.actor),
         id: enemy.definition.id,
@@ -803,8 +898,10 @@ export class Game {
 
   /**
    * Returns the actors to their starts and grants protection. Score, word,
-   * guesses and every collected dot and pellet survive: only the arcade timers
-   * and the actors are reset.
+   * guesses and every collected dot and pellet survive: only the arcade
+   * timers, the actors and any active or queued fruit are reset. Fired
+   * thresholds and dots-consumed progress survive as well, so a threshold can
+   * never be farmed by dying next to it.
    */
   #respawnAfterDeath(): void {
     this.#player = createActor(this.maze.spawn);
@@ -812,20 +909,26 @@ export class Game {
     this.#frightenedRemainingMs = 0;
     this.#enemiesEaten = 0;
     this.#protectionRemainingMs = this.config.protectionMs;
+    this.#fruit = null;
+    this.#pendingFruitSpawn = false;
     this.#spawnBall();
     this.#status = 'chase';
     this.clearInput();
   }
 
-  /** Final letter: award the word bonus once and stop the round. */
+  /**
+   * Final letter: award the word bonus once and stop the round. Levels one
+   * through four open the result screen; level five ends the campaign
+   * directly, so there is never a level six.
+   */
   #completeRound(): void {
     if (this.#status !== 'guess') {
       return;
     }
-    this.#status = 'level-complete';
-    this.#score += this.config.wordBonusScore;
+    this.#awardScore(this.config.wordBonusScore);
     this.#ball = null;
     this.clearInput();
+    this.#status = this.#level >= CAMPAIGN_LENGTH ? 'campaign-complete' : 'level-complete';
   }
 
   #spawnBall(): void {
@@ -835,16 +938,64 @@ export class Game {
     this.#ball = spawn ? createBall(spawn) : null;
   }
 
-  /** Resolves one tile centre the player reached: a dot, a pellet, or nothing. */
+  /** Resolves one tile centre the player reached: a dot, a pellet, fruit, or nothing. */
   #collect(position: GridPosition): void {
     const key = positionKey(position);
     if (this.#dots.delete(key)) {
-      this.#score += this.config.dotScore;
-      return; // A tile carries a dot or a pellet, never both, and scores once.
+      this.#awardScore(this.config.dotScore);
+      this.#dotsConsumed += 1;
+      this.#checkFruitThresholds();
+      return; // A tile carries at most one collectible, and scores once.
     }
     if (this.#pellets.delete(key)) {
-      this.#score += this.config.powerPelletScore;
+      this.#awardScore(this.config.powerPelletScore);
       this.#startFrightened();
+      return;
+    }
+    if (this.#fruit && key === positionKey(this.#fruit.position)) {
+      this.#awardScore(this.config.fruitScorePerLevel * this.#level);
+      this.#fruit = null;
+    }
+  }
+
+  /**
+   * Routes every score award through one place, so the sole extra life can be
+   * granted exactly once, the moment the run's score first reaches the
+   * threshold — including on the same substep as a lethal contact, which is
+   * resolved after collectibles and so always sees this happen first.
+   */
+  #awardScore(amount: number): void {
+    this.#score += amount;
+    if (!this.#extraLifeEarned && this.#score >= this.config.extraLifeScoreThreshold) {
+      this.#extraLifeEarned = true;
+      this.#lives += 1;
+    }
+  }
+
+  /** Checks both fruit thresholds against dots consumed so far, firing each at most once. */
+  #checkFruitThresholds(): void {
+    for (let index = 0; index < this.#fruitThresholds.length; index += 1) {
+      if (!this.#fruitFired[index] && this.#dotsConsumed >= (this.#fruitThresholds[index] as number)) {
+        this.#fruitFired[index] = true;
+        this.#requestFruitSpawn();
+      }
+    }
+  }
+
+  /** Spawns a fruit at once if the board has none, otherwise queues it behind the current one. */
+  #requestFruitSpawn(): void {
+    if (this.#fruit) {
+      this.#pendingFruitSpawn = true;
+      return;
+    }
+    this.#fruit = { position: this.maze.spawn, remainingMs: this.config.fruitLifetimeMs };
+  }
+
+  /** Spawns a queued fruit once the board is free; called once at the start of every substep. */
+  #maybeSpawnPendingFruit(): void {
+    if (this.#pendingFruitSpawn && !this.#fruit) {
+      this.#fruit = { position: this.maze.spawn, remainingMs: this.config.fruitLifetimeMs };
+      this.#pendingFruitSpawn = false;
     }
   }
 
@@ -864,12 +1015,42 @@ export class Game {
     this.#phaseRemainingMs = this.config.scatterPhaseMs;
   }
 
-  #resetRoundState(): void {
+  /** Selects this level's word from the bank, excluding every word already used this run. */
+  #selectRoundWord(): void {
+    const context: WordSelectionContext = {
+      level: this.#level,
+      wordLength: levelDefinition(this.#level).wordLength,
+      excluded: this.#usedWords,
+      random: this.#random,
+    };
+    this.#word = validateWordEntry(this.#selectWord(context));
+    this.#usedWords.add(normalizeWordKey(this.#word.word));
+  }
+
+  /** Overrides `enemySpeedFactor` for the current level; every other tunable is level-invariant. */
+  #applyLevelDifficulty(): void {
+    this.#effectiveConfig = {
+      ...this.config,
+      enemySpeedFactor: levelDefinition(this.#level).enemySpeedFactor,
+    };
+  }
+
+  /**
+   * Resets everything a new level needs, for both a fresh run and a level
+   * transition. Score, lives, the used-word set and the earned-extra-life flag
+   * are deliberately untouched here: `startLevel` resets those explicitly for
+   * a fresh run, and `nextLevel` preserves them across a transition.
+   */
+  #resetLevelState(): void {
     this.#dots = new Set(this.maze.dotTiles.map(positionKey));
     this.#pellets = new Set(this.maze.powerPelletTiles.map(positionKey));
     this.#player = createActor(this.maze.spawn);
     this.#ball = null;
-    this.#lives = this.config.startingLives;
+    this.#fruit = null;
+    this.#pendingFruitSpawn = false;
+    this.#dotsConsumed = 0;
+    this.#fruitFired = [false, false];
+    this.#applyLevelDifficulty();
     this.#resetEnemies();
     this.#frightenedRemainingMs = 0;
     this.#enemiesEaten = 0;

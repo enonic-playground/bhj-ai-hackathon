@@ -10,7 +10,7 @@ import { chaseUntilCaught, snapshot } from './support.js';
  * parameter except the checks that prove the parameters do nothing.
  */
 
-const FIXTURE_PARAMETERS = ['testBall', 'testWord', 'testSeed', 'testEnemies'] as const;
+const FIXTURE_PARAMETERS = ['testBall', 'testWord', 'testWords', 'testSeed', 'testEnemies'] as const;
 
 const consoleErrors = new WeakMap<Page, string[]>();
 
