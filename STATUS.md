@@ -1,29 +1,30 @@
 # Project status
 
-Updated: 2026-09-21
+Updated: 2026-09-24
 
 ## Current checkpoint
 
 - Product baseline: PRD v1.0 accepted by the project owner.
-- Current milestone: M5 — mobile usability and PWA.
-- State: BLOCKED — required device validation; Codex closed M5-R6 on 2026-09-21. All M5 review findings are closed; M4 remains the last ACCEPTED milestone.
-- Current owner: project owner (device-validation evidence); Codex reviews the results before milestone acceptance.
+- Current milestone: M6 — release quality.
+- State: READY for M6. M5 ACCEPTED on 2026-09-24 after owner-reported device validation completed with no notes; M5-R1–R6 closed.
+- Current owner: Claude (M6 implementation); Codex reviews the committed candidate.
 - M5 implementation base: clean HEAD `19bb0529bccd0fc7aaf07b7cc4bb6347fda8950a` (the M5 brief commit itself — the checkout was already clean at planning start, so no separate checkpoint commit was needed).
 - M5 implementation commit: `02396b20307018ca9e3301916dc62cae93b846f7` on `main`. Reduced motion (canvas + CSS), responsive/focus refinements re-verified with new landscape/long-content/misses/five-digit-score/earned-life-badge/both-result-panel coverage, an original-artwork manifest/icon set, a build-generated service worker with complete offline preparation and a native (no `skipWaiting`/`clients.claim`) safe-update lifecycle, and retained denied-storage browser regressions; see [D021](DECISIONS.md#d021--m5-implementation-choices) and the handoff's AC1–AC9 evidence and device matrix. CHANGES_REQUESTED at review round 1 (M5-R1–R5).
 - M5 fix commit: `b9e25940d0aaf3361fdcb52e4c88620e08b0df48` on `main`. Resolves M5-R1 (exact-scope cache matching), M5-R2 (content-byte version fingerprint), M5-R3 (a genuinely distinct failed-update build with real lifecycle-event evidence and a protected paused-tab case), M5-R4 (`safe center` overlay alignment and a 44px install-help touch target) and M5-R5 (a real production subpath deployment completing a full offline campaign); see [D022](DECISIONS.md#d022--m5-fix-round-choices-m5-r1r5) and the handoff's fix-response section.
 - M5-R6 documentation commit: `1f0bd0f6c31bc800c764a2e10b811b656918b140` on `main`. Resolves M5-R6 by correcting `README.md`'s cache-recovery instructions to distinguish Unregister from "Clear data" and document a scoped recovery procedure that preserves the best score and unrelated caches; see the handoff's "Fix response — Claude (M5-R6)" section.
-- Current milestone handoff: `handoffs/M5.md`.
+- Current milestone handoff: `handoffs/M6.md`.
+- M6 reference base: `0d9b83e6cc62dcd9ac04fd3cbc835145b61f16ef` on `main`; checkpoint planning updates and record the actual implementation base before coding.
 - Baseline documentation commit: `061adc7b92d900d63b5e306ab45bd58c0f8c60b2`.
-- Last accepted implementation commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` (M4).
-- Acceptance blockers: none for M4; M4-R1/R2 closed. Human pacing, real-device/PWA checks and the targeted coverage/layout follow-ups in review round 2 remain later milestone/release work.
+- Last accepted implementation commit: `b9e25940d0aaf3361fdcb52e4c88620e08b0df48` (M5), with reviewed README correction `1f0bd0f6c31bc800c764a2e10b811b656918b140`.
+- Release work: M6 regression/edge coverage, clean-install rehearsal, final README and release evidence; three recorded human playtests and demo rehearsal removed by D024. See M6 criteria.
 - M3 implementation base: `3b5255a11870d29ce5e25cc3141a258e8740ab24` on `main`. The planning the brief expected to find uncommitted (M2 acceptance, M3 brief, coordination updates) was already committed there, so nothing needed a separate checkpoint. The brief's reference HEAD `e47ca4777d1d5169559e287a49cdf5cc90c4aa55` is that commit's parent.
 - M4 reference base HEAD: `a5d84530b13458e04603f54249d952eb65bab599` on `main`.
 - M4 implementation base: `8e58ead18121572ad82772ef3485c0747fc5ba08` on `main` (checkpoints the M4 brief and D016 audio-removal documentation that was uncommitted at the reference HEAD; no application code in that commit).
 - M4 implementation commit: `daca44e3c0a439d2fdb278af0833df883973a4c8` on `main`. Word bank, five-level campaign transitions, fruit, centralized scoring with the sole extra life, and a resilient best-score store; see [D018](DECISIONS.md#d018--m4-implementation-choices) and the handoff's AC1–AC10 evidence.
 - M4 fix commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` on `main`. Resolves M4-R1 (cross-tab best-score reconciliation) and M4-R2 (isolated extra-life award-source tests, a real death/respawn case and the final-campaign-bonus case); see [D019](DECISIONS.md#d019--m4-fix-round-choices) and the handoff's fix-response section.
 - M5 reference base: `0509af884bd895451d248fee1ad6e00a337c5324` on `main`.
-- Acceptance blockers for M5: M5-R1–R6 are verified closed. Required real-device install/offline/touch/orientation checks remain UNVERIFIED; see the handoff device matrix and review round 3.
-- Next action: The project owner completes the handoff device matrix and supplies results, or explicitly decides how to treat unavailable checks; Codex then resumes the M5 acceptance review. Do not start M6 before M5 is ACCEPTED.
+- Acceptance blockers for M5: none. Device validation is complete per the owner; exact platform/version details were not supplied. See the M5 acceptance entry.
+- Next action: Claude checkpoints the planning files, marks M6 IMPLEMENTING, follows `handoffs/M6.md`, and returns a committed candidate with release-gate evidence for Codex review. Follow D024: no three-run log or demo rehearsal is required.
 
 
 ## Milestones
@@ -35,10 +36,14 @@ Updated: 2026-09-21
 | M2: defining loop | ACCEPTED | `0be0b439`: Codex closed M2-R1/R2; independently passed install/typecheck/build, 120 unit/integration tests and 39 browser tests (1 skipped) on Node 26.7.0. See handoff review round 2. |
 | M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
 | M4: complete campaign | ACCEPTED | `f4708cb`: Codex closed M4-R1/R2; independently passed 263 tests, both builds, 69 browser tests (3 skips) and two additional production denied-storage probes. See handoff review round 2. |
-| M5: mobile and PWA | BLOCKED | `b9e2594` + `1f0bd0f`: R1–R6 verified closed. Awaiting required device evidence or an explicit owner decision on unavailable checks. |
-| M6: release quality | NOT_STARTED | Depends on accepted M5. |
+| M5: mobile and PWA | ACCEPTED | `b9e2594` + `1f0bd0f`: R1–R6 closed; owner reports device validation complete with no notes on 2026-09-24. |
+| M6: release quality | READY | Brief in `handoffs/M6.md`; Claude owns implementation and release evidence. |
 
 ## Verification and budget
+
+M6 scope amendment (owner/Codex, 2026-09-24): D024 removes the three recorded human playtests and demo rehearsal from scope and release gates. PRD and M6 brief synchronized; AC6/AC8 retired with other IDs preserved. M5 device acceptance and remaining checks are unchanged. M6 remains READY, owner Claude. No application changes or tests; existing time/token allowances remain unchanged.
+
+M5 acceptance / M6 planning (Codex, 2026-09-24): owner reports device validation complete with no notes, closing M5's blocker. Accepted the reviewed M5 revisions; clean starting HEAD `0d9b83e6cc62dcd9ac04fd3cbc835145b61f16ef` contains only documentation changes after the last review. Prepared M6 against PRD release gates and transferred ownership to Claude. No application code or tests changed; no application checks rerun. Device details and three human run timings were not supplied; keep those distinct from the owner report. M6 allowance remains 1.5–2 focused hours, overall PRD budget unchanged; planning usage/time not measured.
 
 M5 review round 3 (Codex, 2026-09-21): reviewed documentation checkpoint `1f0bd0f6c31bc800c764a2e10b811b656918b140` at clean HEAD `41deca8ca1d0f846012d26df6336d0a996654b34`. M5-R6 is closed: README now distinguishes unregistering, exact-scope cache deletion and full-origin clearing, consistent with worker source and the independently verified round-2 recovery probe. No new findings. Only README/status/handoff changed; `git diff --check` passed and application tests were not rerun. All M5 findings are closed, but milestone acceptance awaits required device validation. Prior application checks remain round-2 evidence, not new runs. Review time/tokens not measured; PRD budget unchanged.
 

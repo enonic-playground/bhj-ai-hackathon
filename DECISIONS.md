@@ -247,3 +247,23 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Rationale: three of the five findings (R1, R2, R3) trace to variants of the same mistake — treating a symptom that happened to look right (a `startsWith` check, a filename list, a copied-not-rebuilt "broken" build) as equivalent to the real invariant (exact scope, real content, a genuinely distinct worker) — so each fix replaces the shortcut with the real check and a test that runs the real production code path (the actual template source, the actual plugin function, a real second `vite build`) rather than a reimplementation of it. R4 and R5 were both gaps in what was exercised, not defects in already-tested code, so both fixes are additive coverage of a scenario the original suite simply never reached.
 - Authority: Claude's implementation choices resolving Codex's CHANGES_REQUESTED findings under the role split in [D002](#d002--claude-implements-codex-coordinates-and-reviews); subject to Codex's re-review.
 - Affected documents: `README.md`, `handoffs/M5.md`, `STATUS.md`.
+
+## D023 — M5 device validation accepted; M6 release boundary
+
+- Date: 2026-09-24.
+- Status: accepted; no product scope or budget change.
+- Decision: accept M5 after the owner's report that device validation completed with no notes and the prior closure of M5-R1–R6. Proceed to M6 under PRD sections 7–8: regression and remaining edge coverage, limited cleanup, final README, fresh-checkout verification, three recorded human runs and demo rehearsal.
+- Evidence boundary: the device result is owner-reported. Platform/version details, measured performance and a three-run pacing log were not supplied; do not invent them or treat the general report as satisfying every distinct release gate. Preserve historical evidence and record the later acceptance separately.
+- Rationale: the named M5 blocker is closed; remaining release work belongs in M6 without adding features or silently waiving acceptance criteria.
+- Authority: project owner's device-validation report and request for the M6 brief; Codex's coordination role under D002.
+- Affected documents: `handoffs/M5.md`, `handoffs/M6.md`, `STATUS.md`, `PRD.md`. Claude updates the implementation README in M6.
+
+## D024 — Recorded human playtests and demo rehearsal removed
+
+- Date: 2026-09-24.
+- Status: accepted by the project owner.
+- Decision: remove the three recorded human playtests and demo rehearsal from project scope and release gates. Retire M6 AC6 and AC8; no run-log request or separate gameplay demo is required for M6 acceptance. This supersedes those portions of D020/D023 and historical handoff requirements.
+- Rationale and authority: the project owner explicitly requested their removal after the M6 brief was prepared.
+- Retained requirements: automated regression, targeted defect fixes, clean-install/build/preview verification, final documentation and accurate existing device evidence. M5 remains accepted. Pacing/performance targets do not become measured results through this scope reduction.
+- Estimates: retain the existing planning allowances; no revised duration or measured usage is asserted.
+- Affected documents: `PRD.md`, `STATUS.md`, `handoffs/M5.md`, `handoffs/M6.md`. Historical review entries remain intact.

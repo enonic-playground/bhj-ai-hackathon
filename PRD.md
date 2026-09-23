@@ -1,6 +1,6 @@
 # Hac-Man — Product Requirements Document
 
-Status: accepted implementation baseline, version 1.0. Approved by the project owner on 2026-09-16, with the M3 visual amendment (D015) and removal of audio (D016). See `STATUS.md` for implementation progress.
+Status: accepted implementation baseline, version 1.0. Approved by the project owner on 2026-09-16, with the M3 visual amendment (D015) and removal of audio (D016), and release-validation scope amendment (D024). See `STATUS.md` for implementation progress.
 
 Claude owns implementation and tests; Codex owns planning, coordination, verification, and code review. Future scope changes must be recorded explicitly against this baseline.
 
@@ -122,7 +122,7 @@ Complete these sequentially. Each implementation milestone ends with a runnable 
 | Day 2 — M3: arcade danger | Add four enemy strategies, home/release logic, chase/scatter, power pellets, lives, death, pause, restart, collision priority, and the two-second ball hue cycle. Exit: a complete playable one-level game with win and loss paths. | 3–3.5 h |
 | Day 3 — M4: complete campaign | Add word bank, five levels, fruit, full scoring, extra life, high score and pacing adjustments. Exit: campaign completion and replay with a persistent high score. | 2–2.5 h |
 | Day 3 — M5: mobile and PWA | Refine layout, input, focus, accessibility, install assets, offline cache, and safe update behavior. Exit: install and play offline after initial load; desktop and phone checks pass. | 1.5–2 h |
-| Day 3 — M6: release quality | Full regression, edge cases, cleanup, README, clean-install rehearsal, and demo rehearsal. Exit: reproducible production build and all release gates satisfied. | 1.5–2 h |
+| Day 3 — M6: release quality | Full regression, edge cases, cleanup, README, and clean-install rehearsal. Exit: reproducible production build and all release gates satisfied. | 1.5–2 h |
 
 Base work: 16.5–20.5 hours. Reserve another 2–3.5 hours for input, collision, caching, or device issues: **18.5–24 total hours across three days**. Day 1 is intentionally lighter; allow up to roughly ten hours on either build day if contingency is needed.
 
@@ -143,15 +143,15 @@ Tests are introduced with the owning milestone, then extended:
 
 Use deterministic test fixtures to reach hard-to-trigger states through the game API; retain at least one browser journey using actual player controls. Browser emulation complements real-device touch and installation checks.
 
+The three recorded human playtests and demo rehearsal are excluded from release scope by owner decision D024 (2026-09-24). Pacing targets remain design targets, not verified measurements. M6 requires setup/production-preview verification, not a separate manual gameplay demo.
+
 Release gates:
 
 - Every required feature above is implemented or a scope change is explicitly documented.
 - A fresh checkout installs using documented commands, passes type checks, unit/integration/browser tests, and builds successfully.
-- At least three complete runs are playtested, including a desktop run and a mobile run; record pacing and address blocking issues.
 - No known soft locks, unreachable balls, unintended duplicate scoring, wall penetration, stuck movement, or forced mid-run updates.
 - A real-device offline run and installation check are recorded; any unavailable-device validation is marked unverified.
 - Final README explains concept, rules, controls, prerequisites and pinned runtime version, install/dev/test/build/preview commands, PWA install/offline behavior, architecture, content editing, known limitations, asset credits, and the existing license.
-- Demo walkthrough demonstrates catch, correct and wrong guesses, frightened enemies, word completion, and offline play.
 
 ## 9. Session and token estimates
 
@@ -184,4 +184,4 @@ After M2, replace estimates with observed time and token usage where available. 
 | Stale service worker breaks the demo | Test production offline/update paths and document cache recovery. |
 | Time runs short | Protect the full working loop and release gates; spend contingency before adding optional visuals. |
 
-M0 planning is complete and M1–M4 are accepted, including [M4's reviewed campaign checkpoint](handoffs/M4.md). [M5](handoffs/M5.md) (mobile usability and PWA) is implemented and in review; real-device install/offline/touch checks remain unverified pending device availability. See `AGENTS.md` for the workflow and `STATUS.md` for current progress. The final setup README is a Day 3 deliverable based on verified implementation commands.
+M0 planning is complete and M1–M5 are accepted. M5 acceptance includes the owner's 2026-09-24 report that device validation completed with no notes; see [M5's acceptance record](handoffs/M5.md). [M6](handoffs/M6.md) is ready for release regression, documentation and the remaining section 8 release gates. See `AGENTS.md` for the workflow and `STATUS.md` for current progress.
