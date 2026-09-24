@@ -1,0 +1,17 @@
+$ npm run build
+
+> hac-man@0.1.0 build
+> tsc --noEmit -p tsconfig.build.json && vite build
+
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 30 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                 10.27 kB │ gzip:  2.63 kB
+dist/assets/index-C2vlKqtE.css   7.38 kB │ gzip:  2.12 kB
+dist/assets/index-DWNu0VJn.js   43.48 kB │ gzip: 15.16 kB
+
+✓ built in 201ms
+hacman-service-worker: wrote dist/sw.js, version 21ca6d108b49573c, 8 precached files
+[exit 0, 1s]

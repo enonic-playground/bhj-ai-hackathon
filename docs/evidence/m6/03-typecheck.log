@@ -1,0 +1,6 @@
+$ npm run typecheck
+
+> hac-man@0.1.0 typecheck
+> tsc --noEmit
+
+[exit 0, 0s]

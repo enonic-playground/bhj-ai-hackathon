@@ -97,7 +97,7 @@ npm run build:fixture
 npm run test:e2e
 ```
 
-There is no lint script. `npm run test:e2e` starts its own preview servers and refuses to reuse one already running on ports 4173 or 4174, so stop any manual `preview` first.
+There is no lint script. `npm run test:e2e` starts its own preview servers and refuses to reuse one already running on ports 4173 or 4174, so stop any manual `preview` first. The browser suite also rewrites the committed evidence screenshots under `docs/evidence/`; unless you mean to update them, restore them afterwards with `git checkout -- docs/evidence`.
 
 ## Hosting, installing and playing offline
 

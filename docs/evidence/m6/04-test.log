@@ -1,0 +1,42 @@
+$ npm test
+
+> hac-man@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.1 <scratchpad>/rehearsal
+
+ ✓ tests/bestScore.test.ts (19 tests) 4ms
+ ✓ tests/campaign.test.ts (10 tests) 15ms
+ ✓ tests/score.test.ts (12 tests) 19ms
+ ✓ tests/maze.test.ts (19 tests) 25ms
+ ✓ tests/round.test.ts (18 tests) 37ms
+ ✓ tests/fruit.test.ts (11 tests) 35ms
+ ✓ tests/collision.test.ts (10 tests) 39ms
+ ✓ tests/lives.test.ts (14 tests) 38ms
+ ✓ tests/pellets.test.ts (12 tests) 44ms
+ ✓ tests/enemy.test.ts (23 tests) 51ms
+ ✓ tests/ball.test.ts (17 tests) 68ms
+ ✓ tests/loop.test.ts (9 tests) 18ms
+ ✓ tests/pause.test.ts (12 tests) 18ms
+ ✓ tests/input.test.ts (14 tests) 8ms
+ ✓ tests/serviceWorkerScope.test.ts (4 tests) 5ms
+ ✓ tests/game.test.ts (10 tests) 14ms
+ ✓ tests/words.test.ts (17 tests) 7ms
+ ✓ tests/movement.test.ts (12 tests) 10ms
+ ✓ tests/motion.test.ts (10 tests) 4ms
+ ✓ tests/ballColor.test.ts (6 tests) 10ms
+ ✓ tests/frameTiming.test.ts (8 tests) 5ms
+ ✓ tests/spawn.test.ts (10 tests) 28ms
+ ✓ tests/pwaStatus.test.ts (12 tests) 3ms
+ ✓ tests/levels.test.ts (4 tests) 2ms
+ ✓ tests/reducedMotion.test.ts (3 tests) 2ms
+ ✓ tests/fixture.test.ts (4 tests) 2ms
+ ✓ tests/serviceWorkerVersion.test.ts (4 tests) 24ms
+
+ Test Files  27 passed (27)
+      Tests  304 passed (304)
+   Start at  11:13:30
+   Duration  539ms (transform 43%, import 37%, tests 17%, worker 3%)
+
+[exit 0, 1s]

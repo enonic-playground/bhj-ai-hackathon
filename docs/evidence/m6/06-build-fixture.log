@@ -1,0 +1,16 @@
+$ npm run build:fixture
+
+> hac-man@0.1.0 build:fixture
+> tsc --noEmit -p tsconfig.build.json && vite build --mode fixture --outDir dist-fixture
+
+vite v8.3.0 building client environment for fixture...
+transforming...
+✓ 30 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-fixture/index.html                 10.27 kB │ gzip:  2.63 kB
+dist-fixture/assets/index-C2vlKqtE.css   7.38 kB │ gzip:  2.12 kB
+dist-fixture/assets/index-Dfupb3Py.js   44.75 kB │ gzip: 15.62 kB
+
+✓ built in 67ms
+[exit 0, 1s]

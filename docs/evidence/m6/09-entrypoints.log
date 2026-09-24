@@ -1,0 +1,152 @@
+node v22.12.0
+dev http://127.0.0.1:5173/ -> HTTP 200
+rebuild exit 0
+preview http://127.0.0.1:4173/ -> HTTP 200
+preview-sw http://127.0.0.1:4173/sw.js -> HTTP 200
+--- dist/index.html asset refs
+href="manifest.webmanifest"
+href="icons/icon-192.png"
+href="icons/icon-512.png"
+href="icons/apple-touch-icon.png"
+src="./assets/index-DWNu0VJn.js"
+href="./assets/index-C2vlKqtE.css"
+--- root-absolute refs in dist html/js/css (expect none):
+(end)
+--- fixture parameter names in dist (expect none):
+(end)
+--- fixture parameter names in dist-fixture (expect present):
+dist-fixture/assets/index-Dfupb3Py.js
+--- sw.js in dist-fixture (expect absent):
+ls: dist-fixture/sw.js: No such file or directory
+--- git status after everything (expect empty):
+ M docs/evidence/m3/desktop-ball-cycle-1.png
+ M docs/evidence/m3/desktop-ball-cycle-2.png
+ M docs/evidence/m3/desktop-ball-cycle-3.png
+ M docs/evidence/m3/desktop-ball-cycle-4.png
+ M docs/evidence/m3/desktop-ball-seam.png
+ M docs/evidence/m3/desktop-chase-enemies.png
+ M docs/evidence/m3/desktop-chase.png
+ M docs/evidence/m3/desktop-countdown.png
+ M docs/evidence/m3/desktop-dying.png
+ M docs/evidence/m3/desktop-frightened.png
+ M docs/evidence/m3/desktop-game-over.png
+ M docs/evidence/m3/desktop-guess-short.png
+ M docs/evidence/m3/desktop-guess.png
+ M docs/evidence/m3/desktop-layout-chase.png
+ M docs/evidence/m3/desktop-layout-resized.png
+ M docs/evidence/m3/desktop-layout-title.png
+ M docs/evidence/m3/desktop-paused.png
+ M docs/evidence/m3/desktop-protected.png
+ M docs/evidence/m3/desktop-rejoined.png
+ M docs/evidence/m3/desktop-result.png
+ M docs/evidence/m3/desktop-solved.png
+ M docs/evidence/m3/mobile-ball-cycle-1.png
+ M docs/evidence/m3/mobile-ball-seam.png
+ M docs/evidence/m3/mobile-chase-enemies.png
+ M docs/evidence/m3/mobile-chase-mobile.png
+ M docs/evidence/m3/mobile-chase.png
+ M docs/evidence/m3/mobile-countdown.png
+ M docs/evidence/m3/mobile-dying.png
+ M docs/evidence/m3/mobile-frightened.png
+ M docs/evidence/m3/mobile-game-over.png
+ M docs/evidence/m3/mobile-guess-short.png
+ M docs/evidence/m3/mobile-guess.png
+ M docs/evidence/m3/mobile-layout-chase.png
+ M docs/evidence/m3/mobile-layout-resized.png
+ M docs/evidence/m3/mobile-layout-title.png
+ M docs/evidence/m3/mobile-paused-mobile.png
+ M docs/evidence/m3/mobile-paused.png
+ M docs/evidence/m3/mobile-protected.png
+ M docs/evidence/m3/mobile-rejoined.png
+ M docs/evidence/m3/mobile-result.png
+ M docs/evidence/m3/mobile-solved.png
+ M docs/evidence/m4/desktop-campaign-complete.png
+ M docs/evidence/m4/desktop-fruit-collected.png
+ M docs/evidence/m4/desktop-fruit-spawned.png
+ M docs/evidence/m4/desktop-level-1-solved.png
+ M docs/evidence/m4/desktop-level-3-solved.png
+ M docs/evidence/m4/desktop-level-4-solved.png
+ M docs/evidence/m4/mobile-campaign-complete.png
+ M docs/evidence/m4/mobile-fruit-collected.png
+ M docs/evidence/m4/mobile-fruit-spawned.png
+ M docs/evidence/m4/mobile-level-1-solved.png
+ M docs/evidence/m4/mobile-level-2-solved.png
+ M docs/evidence/m4/mobile-level-3-solved.png
+ M docs/evidence/m4/mobile-level-4-solved.png
+ M docs/evidence/m5/desktop-campaign-complete-panel.png
+ M docs/evidence/m5/desktop-hud-extremes.png
+ M docs/evidence/m5/desktop-install-help-expanded.png
+ M docs/evidence/m5/desktop-landscape-chase.png
+ M docs/evidence/m5/desktop-long-word-misses.png
+ M docs/evidence/m5/desktop-result-panel.png
+ M docs/evidence/m5/mobile-campaign-complete-panel.png
+ M docs/evidence/m5/mobile-hud-extremes.png
+ M docs/evidence/m5/mobile-long-word-misses.png
+ M docs/evidence/m5/mobile-result-panel.png
+ docs/evidence/m3/desktop-ball-cycle-1.png          | Bin 26067 -> 25890 bytes
+ docs/evidence/m3/desktop-ball-cycle-2.png          | Bin 25631 -> 26017 bytes
+ docs/evidence/m3/desktop-ball-cycle-3.png          | Bin 25831 -> 25765 bytes
+ docs/evidence/m3/desktop-ball-cycle-4.png          | Bin 25966 -> 25740 bytes
+ docs/evidence/m3/desktop-ball-seam.png             | Bin 26743 -> 26786 bytes
+ docs/evidence/m3/desktop-chase-enemies.png         | Bin 48653 -> 46806 bytes
+ docs/evidence/m3/desktop-chase.png                 | Bin 45264 -> 43469 bytes
+ docs/evidence/m3/desktop-countdown.png             | Bin 52589 -> 50916 bytes
+ docs/evidence/m3/desktop-dying.png                 | Bin 53576 -> 52023 bytes
+ docs/evidence/m3/desktop-frightened.png            | Bin 47862 -> 46493 bytes
+ docs/evidence/m3/desktop-game-over.png             | Bin 44727 -> 45990 bytes
+ docs/evidence/m3/desktop-guess-short.png           | Bin 43079 -> 43661 bytes
+ docs/evidence/m3/desktop-guess.png                 | Bin 43176 -> 43827 bytes
+ docs/evidence/m3/desktop-layout-chase.png          | Bin 43978 -> 42402 bytes
+ docs/evidence/m3/desktop-layout-resized.png        | Bin 44015 -> 42447 bytes
+ docs/evidence/m3/desktop-layout-title.png          | Bin 109636 -> 126869 bytes
+ docs/evidence/m3/desktop-paused.png                | Bin 44442 -> 43144 bytes
+ docs/evidence/m3/desktop-protected.png             | Bin 52144 -> 50731 bytes
+ docs/evidence/m3/desktop-rejoined.png              | Bin 48963 -> 47149 bytes
+ docs/evidence/m3/desktop-result.png                | Bin 46238 -> 45912 bytes
+ docs/evidence/m3/desktop-solved.png                | Bin 47518 -> 46905 bytes
+ docs/evidence/m3/mobile-ball-cycle-1.png           | Bin 34602 -> 34617 bytes
+ docs/evidence/m3/mobile-ball-seam.png              | Bin 32660 -> 32664 bytes
+ docs/evidence/m3/mobile-chase-enemies.png          | Bin 135730 -> 136925 bytes
+ docs/evidence/m3/mobile-chase-mobile.png           | Bin 134176 -> 135506 bytes
+ docs/evidence/m3/mobile-chase.png                  | Bin 131518 -> 132732 bytes
+ docs/evidence/m3/mobile-countdown.png              | Bin 136648 -> 137491 bytes
+ docs/evidence/m3/mobile-dying.png                  | Bin 134744 -> 135222 bytes
+ docs/evidence/m3/mobile-frightened.png             | Bin 133886 -> 135107 bytes
+ docs/evidence/m3/mobile-game-over.png              | Bin 80329 -> 87129 bytes
+ docs/evidence/m3/mobile-guess-short.png            | Bin 110968 -> 112285 bytes
+ docs/evidence/m3/mobile-guess.png                  | Bin 110569 -> 111791 bytes
+ docs/evidence/m3/mobile-layout-chase.png           | Bin 131424 -> 132155 bytes
+ docs/evidence/m3/mobile-layout-resized.png         | Bin 130059 -> 132201 bytes
+ docs/evidence/m3/mobile-layout-title.png           | Bin 243155 -> 205413 bytes
+ docs/evidence/m3/mobile-paused-mobile.png          | Bin 73749 -> 74512 bytes
+ docs/evidence/m3/mobile-paused.png                 | Bin 74063 -> 74823 bytes
+ docs/evidence/m3/mobile-protected.png              | Bin 145976 -> 147225 bytes
+ docs/evidence/m3/mobile-rejoined.png               | Bin 133729 -> 135103 bytes
+ docs/evidence/m3/mobile-result.png                 | Bin 84514 -> 86414 bytes
+ docs/evidence/m3/mobile-solved.png                 | Bin 84894 -> 86905 bytes
+ docs/evidence/m4/desktop-campaign-complete.png     | Bin 47969 -> 47773 bytes
+ docs/evidence/m4/desktop-fruit-collected.png       | Bin 41851 -> 41299 bytes
+ docs/evidence/m4/desktop-fruit-spawned.png         | Bin 42321 -> 42476 bytes
+ docs/evidence/m4/desktop-level-1-solved.png        | Bin 46268 -> 46312 bytes
+ docs/evidence/m4/desktop-level-3-solved.png        | Bin 46975 -> 47193 bytes
+ docs/evidence/m4/desktop-level-4-solved.png        | Bin 48271 -> 47649 bytes
+ docs/evidence/m4/mobile-campaign-complete.png      | Bin 89152 -> 86493 bytes
+ docs/evidence/m4/mobile-fruit-collected.png        | Bin 124837 -> 124014 bytes
+ docs/evidence/m4/mobile-fruit-spawned.png          | Bin 125694 -> 126594 bytes
+ docs/evidence/m4/mobile-level-1-solved.png         | Bin 86907 -> 87009 bytes
+ docs/evidence/m4/mobile-level-2-solved.png         | Bin 88352 -> 88429 bytes
+ docs/evidence/m4/mobile-level-3-solved.png         | Bin 86495 -> 86842 bytes
+ docs/evidence/m4/mobile-level-4-solved.png         | Bin 89153 -> 88318 bytes
+ .../m5/desktop-campaign-complete-panel.png         | Bin 49579 -> 49503 bytes
+ docs/evidence/m5/desktop-hud-extremes.png          | Bin 35237 -> 34878 bytes
+ docs/evidence/m5/desktop-install-help-expanded.png | Bin 61303 -> 61314 bytes
+ docs/evidence/m5/desktop-landscape-chase.png       | Bin 23653 -> 23664 bytes
+ docs/evidence/m5/desktop-long-word-misses.png      | Bin 45614 -> 45081 bytes
+ docs/evidence/m5/desktop-result-panel.png          | Bin 47353 -> 47623 bytes
+ .../evidence/m5/mobile-campaign-complete-panel.png | Bin 91528 -> 91732 bytes
+ docs/evidence/m5/mobile-hud-extremes.png           | Bin 78783 -> 78926 bytes
+ docs/evidence/m5/mobile-long-word-misses.png       | Bin 99012 -> 98256 bytes
+ docs/evidence/m5/mobile-result-panel.png           | Bin 86147 -> 87838 bytes
+ 64 files changed, 0 insertions(+), 0 deletions(-)
+(end)
+POSTDONE
