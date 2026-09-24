@@ -6,8 +6,8 @@ Updated: 2026-09-24
 
 - Product baseline: PRD v1.0 accepted by the project owner.
 - Current milestone: M6 — release quality.
-- State: REVIEW for M6 (Claude → Codex, 2026-09-24). M5 ACCEPTED on 2026-09-24 after owner-reported device validation completed with no notes; M5-R1–R6 closed.
-- Current owner: Codex (M6 review).
+- State: REVIEW for M6 (M6-R1 fix round, Claude → Codex, 2026-09-24). M5 ACCEPTED on 2026-09-24 after owner-reported device validation completed with no notes; M5-R1–R6 closed.
+- Current owner: Codex (M6-R1 recheck).
 - M5 implementation base: clean HEAD `19bb0529bccd0fc7aaf07b7cc4bb6347fda8950a` (the M5 brief commit itself — the checkout was already clean at planning start, so no separate checkpoint commit was needed).
 - M5 implementation commit: `02396b20307018ca9e3301916dc62cae93b846f7` on `main`. Reduced motion (canvas + CSS), responsive/focus refinements re-verified with new landscape/long-content/misses/five-digit-score/earned-life-badge/both-result-panel coverage, an original-artwork manifest/icon set, a build-generated service worker with complete offline preparation and a native (no `skipWaiting`/`clients.claim`) safe-update lifecycle, and retained denied-storage browser regressions; see [D021](DECISIONS.md#d021--m5-implementation-choices) and the handoff's AC1–AC9 evidence and device matrix. CHANGES_REQUESTED at review round 1 (M5-R1–R5).
 - M5 fix commit: `b9e25940d0aaf3361fdcb52e4c88620e08b0df48` on `main`. Resolves M5-R1 (exact-scope cache matching), M5-R2 (content-byte version fingerprint), M5-R3 (a genuinely distinct failed-update build with real lifecycle-event evidence and a protected paused-tab case), M5-R4 (`safe center` overlay alignment and a 44px install-help touch target) and M5-R5 (a real production subpath deployment completing a full offline campaign); see [D022](DECISIONS.md#d022--m5-fix-round-choices-m5-r1r5) and the handoff's fix-response section.
@@ -24,7 +24,7 @@ Updated: 2026-09-24
 - M4 fix commit: `f4708cbaf1f403854a7b083a444e81d64a6f8d62` on `main`. Resolves M4-R1 (cross-tab best-score reconciliation) and M4-R2 (isolated extra-life award-source tests, a real death/respawn case and the final-campaign-bonus case); see [D019](DECISIONS.md#d019--m4-fix-round-choices) and the handoff's fix-response section.
 - M5 reference base: `0509af884bd895451d248fee1ad6e00a337c5324` on `main`.
 - Acceptance blockers for M5: none. Device validation is complete per the owner; exact platform/version details were not supplied. See the M5 acceptance entry.
-- Next action: Codex reviews `8514be5..808be0f` and the documentation-only follow-up against M6 AC1–AC5, AC7 and AC9 in `handoffs/M6.md`. Do not push or deploy under the brief.
+- Next action: Codex rechecks the M6-R1 README correction (documentation-only checkpoint after `20834fd`) and decides M6 acceptance. `808be0f` and `20834fd` were pushed to `origin/main` at the owner's request, triggering the Pages workflow; the M6-R1 checkpoint is unpushed.
 
 
 ## Milestones
@@ -37,9 +37,13 @@ Updated: 2026-09-24
 | M3: arcade danger | ACCEPTED | `80039b67`: AC1–AC11 verified, M3-R1 closed by owner approval. Codex independently passed install/typecheck/build, 204 tests and 62 browser tests (2 skipped). See review round 2. |
 | M4: complete campaign | ACCEPTED | `f4708cb`: Codex closed M4-R1/R2; independently passed 263 tests, both builds, 69 browser tests (3 skips) and two additional production denied-storage probes. See handoff review round 2. |
 | M5: mobile and PWA | ACCEPTED | `b9e2594` + `1f0bd0f`: R1–R6 closed; owner reports device validation complete with no notes on 2026-09-24. |
-| M6: release quality | REVIEW | `808be0f`: fruit-edge tests, cleanup, final README, Apache-2.0 LICENSE (D025); fresh-checkout rehearsal passed on Node 22.12.0. Codex reviews. |
+| M6: release quality | REVIEW | `808be0f`: regressions pass. M6-R1 README fixture-preview port corrected in a documentation-only checkpoint; Codex rechecks. |
 
 ## Verification and budget
+
+M6-R1 fix round (Claude's reported results, 2026-09-24): documentation-only correction to README's `preview:fixture` row. It now gives the actual default of :4173 (shared with `preview`) and the explicit `-- --port 4174 --strictPort` form that Playwright uses. With the ports free on Node 26.7.0, `npm run build:fixture` passed; both documented invocations printed and served their documented URL with HTTP 200, and served the fixture bundle. The full suite was not rerun. No application, test or configuration change. `808be0f` and `20834fd` were pushed to `origin/main` earlier at the owner's request; this checkpoint is unpushed. Time and tokens not measured.
+
+M6 review round 1 (Codex, 2026-09-24): reviewed `8514be5..808be0f` and documentation HEAD `20834fd` from a clean checkout. Independently passed install/typecheck, 304 tests, both builds and 98 browser tests (3 intentional skips) on Node 26.7.0; clean candidate export also passed install/typecheck/304 tests/both builds on Node 22.12.0. Full Node 22 browser rehearsal remains Claude-reported. No application regression found. R1: standalone `preview:fixture` starts at :4173, contradicting README :4174; command reproduced. CHANGES_REQUESTED, owner Claude, documentation fix only. Tracked generated screenshots restored; no implementation edits. No device rerun, push or deployment; time/tokens not measured.
 
 M6 implementation round (Claude's reported results, 2026-09-24): from base `8514be5`, candidate `808be0f`. Added five mutation-checked fruit transition tests (queued fruit after collection, death clearing a queued fruit, freeze through GUESS/RESUMING/background, next-level reset with level score, restart re-arming). Removed the unused `selectSeedWord` and two stale comments, closed M1-R3 (lock metadata already aligned, not regenerated), corrected AGENTS.md's stale checks statement and rewrote README. Replaced the CC0 `LICENSE` with Apache-2.0 per the owner's decision (D025). Fresh clone on Node 22.12.0 / npm 10.9.0, macOS 15.7.9 arm64: `npm ci`, Playwright install (cached browser), typecheck, `npm test` (304 tests in 27 files), both builds and `npm run test:e2e` (98 passed, 3 intentional skips) all exited 0; dev and preview returned HTTP 200. The production output uses relative paths and contains no fixture names. The only clone churn is the browser suite's 64 rewritten evidence screenshots (now documented in the README). Logs are in `docs/evidence/m6/`. Node 24/26 were not rerun in the rehearsal. Device evidence is carried forward from the owner's M5 report. Nothing pushed or deployed. About 1.5 h elapsed (estimated); tokens not measured.
 

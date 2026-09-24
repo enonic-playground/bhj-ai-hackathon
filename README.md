@@ -80,7 +80,7 @@ npm run dev          # http://127.0.0.1:5173
 | `npm run build` | Type-check and write the production build, including `sw.js`, to `dist/`. |
 | `npm run preview` | Serve `dist/` on <http://127.0.0.1:4173>. Run `npm run build` first. |
 | `npm run build:fixture` | Test-only build with deterministic start-up parameters, written to `dist-fixture/`. |
-| `npm run preview:fixture` | Serve `dist-fixture/` on <http://127.0.0.1:4174>. |
+| `npm run preview:fixture` | Serve `dist-fixture/`. It uses the same default port as `preview`, <http://127.0.0.1:4173>, so run one at a time, or use `npm run preview:fixture -- --port 4174 --strictPort` for <http://127.0.0.1:4174>, which is how the browser suite runs it. Run `npm run build:fixture` first. |
 | `npx playwright install chromium` | One-time browser download needed by `npm run test:e2e`. |
 | `npm run test:e2e` | Playwright browser journeys. Builds both outputs and starts both preview servers itself. |
 | `node scripts/generate-icons.mjs` | Regenerate `public/icons/*.png` after changing the icon design. Not part of the build; commit the output. |
