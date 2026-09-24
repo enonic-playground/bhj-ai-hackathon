@@ -35,8 +35,8 @@ export class FrameTiming {
     this.#previousTime = time;
     if (this.#options.isHidden()) {
       // A frame that still arrives while hidden advances nothing, and the frame
-      // after it starts from scratch. M3 replaces this with the full PAUSED
-      // state and an explicit resume.
+      // after it starts from scratch. The shell also pauses the game itself on
+      // a visibility change, so play still waits for an explicit resume.
       this.suspend();
       return;
     }

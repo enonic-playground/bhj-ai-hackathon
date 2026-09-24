@@ -267,3 +267,13 @@ Use this file for durable decisions and rationale. Reference the PRD instead of 
 - Retained requirements: automated regression, targeted defect fixes, clean-install/build/preview verification, final documentation and accurate existing device evidence. M5 remains accepted. Pacing/performance targets do not become measured results through this scope reduction.
 - Estimates: retain the existing planning allowances; no revised duration or measured usage is asserted.
 - Affected documents: `PRD.md`, `STATUS.md`, `handoffs/M5.md`, `handoffs/M6.md`. Historical review entries remain intact.
+
+## D025 — Apache License 2.0 for the release
+
+- Date: 2026-09-24.
+- Status: accepted by the project owner.
+- Decision: the project is licensed under the Apache License, Version 2.0. `LICENSE` now holds the canonical text from <https://www.apache.org/licenses/LICENSE-2.0.txt> (SHA-256 `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`), replacing the CC0 1.0 Universal text committed with the repository's initial commit (`7848a65`). `package.json` and `package-lock.json` already declared `Apache-2.0` (since M1) and are unchanged.
+- Context: M6 found that `LICENSE` (CC0 1.0) contradicted the package metadata and the M6 brief's "existing Apache-2.0 license". Claude asked the owner which applies; the owner chose Apache-2.0.
+- Note: commits before this change were published with the CC0 text; this decision does not alter what was distributed under those earlier revisions.
+- Authority: project owner's answer during the M6 implementation session.
+- Affected documents: `LICENSE`, `README.md`, `handoffs/M6.md`.

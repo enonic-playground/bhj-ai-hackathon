@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../src/game/config.js';
 import { Game } from '../src/game/game.js';
-import { createMaze } from '../src/game/maze.js';
+import { createMaze, type GridPosition } from '../src/game/maze.js';
+import type { WordEntry } from '../src/game/words.js';
 import {
   createTestGame,
   NO_BALL,
   placeEnemyOnPlayer,
   placePlayer,
   runForMs,
+  runUntil,
   steerPlayerTo,
   STEP_SECONDS,
 } from './fixtures.js';
@@ -144,5 +146,165 @@ describe('fruit thresholds', () => {
     steerPlayerTo(game, { col: 10, row: 1 });
     expect(game.fruit).not.toBeNull();
     expect(game.fruit?.position).toEqual(game.maze.spawn);
+  });
+});
+
+/** Far end of the fruit corridor: a ball there rolls back towards the player. */
+const FAR_END = { col: 13, row: 1 };
+const FRUIT_WORDS = ['FISH', 'BIRDS'] as const;
+
+/**
+ * A fruit round with a ball and a per-level word. The ball tile is read on
+ * every spawn, so a test can take the ball away before a level transition
+ * instead of racing it around the corridor.
+ */
+function fruitGameWithBall(): { game: Game; setBall: (tile: GridPosition | null) => void } {
+  let ballTile: GridPosition | null = FAR_END;
+  const game = createTestGame(fruitMaze(), {
+    selectBallSpawn: () => ballTile,
+    selectWord: ({ level }): WordEntry => ({ word: FRUIT_WORDS[level - 1] as string, category: 'Animal' }),
+    enemies: [CHASER],
+  });
+  game.startLevel();
+  return { game, setBall: (tile) => (ballTile = tile) };
+}
+
+describe('fruit edges across transitions', () => {
+  it('spawns a queued fruit on the substep after the first is collected, never on the same one', () => {
+    const game = fruitGame();
+    steerPlayerTo(game, { col: 5, row: 1 }); // Threshold one: fruit A.
+    steerPlayerTo(game, { col: 10, row: 1 }); // Threshold two queues behind A.
+    const beforeCollect = game.score;
+
+    steerPlayerTo(game, { col: 1, row: 1 }); // Collect A on the spawn tile.
+    const fruitValue = DEFAULT_CONFIG.fruitScorePerLevel * game.level;
+    expect(game.score).toBe(beforeCollect + fruitValue);
+    expect(game.fruit).toBeNull(); // The queued fruit has not appeared on the collecting substep.
+
+    game.step(STEP_SECONDS);
+    expect(game.fruit).not.toBeNull();
+    expect(game.fruit?.position).toEqual(game.maze.spawn);
+    // A fresh fruit with its full lifetime, not the remainder of A.
+    expect(game.fruit?.remainingMs).toBeGreaterThan(DEFAULT_CONFIG.fruitLifetimeMs - 50);
+    expect(game.score).toBe(beforeCollect + fruitValue); // Appearing under the player scores nothing.
+
+    // Leaving and returning collects the second fruit exactly once.
+    steerPlayerTo(game, { col: 2, row: 1 });
+    steerPlayerTo(game, { col: 1, row: 1 });
+    expect(game.fruit).toBeNull();
+    expect(game.score).toBe(beforeCollect + 2 * fruitValue);
+
+    // Both thresholds are spent: no third fruit, however long the level runs.
+    steerPlayerTo(game, { col: 13, row: 1 });
+    runForMs(game, DEFAULT_CONFIG.fruitLifetimeMs + 500);
+    expect(game.fruit).toBeNull();
+  });
+
+  it('death clears a queued fruit as well as the active one, and neither threshold refires', () => {
+    const game = fruitGame();
+    steerPlayerTo(game, { col: 5, row: 1 }); // Fruit A up.
+    steerPlayerTo(game, { col: 10, row: 1 }); // Second fruit queued behind it.
+    expect(game.fruit).not.toBeNull();
+
+    placeEnemyOnPlayer(game, 'chaser', 'roaming');
+    game.step(STEP_SECONDS);
+    expect(game.status).toBe('dying');
+    runForMs(game, DEFAULT_CONFIG.dyingPresentationMs + 50);
+    expect(game.status).toBe('chase');
+    expect(game.fruit).toBeNull();
+
+    // Had the queue survived death, the second fruit would appear on the next
+    // substep; had a threshold been reset, the remaining dots would refire it.
+    runForMs(game, 500);
+    expect(game.fruit).toBeNull();
+    steerPlayerTo(game, { col: 13, row: 1 }); // Every remaining dot.
+    runForMs(game, DEFAULT_CONFIG.fruitLifetimeMs + 500);
+    expect(game.dotsRemaining).toBe(0);
+    expect(game.fruit).toBeNull();
+  });
+
+  it('freezes the fruit lifetime through guessing, the countdown and a background pause', () => {
+    const { game } = fruitGameWithBall();
+    steerPlayerTo(game, { col: 5, row: 1 }); // Fruit up; the ball is rolling towards us.
+    expect(game.fruit).not.toBeNull();
+    game.requestDirection('right');
+    runUntil(game, () => game.status === 'guess', 5000);
+    const frozenAt = game.fruit?.remainingMs as number;
+    expect(frozenAt).toBeGreaterThan(0);
+
+    runForMs(game, 3000);
+    expect(game.fruit?.remainingMs).toBe(frozenAt);
+
+    expect(game.pause('away')).toBe(true); // Tab hidden while guessing.
+    runForMs(game, 3000);
+    expect(game.resume()).toBe(true);
+    expect(game.status).toBe('guess');
+    expect(game.fruit?.remainingMs).toBe(frozenAt);
+
+    expect(game.guess('Z').outcome).toBe('wrong');
+    expect(game.status).toBe('resuming');
+    runForMs(game, DEFAULT_CONFIG.resumeCountdownMs / 2);
+    expect(game.fruit?.remainingMs).toBe(frozenAt);
+    expect(game.pause('away')).toBe(true); // Hidden mid-countdown.
+    runForMs(game, 3000);
+    expect(game.resume()).toBe(true);
+    expect(game.status).toBe('resuming');
+    expect(game.fruit?.remainingMs).toBe(frozenAt);
+
+    runUntil(game, () => game.status === 'chase', DEFAULT_CONFIG.resumeCountdownMs);
+    expect(game.fruit?.remainingMs).toBe(frozenAt); // The countdown spent none of it.
+    placePlayer(game, { col: 12, row: 1 }); // Park away from the ball's spawn.
+    game.step(STEP_SECONDS);
+    expect(game.fruit?.remainingMs).toBeLessThan(frozenAt); // Only chase spends it.
+  });
+
+  it('resets fruit on the next level, fires both thresholds again and scores by level', () => {
+    const { game, setBall } = fruitGameWithBall();
+    steerPlayerTo(game, { col: 5, row: 1 }); // Level-one fruit left uncollected.
+    expect(game.fruit).not.toBeNull();
+    game.requestDirection('right');
+    runUntil(game, () => game.status === 'guess', 5000);
+    for (const letter of 'FISH') game.guess(letter);
+    expect(game.status).toBe('level-complete');
+    expect(game.fruit).not.toBeNull(); // Still held on the result screen, frozen.
+
+    setBall(null); // Level two plays without a ball, so it cannot interrupt the walk.
+    expect(game.nextLevel()).toBe(true);
+    expect(game.level).toBe(2);
+    expect(game.fruit).toBeNull();
+    runForMs(game, 500);
+    expect(game.fruit).toBeNull(); // Nothing queued carried over.
+
+    steerPlayerTo(game, { col: 4, row: 1 }); // Three dots: below threshold one again.
+    expect(game.fruit).toBeNull();
+    steerPlayerTo(game, { col: 5, row: 1 }); // Four dots on the fresh board.
+    expect(game.fruit).not.toBeNull();
+
+    const before = game.score;
+    steerPlayerTo(game, { col: 1, row: 1 });
+    expect(game.fruit).toBeNull();
+    expect(game.score).toBe(before + DEFAULT_CONFIG.fruitScorePerLevel * 2);
+
+    steerPlayerTo(game, { col: 10, row: 1 }); // Nine dots: the second threshold fires too.
+    expect(game.fruit).not.toBeNull();
+  });
+
+  it('a restarted run clears active and queued fruit and re-arms both thresholds', () => {
+    const game = fruitGame();
+    steerPlayerTo(game, { col: 5, row: 1 });
+    steerPlayerTo(game, { col: 10, row: 1 }); // One up, one queued, both thresholds spent.
+
+    game.pause('manual');
+    game.startLevel(); // Restart run from the pause overlay.
+    expect(game.status).toBe('chase');
+    expect(game.fruit).toBeNull();
+    runForMs(game, 500);
+    expect(game.fruit).toBeNull(); // The queue did not survive the restart.
+
+    steerPlayerTo(game, { col: 5, row: 1 });
+    expect(game.fruit).not.toBeNull(); // Threshold one fires again in the new run.
+    const before = game.score;
+    steerPlayerTo(game, { col: 1, row: 1 });
+    expect(game.score).toBe(before + DEFAULT_CONFIG.fruitScorePerLevel * 1);
   });
 });

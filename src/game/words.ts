@@ -7,9 +7,9 @@ export interface WordEntry {
 }
 
 /**
- * M2 seed list: enough categorized words to play a round, including several
- * with repeated letters. The curated 50-word bank, difficulty progression and
- * no-repeat campaign selection are M4 work.
+ * Short seed list that the test-only build's `testWord`/`testWords` start-up
+ * parameters index into, including several words with repeated letters. The
+ * campaign itself always draws from `WORD_BANK` below.
  */
 export const SEED_WORDS: readonly WordEntry[] = [
   { word: 'APPLE', category: 'Fruit' },
@@ -46,12 +46,6 @@ export function validateWordEntry(entry: WordEntry): WordEntry {
     throw new WordValidationError(`word ${entry.word} has no category`);
   }
   return entry;
-}
-
-/** Picks one seed word. A later round may repeat it; uniqueness arrives in M4. */
-export function selectSeedWord(random: RandomSource): WordEntry {
-  const entry = pickRandom(SEED_WORDS, random) ?? (SEED_WORDS[0] as WordEntry);
-  return validateWordEntry(entry);
 }
 
 /** Case/trim-insensitive identity for the used-word set and bank uniqueness. */

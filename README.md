@@ -1,134 +1,178 @@
 # Hac-Man
 
-A mobile and desktop progressive web app, in development, that combines maze-chase arcade action with a word-guessing game.
+A single-player progressive web app for mobile and desktop that combines maze-chase arcade action with letter-by-letter word guessing.
 
-Catch a moving ball to enter Guessing mode. Reveal letters to solve the level's word; an incorrect guess sends you back into the maze to catch the ball again. Dots, four enemies, power pellets, and bonus items keep each chase active.
+Chase a rolling ball through the maze while four enemies chase you. Catch it to freeze the maze and guess a letter of the level's hidden word. A correct letter lets you keep guessing; a wrong one sends you back into the maze to catch the ball again. Solving the word completes the level, whatever dots are left. Five levels make up a campaign.
 
-## Project status
+The game is fully static: no server, accounts, analytics or runtime AI service. After one successful online visit it installs where the browser supports it and plays the whole campaign offline.
 
-Product baseline v1.0 accepted on 2026-09-16. M0 planning is complete. M1 (playable maze) was accepted by Codex on 2026-09-17 after review and independent verification. Later milestones add the campaign and PWA behavior. See [STATUS.md](STATUS.md) for the next action and nonblocking follow-ups.
+Project history, milestone evidence and current progress live outside this guide: [STATUS.md](STATUS.md) (current state and next action), [PRD.md](PRD.md) (accepted specification), [DECISIONS.md](DECISIONS.md) (design decisions and their reasons), [`handoffs/`](handoffs/) (per-milestone briefs, implementation evidence and reviews) and [WIREFRAMES.md](WIREFRAMES.md) (layout references). Contributors and coding agents follow [AGENTS.md](AGENTS.md).
 
-Claude handles implementation and tests; Codex handles planning, coordination, verification, and code review.
+## How to play
 
-M2 (the defining chase/guess loop) is accepted at `0be0b439`; see [its handoff](handoffs/M2.md) for verification. M3 (arcade danger: four enemies, power pellets, lives, death, restart, pause, and the owner-approved ball hue cycle) is accepted at `80039b67` after Codex's recheck on 2026-09-21; see [its handoff](handoffs/M3.md).
+### Chase
 
-M4 (complete five-level campaign: word bank, fruit, extra life, best score and pacing evidence, without audio) is accepted at `f4708cb`; see [its handoff](handoffs/M4.md).
+- You start with three lives. Dots score 10 points each, and the four power pellets in the corners score 50.
+- The ball is ringed in white and its fill drifts through the colour spectrum. It moves slower than you (80% of your speed), follows the corridors, and never enters the enemy home. It always appears at least six tiles away from you.
+- Catching the ball freezes the maze and opens Guessing mode.
+- Four enemies, each with its own colour and shape marker, leave their home at intervals: **Chaser** heads straight for you, **Ambusher** aims ahead of where you are going, **Patroller** walks a fixed circuit, and **Prowler** pursues from a distance but retreats when close. They alternate between scattering to their corners and chasing.
+- Touching an enemy costs one life. The actors return to their starting positions, a new ball appears, and you get two seconds of protection. Your score, word, guesses and collected dots are kept.
+- A power pellet turns the enemies blue for six seconds. Blue enemies can be eaten for 200, 400, 800 and then 1,600 points. An eaten enemy returns home and rejoins play. A second pellet restarts the six seconds and the point chain.
+- Fruit appears twice a level, when 30% and 70% of the dots are gone, on the tile where you start. It is worth 100 points times the level number and disappears after ten seconds of play.
+- Reaching 10,000 points earns one extra life, once per run.
+- Clearing every dot does not end a level. The ball keeps moving, so every word can always be solved.
 
-M5 (mobile usability and PWA: responsive/focus/reduced-motion refinements, install metadata, offline preparation and safe updates) is implemented; see [its handoff](handoffs/M5.md) for the submitted evidence, pending Codex's review.
+### Guessing
 
-Both agents follow [AGENTS.md](AGENTS.md) and resume from [STATUS.md](STATUS.md). Durable decisions live in [DECISIONS.md](DECISIONS.md); milestone briefs and review evidence use the [handoff template](handoffs/TEMPLATE.md). [CLAUDE.md](CLAUDE.md) points Claude to the shared instructions.
+- The maze is dimmed and frozen: no enemies, timers or fruit move while you guess.
+- The panel shows the word as a mask, its category and every letter already tried. Guess by typing A–Z or tapping a letter button.
+- A correct letter reveals every copy and scores 100 per revealed position, and you keep guessing.
+- A wrong letter is recorded, a new ball appears, and play resumes after a two-second countdown. A wrong letter does not cost a life; the risk is another chase.
+- Letters already tried are disabled and cannot be guessed again.
+- Solving the word scores 1,000 points. Levels one to four then show a result screen with a **Next level** action.
 
-See [PRD.md](PRD.md) for game rules, scope, architecture, milestone acceptance criteria, tests, and estimates, and [WIREFRAMES.md](WIREFRAMES.md) for the layout references.
+### Levels and the run
 
-## Requirements
+- Level *N* uses a word of *N* + 3 letters (4 letters on level 1 up to 8 on level 5), and enemies get slightly faster each level. No word repeats within a run.
+- A new level resets the dots, pellets, fruit, guesses, actors and timers. Score and lives carry over.
+- Solving level five completes the campaign and offers **Play again**. Losing your last life ends the run and reveals the word; **Restart run** starts a fresh three-life run.
+- Your best score is kept on this device. Nothing else is saved: reloading always returns to the title screen.
 
-- Node.js `^22.12.0 || ^24.0.0 || >=26.0.0`. This is the range all pinned tools support; the narrowest constraint is Vitest 5. Node 20, 21, 23, and 25 are not supported, and `.npmrc` sets `engine-strict=true` so `npm ci` rejects them instead of failing later inside a tool.
-- Verified on Node 22.12.0 (npm 10.9.0), 24.13.0, and 26.7.0 (npm 11.19.0), all on macOS arm64.
-- A Chromium download for the browser tests: `npx playwright install chromium`.
+### Controls
 
-## Commands
+| Action | Keyboard | Touch / mouse |
+| --- | --- | --- |
+| Move | Arrow keys or W/A/S/D | On-screen direction pad |
+| Turn at the next junction | Press the direction before you reach it; the turn is queued | Same, on the pad |
+| Guess a letter | A–Z (W/A/S/D type letters while guessing, not moves) | Letter buttons |
+| Pause | Escape | Pause button |
+| Resume, restart or quit | Tab to **Resume**, **Restart run** or **Title screen** on the pause screen, then Enter or Space | Tap the same buttons |
+
+Switching tabs, minimizing the window or losing focus pauses the game automatically. Play continues only when you choose **Resume**. Held keys and queued turns are cleared whenever the mode changes, so a move cannot carry into guessing and back.
+
+Accessibility: every button has a label and visible focus, word updates are announced through a live region, lives and mode are shown as text as well as drawn, and touch targets are at least 44 × 44 CSS pixels. When the system asks for reduced motion, the decorative effects hold steady: the ball keeps one colour, and the pellet pulse, protection ring and frightened-enemy warning stop animating. Gameplay is identical either way. Navigating the maze itself without sight is not supported.
+
+## Setup
+
+### Requirements
+
+- **Node.js `^22.12.0 || ^24.0.0 || >=26.0.0`.** Node 20, 21, 23 and 25 are not supported. `.npmrc` sets `engine-strict=true`, so `npm ci` refuses them instead of failing later inside a tool. The range is the intersection of what the pinned tools support, and Vitest 5 is the narrowest.
+- **The reference runtime is Node 22.12.0**, which the GitHub Pages workflow (`.github/workflows/deploy-pages.yml`) builds with. Dependencies are pinned to exact versions in `package.json` and locked in `package-lock.json`. Always install with `npm ci`.
+- **Chromium for the browser tests,** downloaded once with `npx playwright install chromium`.
+
+For the runtimes and platforms each release check actually ran on, see the latest milestone handoff linked from [STATUS.md](STATUS.md). This guide does not record verification results.
+
+### Quick start
+
+```sh
+npm ci
+npm run dev          # http://127.0.0.1:5173
+```
+
+### Commands
 
 | Command | Purpose |
 | --- | --- |
-| `npm ci` | Install pinned dependencies from the committed lockfile. |
-| `npm run dev` | Development server on <http://127.0.0.1:5173>. |
-| `npm run typecheck` | TypeScript checking without emitting output. |
-| `npm test` | Unit, simulation, and input tests (Vitest, single run). |
-| `npm run test:e2e` | Playwright browser journeys; builds and previews both builds automatically. |
-| `npm run build` | Type-check the application and write the production build to `dist/`. |
-| `npm run preview` | Serve the production build on <http://127.0.0.1:4173>. |
-| `npm run build:fixture` | Test-only build with the deterministic start-up parameters, written to `dist-fixture/`. |
-| `npm run preview:fixture` | Serve the test-only build; the browser suite uses <http://127.0.0.1:4174>. |
-| `node scripts/generate-icons.mjs` | Regenerate `public/icons/*.png` after changing the app icon design. Not part of the build; run manually and commit the output. |
+| `npm ci` | Install the pinned dependencies from the lockfile. |
+| `npm run dev` | Development server on <http://127.0.0.1:5173>, with no service worker. |
+| `npm run typecheck` | TypeScript check of the application, tests and configuration, without output. |
+| `npm test` | Unit and integration tests (Vitest, single run). `npm run test:watch` reruns tests on changes. |
+| `npm run build` | Type-check and write the production build, including `sw.js`, to `dist/`. |
+| `npm run preview` | Serve `dist/` on <http://127.0.0.1:4173>. Run `npm run build` first. |
+| `npm run build:fixture` | Test-only build with deterministic start-up parameters, written to `dist-fixture/`. |
+| `npm run preview:fixture` | Serve `dist-fixture/` on <http://127.0.0.1:4174>. |
+| `npx playwright install chromium` | One-time browser download needed by `npm run test:e2e`. |
+| `npm run test:e2e` | Playwright browser journeys. Builds both outputs and starts both preview servers itself. |
+| `node scripts/generate-icons.mjs` | Regenerate `public/icons/*.png` after changing the icon design. Not part of the build; commit the output. |
 
-## What works today (M1–M4 accepted; M5 implemented, pending review)
+A full local check, in the order the milestone reviews use:
 
-A complete five-level campaign with both a win and a loss path: start with three lives, chase the ball while four enemies chase you, catch it, guess letters, miss and chase again, eat a power pellet or a fruit and turn the tables, lose lives, and either solve every level's word through to campaign completion or run out of lives and restart.
+```sh
+npm ci
+npx playwright install chromium
+npm run typecheck
+npm test
+npm run build
+npm run build:fixture
+npm run test:e2e
+```
 
-- Title screen with instructions and a Start action that opens a fresh round.
-- One authored 21 × 23 maze, validated for tile types, spawn, matched tunnel endpoints, and reachability of every corridor and dot.
-- Continuous cardinal movement with buffered turns, wall stops, corridor reversal, and side-tunnel wraparound.
-- Dots score 10 points once each; clearing them never ends a round, which is solved by completing the word.
-- One rolling ball at 80% of the player's speed, whose fill drifts smoothly through the whole hue circle once every two active seconds behind a fixed white ring, so it stays findable once the maze is busy. The colour is a function of the game's own active time, so it holds still whenever the maze does and never jumps ahead after a pause.
-- The ball otherwise behaves exactly as in M2: it follows the same corridors and tunnels as the player, takes a random legal turn at each tile centre without doubling back, reverses at dead ends, enters neither walls nor the enemy home, and collects nothing.
-- Ball spawns are at least six legal tiles from the player, measured along maze edges including the tunnel, and never on the tile or the segment the player occupies. If nothing is that far away, the farthest reachable tile is used.
-- Catching the ball freezes the maze, the actors, the collectibles and every timer, then opens an accessible A–Z letter panel. Capture is tested after bounded movement substeps, so a slow frame cannot let the player and the ball pass through one another, and the side tunnel is measured the short way only on a tunnel row.
-- A correct letter reveals every occurrence and scores 100 a position; guessing continues. A duplicate or a non-letter does nothing. A wrong letter is recorded without any penalty, places one new ball, and starts a two-second countdown in which only the countdown itself advances.
-- Solving a level's word awards the 1,000-point bonus exactly once. Levels one through four show the solved word, the bonus and the score with a deliberate Next level action; level five instead ends the run in a campaign-complete summary with the final score, the best score and Play again / Title screen actions. There is never a level six.
-- Words come from a 50-entry categorized bank, at least ten per length 4–8, validated at load for uniqueness and content. Level `N` draws an unused word of length `N + 3`; the used-word set clears only on a fresh run, so no level repeats a word within it.
-- Five levels raise the word length from 4 to 8 letters and roaming enemy speed in small steps (75%–87% of the player's), configured per level and applied from the level that is actually running, including after a death. Score and lives carry across a level transition; every collectible, actor and timer resets.
-- Bonus fruit spawns at 30% and 70% of a level's original dot count consumed, on the maze's spawn tile, worth 100 points times the level number, and expires after ten active seconds if left. At most one is ever visible: a threshold reached while one is already up queues the next instead of overwriting it, and death clears an active or queued fruit without letting an already-fired threshold refire.
-- Every point source routes through one scoring authority that grants a single extra life the moment a run's score first reaches 10,000, including on the same slice as a lethal contact, where the life gained and the life lost both apply. The flag and the extra life persist across levels and deaths and clear only on a fresh run.
-- The local best score persists across reloads, is read once at startup, only ever improves, and is shown on the title screen and at the end of a run. Storage failures — denied, unavailable, or corrupted data — read as no saved best rather than interrupting play; a reload always returns to the title screen, never a restored run.
-- Arrow keys, WASD, and the directional pad drive the chase; the letter keys and the letter grid drive guessing, so W/A/S/D spell guesses there instead of moving. Held keys, key repeat and stray pointer events cannot cross a mode boundary, and Ctrl, Meta and Alt shortcuts stay with the browser.
-- Responsive shell that keeps the HUD, maze, and pad together at 360 × 640 CSS pixels and uses a side panel on wider viewports, with square tiles at every size. The maze refits when the window is resized in either direction, without a reload. All 26 letters stay at least 44 × 44 px at both sizes, with symbol as well as colour feedback, visible focus, and a live region for word and guess announcements.
-- A fixed 120 Hz simulation with bounded catch-up, independent of the render cadence; neither the maze nor any timer advances while the game is paused or the page is hidden.
-- Four enemies with their own identity, colour and shape marker: Chaser goes straight for you, Ambusher aims up to four legal steps ahead of where you are heading, Patroller walks a fixed circuit and ignores you, and Prowler pursues from eight or more path tiles away and retreats to its corner when it gets closer. Each decides at tile centres using real path distances, never doubles back except at a dead end or on a documented mode change, and roams at 75% of your speed.
-- Repeating phases of 7 seconds scattering to four corners and 20 seconds chasing. Enemies leave home 0, 2, 4 and 6 active chase seconds into a life, and turn round once when the phase flips.
-- An enemy home only enemies can cross. The player and the ball are refused its door and interior by the traversal rules themselves, and the layout is validated at load: one door, one corridor outside it, one waiting tile inside it, and a legal route from every start slot.
-- Four power pellets on the outer corridors, in place of the dots that were there. One scores 50 and frightens every roaming enemy for six active chase seconds: they slow to 50%, turn blue, move at random and can be eaten for 200, 400, 800 then 1,600 points, capped at 1,600 for the rest of that effect. A second pellet refreshes the six seconds rather than adding to them and restarts the chain, and the chase/scatter clock is frozen for the duration and resumes with the time it had left.
-- An eaten enemy is harmless at once, travels home by a legal path at 125% of your speed, waits a second inside the door and then leaves again, inheriting a frightened effect that is still running.
-- Three lives. A lethal touch costs exactly one, however many enemies are involved, and opens a 750 ms death presentation in which only that timer advances. With a life left, the actors return to their starts, the ball respawns by the usual distance rule, the enemy timers and the score chain reset, and you get two active seconds of protection that ignores lethal contacts but not collection, ball capture or eating a frightened enemy. Score, word, guesses, dots and pellets all survive. A wrong letter still costs no life.
-- At zero lives the run freezes, the word is revealed, and Restart run or Title screen are the only ways on. Restart and Play again both start a completely fresh three-life run.
-- Each simulation slice resolves in the PRD's order: legal movement, then collectibles reached, then enemy contacts, then ball capture. A pellet reached on the same slice protects before the contact; a lethal contact beats a simultaneous ball capture; the slice ends at a death. Slices are bounded by the fastest actor in the game, which is an enemy on its way home.
-- A Pause button and Escape pause the chase, guessing, the countdown and the death presentation, and so do losing window focus or the page becoming hidden — including a window that stays visible while frames keep arriving. The pause overlay owns focus, disables everything under it, and offers Resume, Restart run and Title screen. Only Resume restores play, with every timer exactly where it was; returning to the tab never resumes by itself, and repeated blur or visibility events cannot overwrite the state being held. Escape only ever opens the overlay, so the press that paused cannot also resume.
-- Lives, the current mode, protection and the death message are shown in words as well as drawn, and the pause, death and game-over surfaces keep the 44 × 44 px targets and the focus behaviour at 360 × 640 and on desktop.
-- System `prefers-reduced-motion` is respected from load and on a runtime change: the ball fill holds a single stable colour instead of the hue cycle, the power-pellet pulse and the protection-ring pulse hold a steady size/alpha, and the frightened-expiry warning holds its flash tone instead of blinking. Movement, timers, input, collision and scoring are unaffected either way; no new settings screen exists, since this follows the OS preference alone.
-- Landscape phones, a tall-to-short desktop resize, an eight-letter word with a longer category, several misses, a five-digit score and the earned-life badge, and both of M4's newer result panels (level-complete, campaign-complete) all stay within the viewport with no horizontal overflow and no undersized touch target.
-- Installable where the browser supports it (manifest, original icons, standalone display), with a quiet title-screen line reporting offline readiness and, once installed, a launch that always returns to the title screen. After one successful online visit, the production build's service worker precaches the complete build — the shell, the campaign's words, the icons and the manifest — so every one of the five levels plays fully offline from a reload or a fresh tab. Denied or throwing `localStorage` (a private-mode getter, a quota-exceeded write) still lets the game start, score and return to title without crashing. See "Progressive web app" below for the full design and what remains unverified.
+There is no lint script. `npm run test:e2e` starts its own preview servers and refuses to reuse one already running on ports 4173 or 4174, so stop any manual `preview` first.
+
+## Hosting, installing and playing offline
+
+### Hosting
+
+`npm run build` writes a static site to `dist/`. Every asset path is relative (`base: './'` in `vite.config.ts`), so the same output works at a domain root or under a subpath. The repository's workflow publishes it to GitHub Pages at `/bhj-ai-hackathon/` on every push to `main`. The Pages source must be set to **GitHub Actions** in the repository settings. The service worker needs HTTPS or `localhost`.
+
+### Installing
+
+- **Chrome or Edge on Android or desktop:** use the **Install Hac-Man** button that the title screen shows when the browser offers installation, or the browser's own menu or address-bar install action.
+- **Safari on iOS/iPadOS:** Share → **Add to Home Screen**. Safari has no install prompt, so the title screen's **Install manually** section explains this path.
+- Other browsers show best-effort instructions in the same section. Installing is optional; the game works as an ordinary web page.
+
+An installed app opens in its own standalone window and always starts at the title screen.
+
+### Offline
+
+The first visit must be online. During that visit, the service worker downloads the complete app into its cache: the page, scripts and styles (which contain all words and levels), the manifest and the icons. The title screen reports when the app is ready for offline play. From then on, all five levels play without a connection, whether you reload or open a new tab. A first visit made while offline cannot prepare anything.
+
+Only the production build registers the service worker. `npm run dev` and the test-only build do not.
+
+### Updates
+
+A new deployment downloads in the background into its own cache. It never replaces the running version mid-game: an active, paused or between-level run, and any other open Hac-Man tab, keep the version they started with. Once a new version is waiting, the title screen says so. It takes over the next time every Hac-Man tab or window has been closed and the app is opened again. There is no forced reload. If a download is incomplete or fails, the new version is discarded and the current one keeps working, offline included.
+
+### Storage and recovery
+
+- The best score is the only saved data, in `localStorage`. If storage is unavailable, blocked, full or corrupted, the game still runs and keeps the best score for the current session only.
+- Caches are named `hacman-cache:<scope>:<version>`, and only this app's own old versions are ever deleted. Another app on the same origin at a different path is not affected.
+- **If offline play seems stuck on old content** after closing and reopening every Hac-Man tab, clear it without losing the best score. In the browser's developer tools, open the Application panel. Close every other Hac-Man tab. Unregister this scope's worker under **Service Workers**. Under **Cache Storage**, delete only the `hacman-cache:<this app's scope>:…` entries. Then reload while online. The best score is kept, because neither step touches `localStorage`.
+- The browser's site-wide **Clear data** option resets the whole origin, **including the best score**. Use it only when you want to start completely fresh.
 
 ## Architecture
 
-The simulation is independent of the browser. `src/game/` holds the tile map and its validation, the actor movement rules, the ball policy and contact test, the enemy state machine and targeting policies, the shared breadth-first path helpers, ball spawn selection, the word bank and selection rules (`words.ts`), the five level definitions (`levels.ts`), fruit thresholds (`fruit.ts`), seeded randomness, the game state, and the fixed-step loop; nothing there touches canvas, DOM, or timers, so tests step it directly. `src/input/` routes keys, pad presses and letter buttons to the mode that owns them, `src/render/` draws the maze on a canvas — including `motion.ts`'s pure, DOM-free reduced-motion presentation functions — and `src/app/` wires DOM events, resizing, focus and the animation frame, plus the best-score adapter (`bestScore.ts`), the `prefers-reduced-motion` watcher (`reducedMotion.ts`), and the title-screen install/offline/update wiring (`pwa.ts`, with its text/classification logic split into the pure, DOM-free `pwaStatus.ts`) — each is the same shape of exception to the DOM-free simulation as `bestScore.ts`: a genuine browser-API concern, kept injectable and unit-tested against a fake where it can be. `sw/service-worker.template.js` is the production service worker's source; `vite.config.ts`'s `hacmanServiceWorkerPlugin` fills in the real precache list and version at build time and writes it to `dist/sw.js`, only for the ordinary production build. `tests/` holds Vitest suites and `e2e/` the Playwright journeys.
+TypeScript, built by Vite. The maze is drawn on a Canvas 2D element; menus, the HUD and the guessing keyboard are HTML and CSS.
 
-All scoring — dots, pellets, letters, the word bonus, eaten enemies and fruit — is routed through one private method on `Game` that also grants the run's sole extra life the instant score first reaches the threshold, so the same collectibles-before-contacts ordering that already protected the player from a same-slice pellet also lets a same-slice collectible grant the extra life before a lethal contact takes a life away.
+| Path | Contents |
+| --- | --- |
+| `src/game/` | The simulation, with no DOM, canvas or timer dependencies. It covers the maze tiles and validation (`maze.ts`, `mazeData.ts`), shared movement (`actor.ts`), the ball (`ball.ts`, `spawn.ts`), enemies (`enemy.ts`, `paths.ts`), words (`words.ts`), levels (`levels.ts`), fruit (`fruit.ts`), tunables (`config.ts`), seeded randomness, the `Game` state machine (`game.ts`) and the fixed-step loop (`loop.ts`). |
+| `src/input/` | Routes keys, pad presses and letter buttons to the mode that owns them. |
+| `src/render/` | The canvas renderer, plus `motion.ts`, pure functions for normal and reduced-motion effects. |
+| `src/app/` | Browser wiring: the DOM shell, resizing, focus, frame timing, the best-score store, the reduced-motion watcher, install/offline/update UI (`pwa.ts`, `pwaStatus.ts`) and the test-only start-up parameters (`fixture.ts`). |
+| `sw/service-worker.template.js` | The service worker source. At build time, a plugin in `vite.config.ts` fills in the real list of files to cache and a version hash of their bytes, then writes the result to `dist/sw.js`. |
+| `scripts/generate-icons.mjs` | Draws the app icons and writes them as PNGs, with no image dependencies. |
+| `tests/`, `e2e/` | Vitest unit/integration suites and Playwright browser journeys. |
 
-Player, ball and enemies share one movement engine: the ball and the enemies are ordinary actors steered by a policy at each tile centre rather than by queued input, so all three obey the same walls, corridors and tunnel rules. Every state change runs through one private transition in `Game`, so a repeated event cannot open guessing twice, respawn two balls, take two lives for one death, or award the word bonus again.
+Key design points:
 
-What an actor may walk on is a traversal permission passed to the movement engine, not a flag on the actor. `maze` is the shared player, ball and roaming-enemy graph; `home` is that graph plus the enemy door and interior, and only an enemy in its exiting or returning state ever asks for it. Widening enemy movement therefore cannot widen the player's. Enemy turns come from breadth-first path distances over the appropriate graph, memoized per target in `src/game/paths.ts` so four enemies sharing a target search once, and taken only at tile centres rather than on render frames. Ties resolve in a fixed up, left, down, right order, so a fixture replays exactly.
+- **One state machine.** `Game` has the states TITLE, CHASE, GUESS, RESUMING, PAUSED, DYING, LEVEL_COMPLETE, GAME_OVER and CAMPAIGN_COMPLETE, and every transition goes through one private method. Only CHASE advances the maze; the countdown and death states advance only their own timers. A repeated event therefore cannot open guessing twice, take two lives or award a bonus twice.
+- **A fixed 120 Hz simulation** runs with bounded catch-up, independent of the frame rate. Movement is split into small substeps, so actors cannot pass through each other on a slow frame. Each substep resolves movement, then collectibles, then enemy contact, then ball capture: a pellet eaten on the same substep protects you, and a lethal contact beats a simultaneous catch.
+- **One movement engine and permissioned graphs.** The player, the ball and the enemies share one engine. Only an enemy entering or leaving home may use the door and home tiles. Enemies choose turns at tile centres from breadth-first path distances, never on every frame.
+- **One scoring method** handles every point source and grants the single extra life.
+- **Injected randomness, word selection and ball placement** let tests replay a round or campaign exactly. Ordinary games use a random seed.
+- **Test-only parameters are compiled out.** `testSeed`, `testWord`, `testWords`, `testBankWord`, `testBall` and `testEnemies` are read only by the `npm run build:fixture` output (`__TEST_FIXTURES__` in `vite.config.ts`). The production bundle contains none of them. `window.__hacman.getSnapshot()` is a read-only view for browser tests that hides the unsolved word.
 
-The page exposes a read-only `window.__hacman.getSnapshot()` readout for browser assertions. It cannot change game state, and it masks the unsolved word, so a test cannot read the answer out of it; browser tests drive the game through real controls.
+The browser suite has three Playwright projects: `desktop` and `mobile` (360 × 640 emulation) against the fixture build, and `production` against the ordinary build. Production covers offline play at the root and at `/bhj-ai-hackathon/` over a full five-level campaign, safe updates across three real builds, and storage failures.
 
-Randomness, word selection and ball placement are injected, so a test can replay an entire round or campaign. The browser tests use six query parameters read once at start-up (`src/app/fixture.ts`): `testSeed=<integer>` seeds the round, `testWord=<index>` pins every level's word to one entry of an 8-word seed list independently of the level's normal length (the M2/M3 single-word journeys still use this), `testWords=<i1>,<i2>,...` pins level 1, 2, 3… to those seed-list entries in order for a whole campaign journey, `testBankWord=<index>` pins every level's word to one entry of the real 50-word `WORD_BANK` instead (M5, for a genuine eight-letter word/category a 7-letter-max seed list cannot reach), `testBall=off` runs the maze with no ball and `testBall=<col>,<row>` starts it on one tile, and `testEnemies=off` runs the maze with no enemies, so the inherited movement, layout and guessing journeys cannot be interrupted by a legitimate capture or death. They configure what a round or a level starts with and nothing else: no game state is mutated, no answer is revealed through the runtime snapshot, and the complete-loop and campaign journeys use the real spawn rule and the real capture algorithm while chasing the ball with the game's own controls.
+## Editing content
 
-Those parameters take effect only in the test-only build. `vite.config.ts` compiles the build-time constant `__TEST_FIXTURES__` to `true` only for `npm run build:fixture`; it is `false` for `npm run dev`, `npm run build` and the Vitest run, which never read the query string. The production build also tree-shakes the dead branch, so an ordinary bundle contains none of the five parameter names, and a visit to `/?testBall=off` plays an ordinary round in the dev server and in production alike. The browser suite therefore serves two builds. The `desktop` and `mobile` projects run against the test-only build on port 4174; the `production` project runs `e2e/production.spec.ts` against the ordinary production build on port 4173, where it plays an unparameterized round against the real four enemies and asserts that the parameters neither disable the ball nor pin the word. Frame timing is separated from the DOM in `src/app/frameTiming.ts`, so the hidden-page rules are covered by `tests/frameTiming.test.ts` rather than only by a browser.
-
-## Editing content and tuning difficulty
-
-- The word bank is `src/game/words.ts`'s `WORD_BANK`: add or edit `{ word, category }` entries with 4–8 upper-case A–Z letters and a nonempty category. `validateWordBank` runs at module load and throws if any campaign length (4–8) has fewer than ten entries or if a word is duplicated case-insensitively, so a broken edit fails immediately rather than surfacing later as a repeat or a stuck level.
-- Level length and enemy speed live in `src/game/levels.ts`'s `LEVELS`; each entry's `wordLength` decides which bank entries level `N` can draw from, and `enemySpeedFactor` overrides `config.enemySpeedFactor` only for that level. Every other tunable — pellet/frightened/death/fruit timings and every score value, including `extraLifeScoreThreshold` and `fruitScorePerLevel` — stays level-invariant in `src/game/config.ts`.
-- Fruit's fixed tile is the maze's own spawn tile; its thresholds, lifetime and score multiplier are configuration, not hardcoded, so retuning any of them needs no code change beyond `config.ts`.
-
-## Progressive web app
-
-- **Install.** The title screen shows an "Install Hac-Man" button only when the browser fires `beforeinstallprompt` (Chromium-based browsers on Android/desktop); a collapsible "Install manually" section always gives best-effort, platform-detected instructions (iOS Safari has no install prompt event at all, so Share → Add to Home Screen is the only path there). The app is already usable as an ordinary page if install or service-worker APIs are unavailable — nothing here is required to play.
-- **Offline.** The production build's service worker (`sw/service-worker.template.js`, filled in at build time by `vite.config.ts` and written to `dist/sw.js`) precaches every hashed JS/CSS chunk, `index.html`, the manifest and the icons the moment install completes — the whole app, not only the page most recently visited — so a single successful online load is enough to play the entire five-level campaign offline afterwards, from either a reload or a brand-new tab. The title screen's quiet status line reflects real worker lifecycle events (never `navigator.onLine` or registration alone), and a first-ever visit that starts offline cannot install anything and will not play — this is a real, unavoidable limitation of any offline-caching PWA, not a bug, and it is what `e2e/pwa.spec.ts`'s "entirely fresh, never-online browser profile" journey documents. `e2e/pwaSubpath.spec.ts` proves this at the actual deployed repository path (not only the origin root `preview` serves): a real build served under `/bhj-ai-hackathon/`, manifest/scope/icons all resolving inside it, then a full five-level campaign solved entirely offline through real chase/guess controls — no fixture parameters, no state setters (closing M5-R5).
-- **Updates.** A new deployed version is discovered in the background and installs into its own, separately named cache; the worker never calls `skipWaiting()` or `clients.claim()`, so it sits `waiting` and the previously active version keeps serving every currently open tab untouched — including one active, paused or at TITLE — until every Hac-Man tab is closed and a new one is opened, at which point the platform's own default lifecycle activates the new version automatically. The title screen shows a passive notice once a version is waiting; there is no forced reload and no in-place "Update now" action; `e2e/pwa-update.spec.ts` exercises this against three real, independently built production versions on one dedicated static server (not a mocked flag) — a protected active tab, a protected paused tab and a title-screen tab are all left undisturbed while the update installs, and a genuinely distinct third build with one required asset then deleted is observed actually attempting installation and reaching a `redundant` state through real lifecycle events, leaving the previously active version untouched and still playable offline afterwards (closing M5-R3). The version itself is a hash of every precached file's real bytes plus the worker template's own source, not just filenames, so an icon-, manifest- or template-only edit is never silently skipped (`tests/serviceWorkerVersion.test.ts`; closing M5-R2).
-- **Storage isolation.** Cache names are namespaced by the worker's own registration scope path *and* compared for exact equality, not a string prefix, when deciding what to delete on activation — so hosting this app and an unrelated one at a nested or sibling subpath of the same origin cannot collide, and only this app's own precache versions are ever deleted (`tests/serviceWorkerScope.test.ts`; see D022, closing M5-R1). A service worker never touches `localStorage` at all, so the best score is unaffected by any worker/cache behavior. `e2e/storage.spec.ts` retains browser regressions for a throwing `localStorage` getter and quota-exceeded writes: the game still starts and scores, the in-memory best still survives a return to title, and a reload still returns to title without crashing.
-- **Cache recovery.** A closed-and-reopened tab is enough to pick up an already-downloaded new version (see Updates above) without losing anything; only reach for the steps below if offline play still seems stuck on old content afterwards. Unregistering the service worker and clearing this app's cache **without** losing the best score are two separate, deliberate steps, not one button: open DevTools' Application panel, close every other Hac-Man tab, use "Service Workers" to unregister this scope's worker (this alone does not touch Cache Storage or `localStorage`), then use "Cache Storage" to delete only the entries named `hacman-cache:<this app's scope>:...` (`sw/service-worker.template.js`'s `CACHE_PREFIX`) — leaving any unrelated cache at another path or origin untouched — and reload online so the worker reinstalls a fresh precache; the best score is unaffected throughout, since neither step reads or writes `localStorage`. The browser's own per-site "Clear data" shortcut (address-bar site-info icon → "Site settings" → "Clear data") is a coarser, origin-wide reset: it deletes **every** kind of storage for the origin at once, including `localStorage`, so it also resets the best score to zero and should only be used when starting completely fresh is actually wanted, not as the routine fix for stale content.
-- **Icons.** `public/icons/` and `public/manifest.webmanifest` are generated by `node scripts/generate-icons.mjs` (192/512 "any", a 512 maskable variant, and a 180 Apple touch icon), drawn as this project's own established player-disc/ball-ring shapes rather than sourced artwork — no image-processing dependency is added; re-run the script and commit the output after changing the design. See [D021](DECISIONS.md#d021--m5-implementation-choices) for the full design rationale, including the specific `Vary`-header cache-matching bug the test suite caught and fixed.
-- **What is verified here versus on a device.** Everything above is exercised against the real, built production output with a real service worker (`npm run build && npm run preview`, driven by `e2e/pwa.spec.ts`, `e2e/pwa-update.spec.ts`, `e2e/pwaSubpath.spec.ts` and `e2e/storage.spec.ts`) in headless Chromium — this is real worker/cache behavior, not a mock, but it is not a substitute for install/offline checks on an actual phone or desktop browser. Those remain **unverified** in this session; see "Known limitations" and `handoffs/M5.md`'s device matrix.
+- **Words:** `WORD_BANK` in `src/game/words.ts`. Each entry is `{ word, category }`, where the word is 4–8 upper-case letters A–Z and the category is not empty. At load, the bank is checked for duplicates (ignoring case) and for at least ten words of each length from 4 to 8, so a bad edit fails `npm test` and stops the game at startup instead of surfacing later as a repeat or a stuck level. `SEED_WORDS` in the same file is only for the test-only parameters.
+- **Levels:** `LEVELS` in `src/game/levels.ts` sets each level's word length and enemy speed. Every other tunable, including timings, point values, fruit thresholds and lifetime, and the extra-life threshold, is in `src/game/config.ts`, along with the enemy definitions.
+- **Maze:** `LEVEL_ONE_LAYOUT` in `src/game/mazeData.ts`, one string per row. Legend: `#` wall, `.` dot, `o` power pellet, a space for an empty corridor, `P` player start, `T` tunnel end (in matched pairs), `=` home door, `h` home interior, `E` enemy start slot. `createMaze` rejects an invalid layout at load: every corridor and dot must be reachable, tunnels must pair up, and the home must have exactly one door with a corridor outside it. Fruit appears on `P`. Enemy scatter corners and patrol waypoints in `config.ts` must name corridor tiles of the new layout. Then run `npm test` and `npm run test:e2e`, since several browser journeys steer by known tiles.
+- **Icons:** edit and run `scripts/generate-icons.mjs`, then commit `public/icons/`. `public/manifest.webmanifest` lists the icons. Adding or removing a file in `public/` needs no worker change, because the build discovers every file to cache.
 
 ## Known limitations
 
-- No human playtest and no real-device check for the M4 campaign or the M5 PWA behavior. Difficulty progression uses D017's starting enemy-speed values, unvalidated against play; automated browser journeys demonstrate the mechanics, not that the pacing feels right.
-- Automated evidence for the fruit and extra-life mechanics is a mix of real browser play and the deterministic unit/integration suite: reaching both fruit thresholds and the 10,000-point extra life through the authored maze's 200-plus dots is impractical to demonstrate live in full within a single browser journey, so `tests/fruit.test.ts` and `tests/score.test.ts` cover the threshold, ordering and persistence edges exactly, while `e2e/campaign.spec.ts` demonstrates one real fruit spawning, being collected, and the full five-level campaign with real capture, guesses and Next level actions. `e2e/layout-content.spec.ts`'s eight-letter-word journey happens to cross the 10,000-point threshold through ordinary real play across five levels, which is incidental evidence of that edge, not a dedicated test for it.
-- Mobile behavior is verified with browser emulation (360 × 640 portrait and 640 × 360 landscape) only. Real-device touch, installation and offline checks are **UNVERIFIED**: this session has no physical Android, iOS or desktop device or browser GUI available. `handoffs/M5.md` names the exact owner-run steps to resume this.
-- Reduced motion is verified through `prefers-reduced-motion` browser emulation (`page.emulateMedia`) and canvas pixel sampling, not on an OS with the preference genuinely set by a person.
-- Audio, music, sound effects and mute controls are excluded from the project (D016).
+- Pacing targets (about 1–3 minutes per level, a first catch within 10–25 seconds) and the 60 fps target are design goals, not measurements. The recorded human playtests were removed from scope by owner decision D024, and enemy speeds are the initial configured values.
+- Device installation and offline checks rest on the project owner's report that M5 device validation completed with no notes. Exact devices and browser versions were not recorded. The automated suites run in headless Chromium, with mobile as 360 × 640 and 640 × 360 emulation. They exercise the real production service worker, but they do not replace a phone.
+- Reduced motion is tested by emulating the media query and sampling canvas pixels, not with the setting turned on in a real OS.
+- The maze cannot be navigated without sight.
+- The first visit must be online; a stale cache may need the recovery steps above.
+- Audio, music, sound effects and mute controls are excluded from the project (D016). Also out of scope: multiplayer, accounts, leaderboards, saved runs, extra mazes and endless play.
 
-## Three-day delivery target
+## Credits and license
 
-| Day | Outcome | Focused time before contingency |
-| --- | --- | ---: |
-| 1 | Product definition, rules, scope, and milestones | 3–4 hours |
-| 2 | Playable maze, guessing loop, and core arcade mechanics | 6.5–8 hours |
-| 3 | Campaign, mobile/PWA completion, polish, testing, and documentation | 5–6.5 hours |
+The game design and all artwork are original to this project. The maze, player, ball, enemies and fruit are drawn at runtime with Canvas 2D shapes, and the app icons are generated by `scripts/generate-icons.mjs` from the same shapes. The interface uses the system font stack; no third-party images, fonts or sounds are included. The maze-chase genre is inspired by classic arcade games, but no original arcade assets, layouts or names are used.
 
-Base estimate: **16.5–20.5 focused hours**, including **8–11 hours of active Codex sessions**, across **9–10 sessions**, and **1.00–2.45 million cumulative model tokens**.
-
-Budget including contingency: **18.5–24 focused hours**, including **9–13 hours of active Codex sessions**, and **1.2–3.0 million cumulative model tokens**. Allow 1–2 additional repair sessions if needed. Active session time is included in focused work, not added to it.
-
-Tokens include cumulative input and output across model calls, repeated/cached context, and reported reasoning output where available. These are planning allowances, not measured usage or guarantees. [PRD section 9](PRD.md#9-session-and-token-estimates) is the source of truth for estimates and assumptions.
-
-Installation, offline, and release instructions are added as the corresponding milestones complete; the final setup guide is a Day 3 deliverable.
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE).

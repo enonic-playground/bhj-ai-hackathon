@@ -36,8 +36,8 @@ Normal flow: READY → IMPLEMENTING → REVIEW → ACCEPTED, with REVIEW → CHA
 
 ## Verification and handoffs
 
-- Use the actual repository scripts. At present no application or executable checks exist; do not invent commands or claim checks passed.
-- Once available, run type checking, applicable tests, and the production build at each implementation milestone. Include its manual exit demonstration. PWA checks must use the production build as specified in the PRD.
+- Use the actual repository scripts listed in `package.json` and the README (`npm ci`, `npm run typecheck`, `npm test`, `npm run build`, `npm run build:fixture`, `npm run test:e2e`); do not invent commands or claim checks passed. No lint script exists.
+- Run type checking, applicable tests, and the production build at each implementation milestone. Include its manual exit demonstration. PWA checks must use the production build as specified in the PRD.
 - For each acceptance criterion, link evidence or explicitly mark it unverified. Record failed checks, unavailable devices, and known limitations honestly. Tests and reviews do not substitute for required real-device checks.
 - Review correctness, game-state transitions, regressions, tests, maintainability, and relevant mobile/offline behavior. Prefer concrete defects over stylistic preferences already handled by tooling.
 - Before a handoff or ending a session, update status with owner, state, exact next action, blockers, and current handoff path. Keep implementation and review sections separate; append review rounds rather than erasing earlier findings.

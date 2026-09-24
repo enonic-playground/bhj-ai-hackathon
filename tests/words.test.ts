@@ -10,7 +10,6 @@ import {
   maskWord,
   normalizeLetter,
   normalizeWordKey,
-  selectSeedWord,
   selectWordForLevel,
   validateWordBank,
   validateWordEntry,
@@ -36,19 +35,6 @@ describe('seed word list', () => {
       expect(() => validateWordEntry({ word, category: 'Test' })).toThrow(WordValidationError);
     }
     expect(() => validateWordEntry({ word: 'APPLE', category: '  ' })).toThrow(WordValidationError);
-  });
-
-  it('selects a valid word and repeats a seeded sequence exactly', () => {
-    const first = Array.from({ length: 5 }, (_, index) =>
-      selectSeedWord(createSeededRandom(index)),
-    );
-    const second = Array.from({ length: 5 }, (_, index) =>
-      selectSeedWord(createSeededRandom(index)),
-    );
-    expect(first).toEqual(second);
-    for (const entry of first) {
-      expect(SEED_WORDS).toContain(entry);
-    }
   });
 
   it('offers all 26 letters for guessing', () => {
